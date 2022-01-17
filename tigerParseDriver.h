@@ -7,7 +7,7 @@ struct expAttrs {
 		Ty_ty type;
 		A_exp AST;
 };
-#include "tiger-grammar.tab.hh"
+#include "tiger-grammar.tab.hpp"
 
 
 // The tigerParseDriver class is closely based on the example from the documentation (i.e., copied and edited)

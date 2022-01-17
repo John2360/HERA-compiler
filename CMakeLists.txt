@@ -11,8 +11,9 @@ BISON_TARGET(TigerParser tiger-grammar.yy ${CMAKE_CURRENT_BINARY_DIR}/tiger-gram
 FLEX_TARGET(TigerScanner tiger-lex.ll  ${CMAKE_CURRENT_BINARY_DIR}/tiger-lex.yy.cpp)
 ADD_FLEX_BISON_DEPENDENCY(TigerScanner TigerParser)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 # Thanks, cmake.org., for the above and ...OUTPUTS dependencies on the list below
+#   but, note I added CMAKE_CURRENT_SOURCE_DIR to the above
    
 add_executable(tiger
   ${BISON_TigerParser_OUTPUTS}
