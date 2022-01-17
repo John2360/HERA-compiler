@@ -10,7 +10,8 @@
 
 #include <stdlib.h>
 #include "tigerParseDriver.h"
-#include "tiger-grammar.tab.hh"
+#include "tiger-grammar.tab.hpp"
+
 
 // next line from https://www.gnu.org/software/bison/manual/html_node/Calc_002b_002b-Scanner.html#Calc_002b_002b-Scanner
 static yy::location loc;

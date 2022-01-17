@@ -2,7 +2,7 @@
 // And refer to the example at https://www.gnu.org/software/bison/manual/html_node/A-Complete-C_002b_002b-Example.html#A-Complete-C_002b_002b-Example
 
 %skeleton "lalr1.cc" /* -*- C++ -*- */
-%require "3.0.4"
+%require "3.2"
 %defines
 %define api.parser.class {tigerParser}
 
