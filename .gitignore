@@ -2,6 +2,7 @@
 #*#
 .settings
 .idea
+.deps
 Tiger-output.hera
 AST_examples
 util_examples
