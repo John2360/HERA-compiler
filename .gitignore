@@ -6,12 +6,13 @@
 Tiger-output.hera
 AST_examples
 util_examples
+tiger-lex.yy.cpp
 lex.yy.cpp
 stack.hh
 location.hh
 position.hh
 tiger-grammar.tab.cpp
-tiger-grammar.tab.hh
+tiger-grammar.tab.hpp
 tiger-grammar.output
 .DS_Store
 .Trash
