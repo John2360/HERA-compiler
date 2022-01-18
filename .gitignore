@@ -3,6 +3,7 @@
 .settings
 .idea
 .deps
+cmake_build_debug
 Tiger-output.hera
 AST_examples
 util_examples
