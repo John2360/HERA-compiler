@@ -116,6 +116,7 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 
 
 \+		{ return yy::tigerParser::make_PLUS(loc); }
+\-      { return yy::tigerParser::make_MINUS(loc); }
 \*		{ return yy::tigerParser::make_TIMES(loc); }
 
 {integer}	{

@@ -44,7 +44,8 @@ class tigerParseDriver;
 
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
-%left PLUS 
+%left PLUS
+%left MINUS
 %left TIMES
 
 /* Attributes types for nonterminals are next, e.g. struct's from tigerParseDriver.h */
@@ -72,6 +73,10 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 												   A_plusOp,  $exp1.AST,$exp2.AST);
 								  EM_debug("Got plus expression.", $$.AST->pos());
 								}
+    | exp[exp1] MINUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+    												   A_minusOp,  $exp1.AST,$exp2.AST);
+    								  EM_debug("Got minus expression.", $$.AST->pos());
+    							}
 	| exp[exp1] TIMES exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_timesOp, $exp1.AST,$exp2.AST);
 								  EM_debug("Got times expression.", $$.AST->pos());
