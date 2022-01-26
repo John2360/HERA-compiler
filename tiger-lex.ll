@@ -119,6 +119,9 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 \-      { return yy::tigerParser::make_MINUS(loc); }
 \*		{ return yy::tigerParser::make_TIMES(loc); }
 
+\(		{ return yy::tigerParser::make_LPAREN(loc); }
+\)		{ return yy::tigerParser::make_RPAREN(loc); }
+
 {integer}	{
    return yy::tigerParser::make_INT(textToInt(yytext), loc);
    /* textToInt is defined above */

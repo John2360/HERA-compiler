@@ -80,6 +80,10 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 	| exp[exp1] TIMES exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_timesOp, $exp1.AST,$exp2.AST);
 								  EM_debug("Got times expression.", $$.AST->pos());
+								 }
+    | LPAREN exp[exp1] RPAREN	{ $$.AST = $exp1.AST;
+                                EM_debug("Got parentheses expression.", $$.AST->pos());
+    }
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,
 //        to refer to the first and third elements on the right-hand-side of the production.
@@ -90,7 +94,6 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 //        so we could use @exp1 to get it's information about the locations of exp1
 //        writing, e.g., Position::fromLex(@exp1) or instead of $exp1.AST->pos()
 //
-			  					}
 	;
 
 %%
