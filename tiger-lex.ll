@@ -1,3 +1,4 @@
+%x c_comment
 %{
 
 /* In this first section of the lex file (between %{ and %}),
@@ -94,7 +95,7 @@ integer	[0-9]+
    we could do this: */
 real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 
-
+/*  */
 comment \/\*[^\r]+\*\/
 
 /* In the third section of the lex file (after the %%),
@@ -111,6 +112,10 @@ comment \/\*[^\r]+\*\/
   // Code run each time yylex is called.
   loc.step();
 %}
+
+<comment>[^*\n]*        /* eat anything that's not a '*' */
+<comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
+<comment>"*"+"/"        BEGIN(INITIAL);
 
 [ \t]	{ loc.step(); }
 [\n\r]	{ loc.lines(yyleng); loc.step(); }
