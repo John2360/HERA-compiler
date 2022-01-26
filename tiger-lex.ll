@@ -95,6 +95,8 @@ integer	[0-9]+
 real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 
 
+comment \/\*[^\r]+\*\/
+
 /* In the third section of the lex file (after the %%),
    we can define the patterns for each token
    in terms of regular expressions and the variables above,
@@ -112,7 +114,7 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 
 [ \t]	{ loc.step(); }
 [\n\r]	{ loc.lines(yyleng); loc.step(); }
-\/\*[^\r]+\*\/   { loc.lines(yyleng); loc.step(); }
+{comment}   { loc.lines(yyleng); loc.step(); }
 
 
 \+		{ return yy::tigerParser::make_PLUS(loc); }
