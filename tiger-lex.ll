@@ -94,10 +94,6 @@ integer	[0-9]+
    we could do this: */
 real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 
-
-/* c++ style comment */
-comment /* \/\*[^\r]+\*\/
-
 /* In the third section of the lex file (after the %%),
    we can define the patterns for each token
    in terms of regular expressions and the variables above,
@@ -119,7 +115,7 @@ comment /* \/\*[^\r]+\*\/
 /* C++ style comments
  https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html
  */
- /*{comment} { loc.lines(yyleng); loc.step(); } */
+/* \/\*[^\r]+\*\/ { loc.lines(yyleng); loc.step(); }
 
 
 \+		{ return yy::tigerParser::make_PLUS(loc); }
