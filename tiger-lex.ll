@@ -109,6 +109,8 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 /* define IN_COMMENT
  loop which takes start of comment and then eats everything until it finds
  end of comment
+
+ resource: https://www.iith.ac.in/~ramakrishna/Compilers-Aug14/doc/flex.pdf
  */
 %x IN_COMMENT
 
@@ -132,9 +134,11 @@ Uncomment section to enable REGEX comment system:
 %}
 
 \/\*            { loc.lines(yyleng); loc.step(); BEGIN(IN_COMMENT); }
-<IN_COMMENT>\*\/ { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); }
-<IN_COMMENT>.    { loc.lines(yyleng); loc.step(); }
-<IN_COMMENT>\n   { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>[^*\n]* { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>[^*\n]*\n { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>"*"+[^*/\n]* { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>"*"+[^*/\n]*\n { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>"*"+"/" { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); }
 
 
 \+		{ return yy::tigerParser::make_PLUS(loc); }
