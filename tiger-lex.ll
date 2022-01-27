@@ -1,4 +1,3 @@
-%x c_comment
 %{
 
 /* In this first section of the lex file (between %{ and %}),
@@ -95,14 +94,23 @@ integer	[0-9]+
    we could do this: */
 real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 
-/*  */
-comment \/\*[^\r]+\*\/
+/* cpp style comment
+    uncomment below to enable REGEX and go to lines below
+    and uncomment other REGEX comment
+*/
+/* comment \/\*[^\r]+\*\/ */
 
 /* In the third section of the lex file (after the %%),
    we can define the patterns for each token
    in terms of regular expressions and the variables above,
    and give the action (as C++ code) for each token.
    Comments are legal only inside the actions. */
+
+/* define IN_COMMENT
+ loop which takes start of comment and then eats everything until it finds
+ end of comment
+ */
+%x IN_COMMENT
 
 %%
 
@@ -113,13 +121,20 @@ comment \/\*[^\r]+\*\/
   loc.step();
 %}
 
-<comment>[^*\n]*        /* eat anything that's not a '*' */
-<comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
-<comment>"*"+"/"        BEGIN(INITIAL);
-
 [ \t]	{ loc.step(); }
 [\n\r]	{ loc.lines(yyleng); loc.step(); }
+
+%{
+/*
+Uncomment section to enable REGEX comment system:
 {comment}   { loc.lines(yyleng); loc.step(); }
+*/
+%}
+
+\/\*            { loc.lines(yyleng); loc.step(); BEGIN(IN_COMMENT); }
+<IN_COMMENT>\*\/ { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); }
+<IN_COMMENT>.    { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>\n   { loc.lines(yyleng); loc.step(); }
 
 
 \+		{ return yy::tigerParser::make_PLUS(loc); }
