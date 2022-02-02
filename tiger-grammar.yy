@@ -25,11 +25,10 @@ class tigerParseDriver;
 #include "tigerParseDriver.h"
 %}
 
-%token END  0
-%token <bool> BOOL
-%token <int>  INT
-%token <std::string> ID STRING
-
+%token END  0;
+%token <bool> BOOL;
+%token <int>  INT;
+%token <std::string> ID STRING;
 // NOTE that bison complains if you have the same symbol listed as %token (above) and %type (below)
 //      so if you want to add attributes to a token, remove it from the list below
 
@@ -83,7 +82,10 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 								 }
     | LPAREN exp[exp1] RPAREN	{ $$.AST = $exp1.AST;
                                 EM_debug("Got parentheses expression.", $$.AST->pos());
-    }
+                                }
+    | ID LPAREN exp[exp1] RPAREN {
+                                EM_debug("Got ID expression.";
+        }
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,
 //        to refer to the first and third elements on the right-hand-side of the production.

@@ -100,6 +100,9 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 */
 /* comment \/\*[^\r]+\*\/ */
 
+/* indentifier */
+identifier [a-zA-Z][a-zA-Z0-9_]*
+
 /* In the third section of the lex file (after the %%),
    we can define the patterns for each token
    in terms of regular expressions and the variables above,
@@ -147,6 +150,8 @@ Uncomment section to enable REGEX comment system:
 
 \(		{ return yy::tigerParser::make_LPAREN(loc); }
 \)		{ return yy::tigerParser::make_RPAREN(loc); }
+
+{identifier}   { return yy::tigerParser::make_ID(yytext, loc); }
 
 {integer}	{
    return yy::tigerParser::make_INT(textToInt(yytext), loc);
