@@ -84,7 +84,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                 EM_debug("Got parentheses expression.", $$.AST->pos());
                                 }
     | ID LPAREN exp[exp1] RPAREN {
-                                EM_debug("Got ID expression.";
+                                EM_debug("Got ID expression.");
         }
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,
