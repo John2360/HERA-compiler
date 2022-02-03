@@ -51,3 +51,13 @@ string A_opExp_::HERA_code()
 					_right->result_reg_s() + ")\n");
 	return _left->HERA_code() + _right->HERA_code() + my_code;
 }
+
+
+string A_callExp_::HERA_code()
+{
+    string my_code;
+    my_code += "SET(R1, test) \n";
+    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+") \n";
+
+    return my_code;
+}

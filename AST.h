@@ -388,6 +388,8 @@ class A_callExp_ : public A_exp_ {
 public:
 	A_callExp_(A_pos pos, Symbol func, A_expList args);
 	virtual string print_rep(int indent, bool with_attributes);
+    virtual string HERA_code();
+
 private:
 	Symbol _func;
 	A_expList _args;
