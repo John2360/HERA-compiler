@@ -83,7 +83,8 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
     | LPAREN exp[exp1] RPAREN	{ $$.AST = $exp1.AST;
                                 EM_debug("Got parentheses expression.", $$.AST->pos());
                                 }
-    | ID LPAREN exp[exp1] RPAREN { $$.AST = $exp1.AST;
+    | ID LPAREN exp[exp1] RPAREN {
+                                $$.AST = $exp1.AST;
                                 EM_debug("Got ID expression.");
                                 }
 //
