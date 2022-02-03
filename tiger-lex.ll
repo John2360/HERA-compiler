@@ -98,7 +98,7 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
     uncomment below to enable REGEX and go to lines below
     and uncomment other REGEX comment
 */
-comment \/\*(.*?)\*\/
+comment \/\*((.|\s)*?)\*\/
 
 /* indentifier */
 identifier [a-zA-Z][a-zA-Z0-9_]*
