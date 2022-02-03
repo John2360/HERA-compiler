@@ -98,7 +98,7 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
     uncomment below to enable REGEX and go to lines below
     and uncomment other REGEX comment
 */
-/* comment \/\*[^\r]+\*\/ */
+comment \/\*[^\r]+\*\/
 
 /* indentifier */
 identifier [a-zA-Z][a-zA-Z0-9_]*
@@ -129,19 +129,9 @@ identifier [a-zA-Z][a-zA-Z0-9_]*
 [ \t]	{ loc.step(); }
 [\n\r]	{ loc.lines(yyleng); loc.step(); }
 
-%{
-/*
-Uncomment section to enable REGEX comment system:
-{comment}   { loc.lines(yyleng); loc.step(); }
-*/
-%}
 
-\/\*            { loc.lines(yyleng); loc.step(); BEGIN(IN_COMMENT); }
-<IN_COMMENT>[^*\n]* { loc.lines(yyleng); loc.step(); }
-<IN_COMMENT>[^*\n]*\n { loc.lines(yyleng); loc.step(); }
-<IN_COMMENT>"*"+[^*/\n]* { loc.lines(yyleng); loc.step(); }
-<IN_COMMENT>"*"+[^*/\n]*\n { loc.lines(yyleng); loc.step(); }
-<IN_COMMENT>"*"+"/" { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); }
+{comment}   { loc.lines(yyleng); loc.step(); }
+
 
 
 \+		{ return yy::tigerParser::make_PLUS(loc); }

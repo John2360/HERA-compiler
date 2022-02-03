@@ -43,8 +43,7 @@ class tigerParseDriver;
 
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
-%left PLUS
-%left MINUS
+%left MINUS PLUS
 %left TIMES
 
 /* Attributes types for nonterminals are next, e.g. struct's from tigerParseDriver.h */
