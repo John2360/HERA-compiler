@@ -86,7 +86,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
     | ID[name] LPAREN exp[exp1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $exp1.AST->pos()),
                                                                 to_Symbol($name),
                                                                 A_ExpList($exp1.AST, 0));
-                                EM_debug("Got function call to "+$name);
+                                EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,
