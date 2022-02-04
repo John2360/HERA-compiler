@@ -75,19 +75,19 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 	| exp[exp1] PLUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_plusOp,  $exp1.AST,$exp2.AST);
 							      $$.type = Ty_Int();
-							      if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, + needs integer operands", false, $$.AST->pos());
+							      if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, + needs integer operands", true, $$.AST->pos());
 								  EM_debug("Got plus expression.", $$.AST->pos());
 								}
     | exp[exp1] MINUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
     												   A_minusOp,  $exp1.AST,$exp2.AST);
 							      $$.type = Ty_Int();
-							      if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, - needs integer operands", false, $$.AST->pos());
+							      if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, - needs integer operands", true, $$.AST->pos());
     						      EM_debug("Got minus expression.", $$.AST->pos());
     							}
 	| exp[exp1] TIMES exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_timesOp, $exp1.AST,$exp2.AST);
                                   $$.type = Ty_Int();
-                                  if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, * needs integer operands", false, $$.AST->pos());
+                                  if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, * needs integer operands", true, $$.AST->pos());
 								  EM_debug("Got times expression.", $$.AST->pos());
 								 }
     | LPAREN exp[exp1] RPAREN	{ $$.AST = $exp1.AST;
@@ -98,8 +98,8 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                                                 to_Symbol($name),
                                                                 A_ExpList($exp1.AST, 0));
                                   $$.type = Ty_Void();
-                                  if ($name == "print" && $exp1.type != Ty_String()) EM_error("Wait, print needs string arg", false, $$.AST->pos());
-                                  if ($name == "printint" && $exp1.type != Ty_Int()) EM_error("Wait, print needs integer arg", false, $$.AST->pos());
+                                  if ($name == "print" && $exp1.type != Ty_String()) EM_error("Wait, print needs string arg", true, $$.AST->pos());
+                                  if ($name == "printint" && $exp1.type != Ty_Int()) EM_error("Wait, print needs integer arg", true, $$.AST->pos());
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }
