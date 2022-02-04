@@ -19,12 +19,9 @@ string A_callExp_::HERA_data()
 
 string A_stringExp_::HERA_data()
 {
-    string quoteless_quote = value;
-    quoteless_quote = quoteless_quote.erase(0, 1);
-    quoteless_quote = quoteless_quote.erase(quoteless_quote.size() - 1);
 
     string my_code;
     my_code += "DLABEL(the_string) \n";
-    my_code += indent + "LP_STRING("+ repr(quoteless_quote)+") \n\n";
+    my_code += indent + "LP_STRING("+ repr(value)+") \n\n";
     return my_code;
 }

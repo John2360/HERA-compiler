@@ -18,6 +18,7 @@ static yy::location loc;
 
 // allows to keep track of nested comments
 int comment_nesting = 0;
+std::string string_input = "";
 
 // The function below is somewhat overly verbose;
 //  it is designed to serve as an example of
@@ -126,6 +127,7 @@ string \"(.|\s)+?\"
  resource: https://www.iith.ac.in/~ramakrishna/Compilers-Aug14/doc/flex.pdf
  */
 %x IN_COMMENT
+%x S_STRING
 
 %%
 
@@ -160,7 +162,15 @@ string \"(.|\s)+?\"
 
 {identifier}   { return yy::tigerParser::make_ID(yytext, loc); }
 
-{string}   { return yy::tigerParser::make_STRING(yytext, loc); }
+\"             { BEGIN(S_STRING); }
+<S_STRING>{
+  [^"\\]+       { string_input += yytext; loc.lines(yyleng); loc.step(); }
+  \\n           { string_input += '\n'; loc.lines(yyleng); loc.step(); }
+  \\t           { string_input += '\t'; loc.lines(yyleng); loc.step(); }
+   /* Etc. Handle other escape sequences similarly */
+  \"            { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); return yy::tigerParser::make_STRING(string_input, loc); }
+     /* See below */
+}
 
 {integer}	{
    return yy::tigerParser::make_INT(textToInt(yytext), loc);
