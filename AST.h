@@ -309,6 +309,7 @@ public:
 	A_intExp_(A_pos pos, int i);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    virtual string HERA_data();
 	virtual string HERA_code();
 private:
 	int value;
@@ -360,7 +361,9 @@ class A_opExp_ : public A_exp_ {
 public:
 	A_opExp_(A_pos pos, A_oper oper, A_exp left, A_exp right);
 	virtual string print_rep(int indent, bool with_attributes);
-	virtual string HERA_code();
+
+    virtual string HERA_data();
+    virtual string HERA_code();
 
 	void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 	virtual int compute_height();  // just for an example, not needed to compile
