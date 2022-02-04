@@ -4,3 +4,13 @@
 <IN_COMMENT>"*"+[^*/\n]* { loc.lines(yyleng); loc.step(); }
 <IN_COMMENT>"*"+[^*/\n]*\n { loc.lines(yyleng); loc.step(); }
 <IN_COMMENT>"*"+"/" { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); }
+
+
+<INITIAL>"/*"         { loc.lines(yyleng); loc.step(); BEGIN(IN_COMMENT); }
+<IN_COMMENT>"*/"      { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); }
+<IN_COMMENT>[^*\n]+   { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>"*"       { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>\n        { loc.lines(yyleng); loc.step(); }
+
+COMMENT REGEX::
+comment "/*"([^*]|(\*+[^*/]))*\*+\/

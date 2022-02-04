@@ -97,8 +97,12 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 /* cpp style comment
     uncomment below to enable REGEX and go to lines below
     and uncomment other REGEX comment
+
+    add code from outtake labeled comments below comment!!
+
+    add below newline definition
+    {comment}   { loc.lines(yyleng); loc.step(); }
 */
-comment "/*"([^*]|(\*+[^*/]))*\*+\/
 
 /* indentifier */
 identifier [a-zA-Z][a-zA-Z0-9_]*
@@ -129,10 +133,11 @@ identifier [a-zA-Z][a-zA-Z0-9_]*
 [ \t]	{ loc.step(); }
 [\n\r]	{ loc.lines(yyleng); loc.step(); }
 
-
-{comment}   { loc.lines(yyleng); loc.step(); }
-
-
+<INITIAL>\/\*         { loc.lines(yyleng); loc.step(); BEGIN(IN_COMMENT); }
+<IN_COMMENT>\*\/      { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); }
+<IN_COMMENT>[^*\n]+   { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>\*       { loc.lines(yyleng); loc.step(); }
+<IN_COMMENT>\n        { loc.lines(yyleng); loc.step(); }
 
 \+		{ return yy::tigerParser::make_PLUS(loc); }
 \-      { return yy::tigerParser::make_MINUS(loc); }
