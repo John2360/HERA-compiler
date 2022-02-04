@@ -17,7 +17,7 @@ string AST_node_::HERA_code()  // Default used during development; could be remo
 
 string A_root_::HERA_code()
 {
-	return "CBON()\n\n" + main_expr->HERA_code();  // was SETCB for HERA 2.3
+	return  main_expr->HERA_data() +"CBON()\n\n" + main_expr->HERA_code();  // was SETCB for HERA 2.3
 }
 
 
@@ -25,6 +25,14 @@ string A_root_::HERA_code()
 string A_intExp_::HERA_code()
 {
 	return indent_math + "SET(" + result_reg_s() + ", " + str(value) +")\n";
+}
+
+string A_stringExp_::HERA_code()
+{
+    string my_code;
+    my_code += "SET("+this->result_reg_s()+", the_string)\n";
+
+    return my_code;
 }
 
 

@@ -28,8 +28,8 @@ if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     endif()
 endif()
 
-find_package(bison REQUIRED)
-find_package(flex REQUIRED)
+find_package(BISON REQUIRED)
+find_package(FLEX REQUIRED)
 
 BISON_TARGET(TigerParser tiger-grammar.yy ${CMAKE_CURRENT_BINARY_DIR}/tiger-grammar.tab.cpp)
 FLEX_TARGET(TigerScanner tiger-lex.ll  ${CMAKE_CURRENT_BINARY_DIR}/tiger-lex.yy.cpp)
@@ -59,6 +59,6 @@ add_executable(tiger
   typecheck
   types
   util
-)
+        HERA_data.cpp)
 
 include_directories(/home/courses/include ../HaverfordCS/include)

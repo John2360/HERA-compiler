@@ -67,6 +67,9 @@ program: exp[main]	{ EM_debug("Got the main expression of our tiger program.", $
 exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 								  EM_debug("Got int " + str($i), $$.AST->pos());
 								}
+    | STRING[i]					{ $$.AST = A_StringExp(Position::fromLex(@i), $i);
+      								  EM_debug("Got str " + $i, $$.AST->pos());
+      								}
 	| exp[exp1] PLUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_plusOp,  $exp1.AST,$exp2.AST);
 								  EM_debug("Got plus expression.", $$.AST->pos());

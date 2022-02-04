@@ -220,6 +220,7 @@ public:
 	
 	// And now, the attributes that exist in ALL kinds of AST nodes.
 	//  See Design_Documents/AST_Attributes.txt for details.
+    virtual string HERA_data();
 	virtual string HERA_code();  // defaults to a warning, with HERA code that would error if compiled; could be "=0" in final compiler
 
 	int height();  // example we'll play with in class, not actually needed to compile
@@ -317,6 +318,9 @@ class A_stringExp_ : public A_leafExp_ {
 public:
 	A_stringExp_(A_pos pos, String s);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    virtual string HERA_data();
+    virtual string HERA_code();
 private:
 	String value;
 };
@@ -388,6 +392,8 @@ class A_callExp_ : public A_exp_ {
 public:
 	A_callExp_(A_pos pos, Symbol func, A_expList args);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    virtual string HERA_data();
     virtual string HERA_code();
 
 private:

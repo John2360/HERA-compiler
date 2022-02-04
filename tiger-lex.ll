@@ -110,6 +110,9 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 /* indentifier */
 identifier [a-zA-Z][a-zA-Z0-9_]*
 
+/* string */
+string \"(.|\s)+?\"
+
 /* In the third section of the lex file (after the %%),
    we can define the patterns for each token
    in terms of regular expressions and the variables above,
@@ -138,13 +141,14 @@ identifier [a-zA-Z][a-zA-Z0-9_]*
 
 \/\*             { BEGIN(IN_COMMENT); }
 <IN_COMMENT>{
-  \/\*           { ++comment_nesting; }
-  \*+\/        { if (comment_nesting) --comment_nesting;
+    \/\*           { loc.lines(yyleng); loc.step(); ++comment_nesting; }
+    \*+\/        { loc.lines(yyleng); loc.step();
+                    if (comment_nesting) --comment_nesting;
                    else BEGIN(INITIAL); }
-  \*+           ; /* Line 11 */
-  [^/*\n]+       ; /* Line 12 */
-  [/]            ; /* Line 13 */
-  \n             ; /* Line 14 */
+    \*+           { loc.lines(yyleng); loc.step(); }
+    [^/*\n]+      { loc.lines(yyleng); loc.step(); }
+    [/]           { loc.lines(yyleng); loc.step(); }
+    \n            { loc.lines(yyleng); loc.step(); }
 }
 
 \+		{ return yy::tigerParser::make_PLUS(loc); }
@@ -155,6 +159,8 @@ identifier [a-zA-Z][a-zA-Z0-9_]*
 \)		{ return yy::tigerParser::make_RPAREN(loc); }
 
 {identifier}   { return yy::tigerParser::make_ID(yytext, loc); }
+
+{string}   { return yy::tigerParser::make_STRING(yytext, loc); }
 
 {integer}	{
    return yy::tigerParser::make_INT(textToInt(yytext), loc);
