@@ -91,6 +91,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 								  EM_debug("Got times expression.", $$.AST->pos());
 								 }
     | LPAREN exp[exp1] RPAREN	{ $$.AST = $exp1.AST;
+                                $$.type = $exp1.type;
                                 EM_debug("Got parentheses expression.", $$.AST->pos());
                                 }
     // maybe have to add 1 to position
