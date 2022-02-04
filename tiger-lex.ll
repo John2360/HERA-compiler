@@ -16,6 +16,9 @@
 // next line from https://www.gnu.org/software/bison/manual/html_node/Calc_002b_002b-Scanner.html#Calc_002b_002b-Scanner
 static yy::location loc;
 
+// allows to keep track of nested comments
+int comment_nesting = 0;
+
 // The function below is somewhat overly verbose;
 //  it is designed to serve as an example of
 //  (a) calling a C function to process something from lex (see the "INT" pattern below), and
@@ -133,11 +136,16 @@ identifier [a-zA-Z][a-zA-Z0-9_]*
 [ \t]	{ loc.step(); }
 [\n\r]	{ loc.lines(yyleng); loc.step(); }
 
-<INITIAL>\/\*         { loc.lines(yyleng); loc.step(); BEGIN(IN_COMMENT); }
-<IN_COMMENT>\*\/      { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); }
-<IN_COMMENT>[^*\n]+   { loc.lines(yyleng); loc.step(); }
-<IN_COMMENT>\*       { loc.lines(yyleng); loc.step(); }
-<IN_COMMENT>\n        { loc.lines(yyleng); loc.step(); }
+\/\*             { BEGIN(IN_COMMENT); }
+<IN_COMMENT>{
+  \/\*           { ++comment_nesting; }
+  \*+\/        { if (comment_nesting) --comment_nesting;
+                   else BEGIN(INITIAL); }
+  \*+           ; /* Line 11 */
+  [^/*\n]+       ; /* Line 12 */
+  [/]            ; /* Line 13 */
+  \n             ; /* Line 14 */
+}
 
 \+		{ return yy::tigerParser::make_PLUS(loc); }
 \-      { return yy::tigerParser::make_MINUS(loc); }
