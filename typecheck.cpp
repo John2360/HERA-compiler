@@ -16,7 +16,7 @@ void typecheck(AST_node_ *root)
 	//  assuming "root" is the root of a tiger AST.
 	// It should call on some functions to define the attributes
 	//  related to type checking (and, in so doing, produce any necessary error messages).
-	
+
 }
 
 // The bodies of other type checking functions,

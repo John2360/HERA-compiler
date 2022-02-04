@@ -66,20 +66,28 @@ program: exp[main]	{ EM_debug("Got the main expression of our tiger program.", $
 
 exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 								  EM_debug("Got int " + str($i), $$.AST->pos());
+								  $$.type = Ty_Int();
 								}
     | STRING[i]					{ $$.AST = A_StringExp(Position::fromLex(@i), $i);
       								  EM_debug("Got str " + $i, $$.AST->pos());
+      								  $$.type = Ty_String();
       								}
 	| exp[exp1] PLUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_plusOp,  $exp1.AST,$exp2.AST);
+							      $$.type = Ty_Int();
+							      if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, + needs integer operands", false, $$.AST->pos());
 								  EM_debug("Got plus expression.", $$.AST->pos());
 								}
     | exp[exp1] MINUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
     												   A_minusOp,  $exp1.AST,$exp2.AST);
-    								  EM_debug("Got minus expression.", $$.AST->pos());
+							      $$.type = Ty_Int();
+							      if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, - needs integer operands", false, $$.AST->pos());
+    						      EM_debug("Got minus expression.", $$.AST->pos());
     							}
 	| exp[exp1] TIMES exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_timesOp, $exp1.AST,$exp2.AST);
+                                  $$.type = Ty_Int();
+                                  if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, * needs integer operands", false, $$.AST->pos());
 								  EM_debug("Got times expression.", $$.AST->pos());
 								 }
     | LPAREN exp[exp1] RPAREN	{ $$.AST = $exp1.AST;
@@ -89,7 +97,11 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
     | ID[name] LPAREN exp[exp1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $exp1.AST->pos()),
                                                                 to_Symbol($name),
                                                                 A_ExpList($exp1.AST, 0));
-                                EM_debug("Got function call to "+$name, $$.AST->pos());
+                                  $$.type = Ty_Void();
+                                  if ($name == "print" && $exp1.type != Ty_String()) EM_error("Wait, print needs string arg", false, $$.AST->pos());
+                                  if ($name == "printint" && $exp1.type != Ty_Int()) EM_error("Wait, print needs integer arg", false, $$.AST->pos());
+
+                                  EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,
