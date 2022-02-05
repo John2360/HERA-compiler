@@ -48,6 +48,7 @@ class tigerParseDriver;
 
 /* Attributes types for nonterminals are next, e.g. struct's from tigerParseDriver.h */
 %type <expAttrs>  exp
+%type <expAttrs>  seq
 
 
 // The line below means our grammar must not have conflicts
@@ -63,6 +64,16 @@ program: exp[main]	{ EM_debug("Got the main expression of our tiger program.", $
 		 			  driver.AST = new A_root_($main.AST);
 		 			}
 	;
+
+seq:
+    | exp[exp1] SEMICOLON exp[exp2] seq    { $$.AST = A_SeqExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+                                                                        A_ExpList($exp1.AST,
+                                                                        A_ExpList($exp2.AST, 0)
+                                                                       ));
+                                        $$.type = $exp2.type;
+                                        EM_debug("Got semicolon seq expression.", $$.AST->pos());
+}
+;
 
 exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 								  EM_debug("Got int " + str($i), $$.AST->pos());
@@ -94,8 +105,12 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                 $$.type = $exp1.type;
                                 EM_debug("Got parentheses expression.", $$.AST->pos());
                                 }
-    // maybe have to add 1 to position
-    | ID[name] LPAREN exp[exp1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $exp1.AST->pos()),
+    | LPAREN seq[seq1] RPAREN { $$.AST = $seq1.AST;
+                                $$.type = $seq1.type;
+                                EM_debug("Got seq expression.", $$.AST->pos());
+                                }
+    /* CONDENSE THIS */
+    | ID[name] LPAREN seq[exp1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $exp1.AST->pos()),
                                                                 to_Symbol($name),
                                                                 A_ExpList($exp1.AST, 0));
                                   $$.type = Ty_Void();
@@ -104,6 +119,15 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }
+    | ID[name] LPAREN exp[exp1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $exp1.AST->pos()),
+                                                                    to_Symbol($name),
+                                                                    A_ExpList($exp1.AST, 0));
+                                      $$.type = Ty_Void();
+                                      if ($name == "print" && $exp1.type != Ty_String()) EM_error("Wait, print needs string arg", true, $$.AST->pos());
+                                      if ($name == "printint" && $exp1.type != Ty_Int()) EM_error("Wait, print needs integer arg", true, $$.AST->pos());
+
+                                      EM_debug("Got function call to "+$name, $$.AST->pos());
+                                    }
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,
 //        to refer to the first and third elements on the right-hand-side of the production.

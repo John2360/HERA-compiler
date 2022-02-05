@@ -69,3 +69,18 @@ string A_callExp_::HERA_code()
 
     return _args->_head->HERA_code() + my_code;
 }
+
+string A_seqExp_::HERA_code()
+{
+    return _seq->HERA_code();
+}
+
+string A_expList_::HERA_code() {
+    string my_code;
+    my_code += _head->HERA_code();
+
+    if (_tail != 0){
+        my_code += _tail->HERA_code();
+    }
+    return my_code;
+}

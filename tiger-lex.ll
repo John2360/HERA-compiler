@@ -153,6 +153,7 @@ string \"(.|\s)+?\"
     \n            { loc.lines(yyleng); loc.step(); }
 }
 
+\;		{ return yy::tigerParser::make_SEMICOLON(loc); }
 \+		{ return yy::tigerParser::make_PLUS(loc); }
 \-      { return yy::tigerParser::make_MINUS(loc); }
 \*		{ return yy::tigerParser::make_TIMES(loc); }

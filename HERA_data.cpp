@@ -26,6 +26,21 @@ string A_callExp_::HERA_data()
     return _args->_head->HERA_data();
 }
 
+string A_seqExp_::HERA_data()
+{
+    return _seq->HERA_data();
+}
+
+string A_expList_::HERA_data() {
+    string my_code;
+    my_code += _head->HERA_data();
+
+    if (_tail != 0){
+        my_code += _tail->HERA_data();
+    }
+    return my_code;
+}
+
 string A_stringExp_::HERA_data()
 {
 

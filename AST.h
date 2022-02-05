@@ -443,6 +443,9 @@ class A_seqExp_ : public A_controlExp_ {
 public:
 	A_seqExp_(A_pos pos, A_expList seq);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    virtual string HERA_data();
+    virtual string HERA_code();
 private:
 	A_expList _seq;
 };
@@ -484,6 +487,10 @@ class A_expList_ : public AST_node_ {
 public:
 	A_expList_(A_exp head, A_expList tail);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    virtual string HERA_data();
+    virtual string HERA_code();
+
 	int length();
 	A_exp _head;
 	A_expList _tail;
