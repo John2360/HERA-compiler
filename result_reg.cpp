@@ -6,6 +6,7 @@
 
 
 static int next_unique_number = 1;
+static int next_unique_string_number = 0;
 
 int A_exp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
@@ -14,4 +15,14 @@ int A_exp_::init_result_reg()  // generate unique numbers, starting from 1, each
 	next_unique_number = next_unique_number + 1;
 	// end of atomic transaction
 	return my_number;
+}
+
+string A_exp_::init_result_dlabel()  // generate unique numbers, starting from 1, each time this is called
+{
+    // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
+    int my_number = next_unique_string_number;
+    next_unique_string_number = next_unique_string_number + 1;
+    std::string my_string = "my_string_"+str(next_unique_string_number);
+    // end of atomic transaction
+    return my_string;
 }

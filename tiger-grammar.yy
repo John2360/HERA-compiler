@@ -65,12 +65,15 @@ program: exp[main]	{ EM_debug("Got the main expression of our tiger program.", $
 		 			}
 	;
 
-seq:
-    | exp[exp1] SEMICOLON exp[exp2] seq    { $$.AST = A_SeqExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+seq: exp[i]					{ $$.AST = $i.AST;
+      								  EM_debug("Got exp in seq", $$.AST->pos());
+      								  $$.type = $i.type;
+      								}
+    | exp[exp1] SEMICOLON seq[seq1]    { $$.AST = A_SeqExp(Position::range($exp1.AST->pos(), $seq1.AST->pos()),
                                                                         A_ExpList($exp1.AST,
-                                                                        A_ExpList($exp2.AST, 0)
+                                                                            A_ExpList($seq1.AST, 0)
                                                                        ));
-                                        $$.type = $exp2.type;
+                                        $$.type = $exp1.type;
                                         EM_debug("Got semicolon seq expression.", $$.AST->pos());
 }
 ;
@@ -101,15 +104,10 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                   if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, * needs integer operands", true, $$.AST->pos());
 								  EM_debug("Got times expression.", $$.AST->pos());
 								 }
-    | LPAREN exp[exp1] RPAREN	{ $$.AST = $exp1.AST;
-                                $$.type = $exp1.type;
-                                EM_debug("Got parentheses expression.", $$.AST->pos());
-                                }
     | LPAREN seq[seq1] RPAREN { $$.AST = $seq1.AST;
                                 $$.type = $seq1.type;
                                 EM_debug("Got seq expression.", $$.AST->pos());
                                 }
-    /* CONDENSE THIS */
     | ID[name] LPAREN seq[exp1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $exp1.AST->pos()),
                                                                 to_Symbol($name),
                                                                 A_ExpList($exp1.AST, 0));
@@ -119,15 +117,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }
-    | ID[name] LPAREN exp[exp1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $exp1.AST->pos()),
-                                                                    to_Symbol($name),
-                                                                    A_ExpList($exp1.AST, 0));
-                                      $$.type = Ty_Void();
-                                      if ($name == "print" && $exp1.type != Ty_String()) EM_error("Wait, print needs string arg", true, $$.AST->pos());
-                                      if ($name == "printint" && $exp1.type != Ty_Int()) EM_error("Wait, print needs integer arg", true, $$.AST->pos());
 
-                                      EM_debug("Got function call to "+$name, $$.AST->pos());
-                                    }
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,
 //        to refer to the first and third elements on the right-hand-side of the production.

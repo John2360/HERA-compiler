@@ -163,7 +163,7 @@ string \"(.|\s)+?\"
 
 {identifier}   { return yy::tigerParser::make_ID(yytext, loc); }
 
-\"             { BEGIN(S_STRING); }
+\"             { string_input = ""; BEGIN(S_STRING); }
 <S_STRING>{
   [^"\\]+       { string_input += yytext; loc.lines(yyleng); loc.step(); }
   \\n           { string_input += '\n'; loc.lines(yyleng); loc.step(); }

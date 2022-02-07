@@ -45,7 +45,7 @@ string A_stringExp_::HERA_data()
 {
 
     string my_code;
-    my_code += "DLABEL(the_string) \n";
+    my_code += "DLABEL("+this->result_dlabel()+") \n";
     my_code += indent + "LP_STRING("+ repr(value)+") \n\n";
     return my_code;
 }

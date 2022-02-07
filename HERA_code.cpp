@@ -30,7 +30,7 @@ string A_intExp_::HERA_code()
 string A_stringExp_::HERA_code()
 {
     string my_code;
-    my_code += "SET("+this->result_reg_s()+", the_string)\n";
+    my_code += "SET("+this->result_reg_s()+", "+this->result_dlabel()+")\n";
 
     return my_code;
 }
@@ -64,8 +64,8 @@ string A_opExp_::HERA_code()
 string A_callExp_::HERA_code()
 {
     string my_code;
-    my_code += "MOVE(R1, "+_args->_head->result_reg_s()+") \n";
-    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+") \n";
+    my_code += "MOVE(R1, "+_args->_head->result_dlabel()+") \n";
+    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+") \n\n";
 
     return _args->_head->HERA_code() + my_code;
 }
