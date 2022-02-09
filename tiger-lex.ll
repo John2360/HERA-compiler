@@ -157,6 +157,8 @@ string \"(.|\s)+?\"
 \+		{ return yy::tigerParser::make_PLUS(loc); }
 \-      { return yy::tigerParser::make_MINUS(loc); }
 \*		{ return yy::tigerParser::make_TIMES(loc); }
+\/		{ return yy::tigerParser::make_DIVIDE(loc); }
+
 
 \(		{ return yy::tigerParser::make_LPAREN(loc); }
 \)		{ return yy::tigerParser::make_RPAREN(loc); }
@@ -168,7 +170,7 @@ string \"(.|\s)+?\"
   [^"\\]+       { string_input += yytext; loc.lines(yyleng); loc.step(); }
   \\n           { string_input += '\n'; loc.lines(yyleng); loc.step(); }
   \\t           { string_input += '\t'; loc.lines(yyleng); loc.step(); }
-   /* Etc. Handle other escape sequences similarly */
+   /* Above handle escape strings; Then get out. */
   \"            { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); return yy::tigerParser::make_STRING(string_input, loc); }
      /* See below */
 }

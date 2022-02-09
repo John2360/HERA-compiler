@@ -44,7 +44,7 @@ class tigerParseDriver;
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
 %left MINUS PLUS
-%left TIMES
+%left TIMES DIVIDE
 
 /* Attributes types for nonterminals are next, e.g. struct's from tigerParseDriver.h */
 %type <expAttrs>  exp
@@ -104,6 +104,13 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                   if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, * needs integer operands", true, $$.AST->pos());
 								  EM_debug("Got times expression.", $$.AST->pos());
 								 }
+	| exp[exp1] DIVIDE exp[exp2]	{  $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+                                                       A_divideOp, $exp1.AST,$exp2.AST);
+                                         $$.type = Ty_Int();
+                                         if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, / needs integer operands", true, $$.AST->pos());
+                                      EM_debug("Got divide expression.", $$.AST->pos());
+
+    								 }
     | LPAREN seq[seq1] RPAREN { $$.AST = $seq1.AST;
                                 $$.type = $seq1.type;
                                 EM_debug("Got seq expression.", $$.AST->pos());
@@ -114,6 +121,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                   $$.type = Ty_Void();
                                   if ($name == "print" && $exp1.type != Ty_String()) EM_error("Wait, print needs string arg", true, $$.AST->pos());
                                   if ($name == "printint" && $exp1.type != Ty_Int()) EM_error("Wait, print needs integer arg", true, $$.AST->pos());
+                                  if ($name == "mod" && $exp1.type != Ty_Int()) EM_error("Wait, mod needs integer arg", true, $$.AST->pos());
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }

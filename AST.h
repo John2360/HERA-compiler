@@ -251,6 +251,10 @@ public:
         if (stored_dlabel == "") this->stored_dlabel = this->init_result_dlabel();
         return stored_dlabel;
     }
+    bool is_dlabel(){
+        if (stored_dlabel == "") return false;
+        return true;
+    }
 	string result_reg_s() { // return in string form, e.g. "R2"
 		return "R" + std::to_string(this->result_reg());
 	}
@@ -315,9 +319,20 @@ public:
 	A_intExp_(A_pos pos, int i);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    int    result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+    virtual int init_result_reg();
+
+
     virtual string HERA_data();
 	virtual string HERA_code();
 private:
+    int stored_result_reg = -1;
 	int value;
 };
 
@@ -360,7 +375,7 @@ private:
 	A_var _var;
 };
 
-typedef enum {A_plusOp, A_minusOp, A_timesOp, A_divideOp,
+typedef enum {A_plusOp, A_minusOp, A_timesOp, A_divideOp, A_modOp,
 	     A_eqOp, A_neqOp, A_ltOp, A_leOp, A_gtOp, A_geOp} A_oper;
 
 class A_opExp_ : public A_exp_ {
@@ -368,12 +383,23 @@ public:
 	A_opExp_(A_pos pos, A_oper oper, A_exp left, A_exp right);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    int    result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+    virtual int init_result_reg();
+
     virtual string HERA_data();
     virtual string HERA_code();
 
 	void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 	virtual int compute_height();  // just for an example, not needed to compile
 private:
+    int stored_result_reg = -1;
+
 	A_oper _oper;
 	A_exp _left;
 	A_exp _right;

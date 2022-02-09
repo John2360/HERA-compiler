@@ -1,4 +1,6 @@
 #include "AST.h"
+#include <hc_list.h>
+#include <hc_list_helpers.h>
 
 /*
  * HERA_code methods
@@ -46,6 +48,8 @@ static string HERA_math_op(Position p, A_oper op) // needed for opExp
         return "SUB";
 	case A_timesOp:
 		return "MUL";	// was MULT for HERA 2.3
+    case A_divideOp:
+        return "DIV";
 	default:
 		EM_error("Unhandled case in HERA_math_op", false, p);
 		return "Oops_unhandled_hera_math_op";
@@ -63,11 +67,31 @@ string A_opExp_::HERA_code()
 
 string A_callExp_::HERA_code()
 {
+
+    string prefix_code;
     string my_code;
-    my_code += "MOVE(R1, "+_args->_head->result_dlabel()+") \n";
+
+    A_expList my_pointer = _args;
+    while (true) {
+
+        string my_register;
+        if (my_pointer->_head->is_dlabel()){
+            my_register = my_pointer->_head->result_dlabel();
+        } else {
+            my_register = my_pointer->_head->result_reg_s();
+        }
+
+        prefix_code += _args->_head->HERA_code();
+        my_code += "MOVE(R1, "+my_register+") \n";
+
+        if (my_pointer->_tail == 0) break;
+        my_pointer = my_pointer->_tail;
+
+    }
+
     my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+") \n\n";
 
-    return _args->_head->HERA_code() + my_code;
+    return prefix_code + my_code;
 }
 
 string A_seqExp_::HERA_code()
