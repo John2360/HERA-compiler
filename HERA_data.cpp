@@ -13,7 +13,7 @@ string AST_node_::HERA_data()  // Default used during development; could be remo
 }
 
 string A_opExp_::HERA_data() {
-    return "";
+    return _left->HERA_data() + _right->HERA_data();
 }
 
 string A_intExp_::HERA_data()
