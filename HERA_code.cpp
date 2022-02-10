@@ -57,11 +57,30 @@ static string HERA_math_op(Position p, A_oper op) // needed for opExp
 }
 string A_opExp_::HERA_code()
 {
-	string my_code = indent_math + (HERA_math_op(pos(), _oper) + "(" +
-					this->result_reg_s() + ", " +
-					_left->result_reg_s() + ", " +
-					_right->result_reg_s() + ")\n");
-	return _left->HERA_code() + _right->HERA_code() + my_code;
+
+    string left_side = _left->HERA_code();
+    string right_side = _right->HERA_code();
+
+    string pre_build;
+    string my_code;
+
+    if (_left->result_reg() >  _right->result_reg()){
+        pre_build = left_side + "MOVE(R"+str( _left->result_reg()+1)+", "+_left->result_reg_s()+")\n" + right_side;
+
+        my_code = indent_math + (HERA_math_op(pos(), _oper) + "(" +
+                                 this->result_reg_s() + ", " +
+                "R"+str( _left->result_reg()+1) + ", " +
+                                 _right->result_reg_s() + ")\n");
+    } else {
+        pre_build = right_side + "MOVE(R"+str( _right->result_reg()+1)+", "+ _right->result_reg_s()+")\n" + left_side;
+
+        my_code = indent_math + (HERA_math_op(pos(), _oper) + "(" +
+                                 this->result_reg_s() + ", " +
+                                 _left->result_reg_s() + ", " +
+                "R"+str( _right->result_reg()+1)+")\n");
+    }
+
+	return pre_build + my_code;
 }
 
 
@@ -99,7 +118,8 @@ string A_seqExp_::HERA_code()
     return _seq->HERA_code();
 }
 
-string A_expList_::HERA_code() {
+string A_expList_::HERA_code()
+{
     string my_code;
     my_code += _head->HERA_code();
 
