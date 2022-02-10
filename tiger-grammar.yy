@@ -73,7 +73,7 @@ seq: exp[i]					{ $$.AST = $i.AST;
                                                                         A_ExpList($exp1.AST,
                                                                             A_ExpList($seq1.AST, 0)
                                                                        ));
-                                        $$.type = $exp1.type;
+                                        $$.type = $seq1.type;
                                         EM_debug("Got semicolon seq expression.", $$.AST->pos());
 }
 ;
