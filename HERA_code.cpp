@@ -64,20 +64,20 @@ string A_opExp_::HERA_code()
     string pre_build;
     string my_code;
 
-    if (_left->result_reg() >  _right->result_reg()){
-        pre_build = left_side + "MOVE(R"+str( _left->result_reg()+1)+", "+_left->result_reg_s()+")\n" + right_side;
+    if (_left->result_reg() >= _right->result_reg()){
+        pre_build = left_side + indent_math + "MOVE(R"+str( _left->result_reg()+1)+", "+_left->result_reg_s()+")\n" + right_side;
 
         my_code = indent_math + (HERA_math_op(pos(), _oper) + "(" +
                                  this->result_reg_s() + ", " +
                 "R"+str( _left->result_reg()+1) + ", " +
-                                 _right->result_reg_s() + ")\n");
+                                 _right->result_reg_s() + ")\n\n");
     } else {
-        pre_build = right_side + "MOVE(R"+str( _right->result_reg()+1)+", "+ _right->result_reg_s()+")\n" + left_side;
+        pre_build = right_side + indent_math + "MOVE(R"+str( _right->result_reg()+1)+", "+ _right->result_reg_s()+")\n" + left_side;
 
         my_code = indent_math + (HERA_math_op(pos(), _oper) + "(" +
                                  this->result_reg_s() + ", " +
                                  _left->result_reg_s() + ", " +
-                "R"+str( _right->result_reg()+1)+")\n");
+                "R"+str( _right->result_reg()+1)+")\n\n");
     }
 
 	return pre_build + my_code;
