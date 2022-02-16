@@ -249,14 +249,14 @@ public:
 		return stored_result_reg;
 	}
 	string result_reg_s() { // return in string form, e.g. "R2"
-		return "R" + std::to_string(this->result_reg());
-	}
-	virtual int init_result_reg();
+        return "R" + std::to_string(this->result_reg());
+    }
 
 	// we'll need to print the register number attribute for exp's
 	virtual String attributes_for_printing();
 
 private:
+    virtual int init_result_reg();
 	int stored_result_reg = -1;  // Initialize to -1 to be sure it gets replaced by "if" in result_reg() above
 };
 
@@ -317,12 +317,12 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
-    virtual int init_result_reg();
 
 
     virtual string HERA_data();
 	virtual string HERA_code();
 private:
+    virtual int init_result_reg();
     int stored_result_reg = -1;
 	int value;
 };
@@ -339,7 +339,6 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
-    virtual int init_result_reg();
 
     string result_dlabel() {
         if (stored_dlabel == "") this->stored_dlabel = this->init_result_dlabel();
@@ -349,11 +348,13 @@ public:
         if (stored_dlabel == "") return false;
         return true;
     }
-    virtual string init_result_dlabel();
 
     virtual string HERA_data();
     virtual string HERA_code();
 private:
+    virtual string init_result_dlabel();
+    virtual int init_result_reg();
+
 	String value;
     string stored_dlabel = "";
     int stored_result_reg = -1;
