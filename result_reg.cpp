@@ -30,6 +30,13 @@ int A_intExp_::init_result_reg()  // generate unique numbers, starting from 1, e
 //    return my_number;
 }
 
+int A_stringExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
+{
+    // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
+    // TODO: Put this back to one once we have different function parameters on the stack
+    return 4;
+}
+
 int A_opExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
@@ -94,7 +101,7 @@ int A_callExp_::init_result_reg()
     return max_reg;
 }
 
-string A_exp_::init_result_dlabel()  // generate unique numbers, starting from 1, each time this is called
+string A_stringExp_::init_result_dlabel()  // generate unique numbers, starting from 1, each time this is called
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
     int my_number = next_unique_string_number;

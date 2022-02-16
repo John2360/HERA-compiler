@@ -91,15 +91,15 @@ string A_callExp_::HERA_code()
     A_expList my_pointer = _args;
     while (true) {
 
-        string my_register;
-        if (my_pointer->_head->is_dlabel()){
-            my_register = my_pointer->_head->result_dlabel();
-        } else {
-            my_register = my_pointer->_head->result_reg_s();
-        }
+//        string my_register;
+//        if (my_pointer->_head->is_dlabel()){
+//            my_register = my_pointer->_head->result_dlabel();
+//        } else {
+//            my_register = my_pointer->_head->result_reg_s();
+//        }
 
         prefix_code += _args->_head->HERA_code();
-        my_code += "MOVE(R1, "+my_register+") \n";
+        my_code += "MOVE(R1, "+this->result_reg_s()+") \n";
 
         if (my_pointer->_tail == 0) break;
         my_pointer = my_pointer->_tail;
