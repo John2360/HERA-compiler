@@ -19,6 +19,11 @@ void typecheck(AST_node_ *root)
 
 }
 
+Ty_ty AST_node_::typecheck()
+{
+    return Ty_Nil();
+}
+
 // The bodies of other type checking functions,
 //  including any virtual functions you introduce into
 //  the AST classes, should go here.

@@ -37,6 +37,63 @@ int A_opExp_::init_result_reg()  // generate unique numbers, starting from 1, ea
     return std::max(_left->result_reg(), _right->result_reg());
 }
 
+int A_expList_::init_result_reg()
+{
+    A_expList my_pointer = _tail;
+    int max_reg = 0;
+    while (true) {
+
+        string my_register;
+        if (max_reg < my_pointer->_head->result_reg()){
+            max_reg = my_pointer->_head->result_reg();
+        }
+
+        if (my_pointer->_tail == 0) break;
+        my_pointer = my_pointer->_tail;
+
+    }
+
+    return max_reg;
+}
+
+int A_seqExp_::init_result_reg()
+{
+    A_expList my_pointer = _seq;
+    int max_reg = 0;
+    while (true) {
+
+        string my_register;
+        if (max_reg < my_pointer->_head->result_reg()){
+            max_reg = my_pointer->_head->result_reg();
+        }
+
+        if (my_pointer->_tail == 0) break;
+        my_pointer = my_pointer->_tail;
+
+    }
+
+    return max_reg;
+}
+
+int A_callExp_::init_result_reg()
+{
+    A_expList my_pointer = _args;
+    int max_reg = 0;
+    while (true) {
+
+        string my_register;
+        if (max_reg < my_pointer->_head->result_reg()){
+            max_reg = my_pointer->_head->result_reg();
+        }
+
+        if (my_pointer->_tail == 0) break;
+        my_pointer = my_pointer->_tail;
+
+    }
+
+    return max_reg;
+}
+
 string A_exp_::init_result_dlabel()  // generate unique numbers, starting from 1, each time this is called
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment

@@ -227,6 +227,7 @@ public:
 	virtual int compute_height();  // just for an example, not needed to compile
 	int depth();   // example we'll play with in class, not actually needed to compile
 	virtual int compute_depth();   // just for an example, not needed to compile
+    virtual Ty_ty typecheck();
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
 	AST_node_ *stored_parent = 0;
@@ -375,7 +376,7 @@ private:
 	A_var _var;
 };
 
-typedef enum {A_plusOp, A_minusOp, A_timesOp, A_divideOp, A_modOp,
+typedef enum {A_plusOp, A_minusOp, A_timesOp, A_divideOp,
 	     A_eqOp, A_neqOp, A_ltOp, A_leOp, A_gtOp, A_geOp} A_oper;
 
 class A_opExp_ : public A_exp_ {
@@ -428,12 +429,22 @@ public:
 	A_callExp_(A_pos pos, Symbol func, A_expList args);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    int result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+    virtual int init_result_reg();
+
     virtual string HERA_data();
     virtual string HERA_code();
 
 private:
 	Symbol _func;
 	A_expList _args;
+    int stored_result_reg = -1;
 };
 
 class A_controlExp_ : public A_exp_ {
@@ -476,10 +487,20 @@ public:
 	A_seqExp_(A_pos pos, A_expList seq);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    int result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+    virtual int init_result_reg();
+
     virtual string HERA_data();
     virtual string HERA_code();
 private:
 	A_expList _seq;
+    int stored_result_reg = -1;
 };
 
 class A_var_ : public AST_node_ {
@@ -520,12 +541,24 @@ public:
 	A_expList_(A_exp head, A_expList tail);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    int result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+    virtual int init_result_reg();
+
     virtual string HERA_data();
     virtual string HERA_code();
 
 	int length();
 	A_exp _head;
 	A_expList _tail;
+
+private:
+    int stored_result_reg = -1;
 };
 
 // The componends of a A_recordExp, e.g. point{X = 4, Y = 12}

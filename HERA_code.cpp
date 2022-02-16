@@ -48,8 +48,6 @@ static string HERA_math_op(Position p, A_oper op) // needed for opExp
         return "SUB";
 	case A_timesOp:
 		return "MUL";	// was MULT for HERA 2.3
-    case A_divideOp:
-        return "DIV";
 	default:
 		EM_error("Unhandled case in HERA_math_op", false, p);
 		return "Oops_unhandled_hera_math_op";
