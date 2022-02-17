@@ -98,9 +98,10 @@ int A_callExp_::init_result_reg()
 
     }
 
-    return 1;
+    // TODO: fix error
+//    return 1;
 
-    return max_reg;
+    return max_reg + 1;
 }
 
 string A_stringExp_::init_result_dlabel()  // generate unique numbers, starting from 1, each time this is called

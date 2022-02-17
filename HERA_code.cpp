@@ -102,7 +102,7 @@ string A_callExp_::HERA_code()
 
     }
 
-    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+") \n\n";
+    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+")\n MOVE("+this->result_reg_s()+", R1) \n\n";
 
     return my_code;
 }
