@@ -62,6 +62,8 @@ string A_opExp_::HERA_code()
     string pre_build;
     string my_code;
 
+    EM_debug((HERA_math_op(pos(), _oper)) + " - " + _right->result_reg_s(), false);
+
     if (_left->result_reg() >= _right->result_reg()){
         pre_build = left_side + indent_math + "MOVE(R"+str( _left->result_reg()+1)+", "+_left->result_reg_s()+")\n" + right_side;
 
@@ -113,7 +115,16 @@ string A_callExp_::HERA_code()
 
 string A_seqExp_::HERA_code()
 {
-    return _seq->HERA_code();
+    A_expList my_pointer = _seq;
+    string last_reg = "";
+    while (true) {
+        last_reg = my_pointer->_head->result_reg_s();
+
+        if (my_pointer->_tail == 0) break;
+        my_pointer = my_pointer->_tail;
+    }
+
+    return _seq->HERA_code() + "MOVE("+this->result_reg_s()+", "+last_reg+")\n";
 }
 
 string A_expList_::HERA_code()

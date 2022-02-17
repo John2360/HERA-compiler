@@ -21,6 +21,7 @@ void typecheck(AST_node_ *root)
 
 Ty_ty AST_node_::typecheck()
 {
+    EM_warning("Using generic node method", false);
     return Ty_Nil();
 }
 
