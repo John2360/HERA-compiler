@@ -98,6 +98,8 @@ int A_callExp_::init_result_reg()
 
     }
 
+    return 1;
+
     return max_reg;
 }
 

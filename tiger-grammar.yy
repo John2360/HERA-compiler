@@ -105,7 +105,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 								  EM_debug("Got times expression.", $$.AST->pos());
 								 }
 	| exp[exp1] DIVIDE exp[exp2]	{  $$.AST = A_CallExp( Position::range($exp1.AST->pos(), $exp2.AST->pos()),
-                                                                                                       to_Symbol("DIV"),
+                                                                                                       to_Symbol("div"),
                                                                                                        A_ExpList($exp1.AST, A_ExpList($exp2.AST, 0)));
                                                                          $$.type = Ty_Int();
                                          if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, / needs integer operands", true, $$.AST->pos());

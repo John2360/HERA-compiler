@@ -87,21 +87,15 @@ string A_opExp_::HERA_code()
 string A_callExp_::HERA_code()
 {
 
-    string prefix_code;
     string my_code;
+    int call_registers = 1;
 
     A_expList my_pointer = _args;
     while (true) {
 
-//        string my_register;
-//        if (my_pointer->_head->is_dlabel()){
-//            my_register = my_pointer->_head->result_dlabel();
-//        } else {
-//            my_register = my_pointer->_head->result_reg_s();
-//        }
-
-        prefix_code += _args->_head->HERA_code();
-        my_code += "MOVE(R1, "+this->result_reg_s()+") \n";
+        my_code += my_pointer->_head->HERA_code();
+        my_code += "MOVE(R"+str(call_registers)+", "+my_pointer->_head->result_reg_s()+") \n";
+        call_registers += 1;
 
         if (my_pointer->_tail == 0) break;
         my_pointer = my_pointer->_tail;
@@ -110,7 +104,7 @@ string A_callExp_::HERA_code()
 
     my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+") \n\n";
 
-    return prefix_code + my_code;
+    return my_code;
 }
 
 string A_seqExp_::HERA_code()
