@@ -67,62 +67,45 @@ program: exp[main]	{ EM_debug("Got the main expression of our tiger program.", $
 
 seq: exp[i]					{ $$.AST = $i.AST;
       								  EM_debug("Got exp in seq", $$.AST->pos());
-      								  $$.type = $i.type;
       								}
     | exp[exp1] SEMICOLON seq[seq1]    { $$.AST = A_SeqExp(Position::range($exp1.AST->pos(), $seq1.AST->pos()),
                                                                         A_ExpList($exp1.AST,
                                                                             A_ExpList($seq1.AST, 0)
                                                                        ));
-                                        $$.type = $seq1.type;
                                         EM_debug("Got semicolon seq expression.", $$.AST->pos());
 }
 ;
 
 exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 								  EM_debug("Got int " + str($i), $$.AST->pos());
-								  $$.type = Ty_Int();
 								}
     | STRING[i]					{ $$.AST = A_StringExp(Position::fromLex(@i), $i);
       								  EM_debug("Got str " + $i, $$.AST->pos());
-      								  $$.type = Ty_String();
       								}
 	| exp[exp1] PLUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_plusOp,  $exp1.AST,$exp2.AST);
-							      $$.type = Ty_Int();
-							      if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, + needs integer operands", true, $$.AST->pos());
 								  EM_debug("Got plus expression.", $$.AST->pos());
 								}
     | exp[exp1] MINUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
     												   A_minusOp,  $exp1.AST,$exp2.AST);
-							      $$.type = Ty_Int();
-							      if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, - needs integer operands", true, $$.AST->pos());
     						      EM_debug("Got minus expression.", $$.AST->pos());
     							}
 	| exp[exp1] TIMES exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_timesOp, $exp1.AST,$exp2.AST);
-                                  $$.type = Ty_Int();
-                                  if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, * needs integer operands", true, $$.AST->pos());
 								  EM_debug("Got times expression.", $$.AST->pos());
 								 }
 	| exp[exp1] DIVIDE exp[exp2]	{  $$.AST = A_CallExp( Position::range($exp1.AST->pos(), $exp2.AST->pos()),
                                                                                                        to_Symbol("div"),
                                                                                                        A_ExpList($exp1.AST, A_ExpList($exp2.AST, 0)));
-                                                                         $$.type = Ty_Int();
-                                         if ($exp1.type != Ty_Int() || $exp2.type != Ty_Int()) EM_error("Wait, / needs integer operands", true, $$.AST->pos());
                                       EM_debug("Got divide expression.", $$.AST->pos());
 
     								 }
     | LPAREN seq[seq1] RPAREN { $$.AST = $seq1.AST;
-                                $$.type = $seq1.type;
                                 EM_debug("Got seq expression.", $$.AST->pos());
                                 }
     | ID[name] LPAREN seq[exp1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $exp1.AST->pos()),
                                                                 to_Symbol($name),
                                                                 A_ExpList($exp1.AST, 0));
-                                  $$.type = Ty_Void();
-                                  if ($name == "print" && $exp1.type != Ty_String()) EM_error("Wait, print needs string arg", true, $$.AST->pos());
-                                  if ($name == "printint" && $exp1.type != Ty_Int()) EM_error("Wait, print needs integer arg", true, $$.AST->pos());
-                                  if ($name == "mod" && $exp1.type != Ty_Int()) EM_error("Wait, mod needs integer arg", true, $$.AST->pos());
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }

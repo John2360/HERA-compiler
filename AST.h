@@ -269,6 +269,8 @@ public:
 	AST_node_ *parent();	// We should never call this
 	string print_rep(int indent, bool with_attributes);
 
+    virtual Ty_ty typecheck();
+
 	virtual void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);  // should not be called, since it's in-line in the constructor
 	virtual int compute_depth();  // just for an example, not needed to compile
 private:
@@ -321,6 +323,8 @@ public:
 
     virtual string HERA_data();
 	virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
 private:
     virtual int init_result_reg();
     int stored_result_reg = -1;
@@ -351,6 +355,8 @@ public:
 
     virtual string HERA_data();
     virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
 private:
     virtual string init_result_dlabel();
     virtual int init_result_reg();
@@ -408,6 +414,8 @@ public:
     virtual string HERA_data();
     virtual string HERA_code();
 
+    virtual Ty_ty typecheck();
+
 	void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 	virtual int compute_height();  // just for an example, not needed to compile
 private:
@@ -452,6 +460,8 @@ public:
 
     virtual string HERA_data();
     virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
 
 private:
 	Symbol _func;
@@ -510,6 +520,8 @@ public:
 
     virtual string HERA_data();
     virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
 private:
 	A_expList _seq;
     int stored_result_reg = -1;
@@ -564,6 +576,8 @@ public:
 
     virtual string HERA_data();
     virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
 
 	int length();
 	A_exp _head;
