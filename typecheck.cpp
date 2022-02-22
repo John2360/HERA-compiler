@@ -58,6 +58,7 @@ Ty_ty A_expList_::typecheck()
 
         if (my_pointer->_tail == 0) break;
         my_node = my_pointer->_head;
+        my_node->typecheck();
         my_pointer = my_pointer->_tail;
 
     }
