@@ -82,6 +82,10 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
     | STRING[i]					{ $$.AST = A_StringExp(Position::fromLex(@i), $i);
       								  EM_debug("Got str " + $i, $$.AST->pos());
       								}
+    | MINUS exp[exp1]           { $$.AST = A_OpExp($exp1.AST->pos(),
+                                               A_minusOp,  A_IntExp($exp1.AST->pos(), 0),$exp1.AST);
+                              EM_debug("Got negative expression.", $$.AST->pos());
+                                }
 	| exp[exp1] PLUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_plusOp,  $exp1.AST,$exp2.AST);
 								  EM_debug("Got plus expression.", $$.AST->pos());
