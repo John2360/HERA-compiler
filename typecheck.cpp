@@ -49,6 +49,11 @@ Ty_ty A_stringExp_::typecheck()
     return Ty_String();
 }
 
+Ty_ty A_boolExp_::typecheck()
+{
+    return Ty_Bool();
+}
+
 Ty_ty A_expList_::typecheck()
 {
     A_expList my_pointer = _tail;

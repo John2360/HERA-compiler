@@ -303,8 +303,23 @@ class A_boolExp_ : public A_leafExp_ {
 public:
 	A_boolExp_(A_pos pos, bool b);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    int    result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+
+    virtual string HERA_data();
+    virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
 private:
-  bool value;
+    virtual int init_result_reg();
+    int stored_result_reg = -1;
+    bool value;
 };
 
 class A_intExp_ : public A_leafExp_ {

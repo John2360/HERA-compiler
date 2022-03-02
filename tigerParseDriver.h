@@ -2,6 +2,7 @@
 #define TIGER_PARSE_DRIVER_H
 
 #include "AST.h"
+
 // Define the types of the attributes of various kinds of nodes in the parse tree
 struct expAttrs {
 		Ty_ty type;

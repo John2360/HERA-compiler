@@ -29,6 +29,11 @@ string A_intExp_::HERA_code()
 	return indent_math + "SET(" + result_reg_s() + ", " + str(value) +")\n";
 }
 
+string A_boolExp_::HERA_code()
+{
+    return indent_math + "SET(" + result_reg_s() + ", " + (value == true ? '1' : '0') +")\n";
+}
+
 string A_stringExp_::HERA_code()
 {
     string my_code;

@@ -59,6 +59,17 @@ static int textToInt(std::string the_text)  // a C-style array of char will be c
 	// return to_int(the_text);
 }
 
+static bool textToBool(std::string the_text)
+{
+    if (the_text == "true") {
+        return true;
+    } else if (the_text == "false") {
+        return false;
+    }
+
+    return false;
+}
+
 
 // This uses some stuff created by flex, so it's easiest to just put it here.
 int tigerParseDriver::parse (const std::string &f)
@@ -107,6 +118,9 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
     add below newline definition
     {comment}   { loc.lines(yyleng); loc.step(); }
 */
+
+/* bool */
+bool (true|false)
 
 /* indentifier */
 identifier [a-zA-Z][a-zA-Z0-9_]*
@@ -162,6 +176,14 @@ string \"(.|\s)+?\"
 
 \(		{ return yy::tigerParser::make_LPAREN(loc); }
 \)		{ return yy::tigerParser::make_RPAREN(loc); }
+
+if      { return yy::tigerParser::make_IF(loc); }
+then    { return yy::tigerParser::make_THEN(loc); }
+else    { return yy::tigerParser::make_ELSE(loc); }
+
+{bool}	{
+   return yy::tigerParser::make_BOOL(textToBool(yytext), loc);
+   }
 
 {identifier}   { return yy::tigerParser::make_ID(yytext, loc); }
 

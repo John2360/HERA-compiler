@@ -21,6 +21,11 @@ string A_intExp_::HERA_data()
     return "";
 }
 
+string A_boolExp_::HERA_data()
+{
+    return "";
+}
+
 string A_callExp_::HERA_data()
 {
     return _args->_head->HERA_data();

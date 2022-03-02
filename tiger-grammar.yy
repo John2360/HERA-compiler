@@ -46,6 +46,11 @@ class tigerParseDriver;
 %left MINUS PLUS
 %left TIMES DIVIDE
 
+/* https://www.gnu.org/software/bison/manual/html_node/Precedence-Only.html */
+%precedence THEN
+%precedence ELSE
+%nonassoc UMINUS
+
 /* Attributes types for nonterminals are next, e.g. struct's from tigerParseDriver.h */
 %type <expAttrs>  exp
 %type <expAttrs>  seq
@@ -64,7 +69,6 @@ program: exp[main]	{ EM_debug("Got the main expression of our tiger program.", $
 		 			  driver.AST = new A_root_($main.AST);
 		 			}
 	;
-
 seq: exp[i]					{ $$.AST = $i.AST;
       								  EM_debug("Got exp in seq", $$.AST->pos());
       								}
@@ -79,10 +83,15 @@ seq: exp[i]					{ $$.AST = $i.AST;
 exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 								  EM_debug("Got int " + str($i), $$.AST->pos());
 								}
+    | BOOL[i]					{ $$.AST = A_BoolExp(Position::fromLex(@i), $i);
+                                      std::string bool_str = ($i == true ? "true" : "false");
+      								  EM_debug("Got bool " + bool_str , $$.AST->pos());
+      								}
     | STRING[i]					{ $$.AST = A_StringExp(Position::fromLex(@i), $i);
       								  EM_debug("Got str " + $i, $$.AST->pos());
       								}
-    | MINUS exp[exp1]           { $$.AST = A_OpExp($exp1.AST->pos(),
+     //bison manual 75
+    | MINUS exp[exp1] %prec UMINUS  { $$.AST = A_OpExp($exp1.AST->pos(),
                                                A_minusOp,  A_IntExp($exp1.AST->pos(), 0),$exp1.AST);
                               EM_debug("Got negative expression.", $$.AST->pos());
                                 }
@@ -113,6 +122,16 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }
+    | IF exp[seq1] THEN exp[seq2] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq2.AST->pos()),
+                                                                                $seq1.AST,
+                                                                                $seq2.AST,
+                                                                                0);
+                                            }
+    | IF exp[seq1] THEN exp[seq2] ELSE exp[seq3] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq3.AST->pos()),
+                                                                       $seq1.AST,
+                                                                       $seq2.AST,
+                                                                       $seq3.AST);
+                                   }
 
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,
