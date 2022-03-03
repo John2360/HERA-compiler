@@ -471,7 +471,6 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
-    virtual int init_result_reg();
 
     virtual string HERA_data();
     virtual string HERA_code();
@@ -481,6 +480,8 @@ public:
 private:
 	Symbol _func;
 	A_expList _args;
+
+    virtual int init_result_reg();
     int stored_result_reg = -1;
 };
 
@@ -493,10 +494,33 @@ class A_ifExp_ : public A_controlExp_ {
 public:
 	A_ifExp_(A_pos pos, A_exp test, A_exp then, A_exp else_or_0_pointer_for_no_else);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    std::tuple<string, string, string> branch_labels() {
+        if (this->stored_then_label == "" && this->stored_else_label == "" && this->stored_post_label == ""){
+            std::tuple<string, string, string> results = this->init_if_labels();
+            this->stored_then_label = get<0>(results);
+            this->stored_else_label = get<1>(results);
+            this->stored_post_label = get<2>(results);
+        }
+
+        return std::tuple<string, string, string> (stored_then_label, stored_else_label, stored_post_label);
+    }
+
+    virtual string HERA_data();
+    virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
 private:
 	A_exp _test;
 	A_exp _then;
 	A_exp _else_or_null;
+
+    virtual std::tuple<string, string, string> init_if_labels();
+
+    int stored_result_reg = -1;
+    string stored_then_label = "";
+    string stored_else_label = "";
+    string stored_post_label = "";
 };
 
 

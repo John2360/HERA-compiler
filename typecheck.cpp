@@ -98,6 +98,16 @@ Ty_ty A_opExp_::typecheck()
     }
 }
 
+Ty_ty A_ifExp_::typecheck()
+{
+    if (_test->typecheck() != Ty_Bool()) {
+        EM_error("Oops, if expression requires boolean", true);
+        return Ty_Error();
+    } else {
+        return Ty_Void();
+    }
+}
+
 Ty_ty A_callExp_::typecheck()
 {
     std::map<std::string, HaverfordCS::list<Ty_ty>> function_lookup = {

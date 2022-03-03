@@ -48,9 +48,13 @@ string A_expList_::HERA_data() {
 
 string A_stringExp_::HERA_data()
 {
-
     string my_code;
     my_code += "DLABEL("+this->result_dlabel()+") \n";
     my_code += indent + "LP_STRING("+ repr(value)+") \n\n";
     return my_code;
+}
+
+string A_ifExp_::HERA_data()
+{
+    return "";
 }

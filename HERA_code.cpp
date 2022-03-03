@@ -136,3 +136,17 @@ string A_expList_::HERA_code()
     }
     return my_code;
 }
+
+string A_ifExp_::HERA_code()
+{
+    std::tuple<string, string, string> labels = this->branch_labels();
+    string test_cond = _test->HERA_code() + "\nCMP(" + _test->result_reg_s() + ", R0)" + "\nBZ(" + get<1>(labels) + ")\n";
+    string then_clause = "\nLABEL(" + get<0>(labels)+ ")\n" +  _then->HERA_code() + "\nBR(" + get<2>(labels) + ")\n";
+
+    string else_clause = "";
+    if (_else_or_null != 0){
+        else_clause =  "\nLABEL(" + get<1>(labels)+ ")\n"  + _else_or_null->HERA_code() + "\nBR(" + get<2>(labels) + ")\n";
+    }
+
+    return test_cond + then_clause + else_clause + "LABEL(" + get<2>(labels)+ ")";
+}
