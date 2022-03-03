@@ -296,6 +296,9 @@ class A_nilExp_ : public A_leafExp_ {
 public:
 	A_nilExp_(A_pos p);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    virtual string HERA_code(){return "";}
+    virtual string HERA_data(){return "";}
 };
 
 

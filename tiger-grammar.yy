@@ -92,8 +92,8 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
     | STRING[i]					{ $$.AST = A_StringExp(Position::fromLex(@i), $i);
       								  EM_debug("Got str " + $i, $$.AST->pos());
       								}
-    | LPAREN RPAREN              {  $$.AST = A_NilExp($$.AST->pos());
-                                        EM_debug("Got nil", $$.AST->pos());
+    | LPAREN RPAREN              {  $$.AST = A_NilExp(Position::undefined());
+                                        EM_debug("Got nil", Position::undefined());
                                    }
      //bison manual 75
     | MINUS exp[exp1] %prec UMINUS  { $$.AST = A_OpExp($exp1.AST->pos(),
