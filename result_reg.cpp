@@ -122,13 +122,13 @@ string A_stringExp_::init_result_dlabel()  // generate unique numbers, starting 
     return my_string;
 }
 
-std::tuple<string, string, string> A_ifExp_::init_if_labels()
+int A_ifExp_::init_if_labels()
 {
     int my_number = next_unique_if_number;
     next_unique_string_number = my_number + 1;
-    std::string my_string1 = "my_if_then_"+str(next_unique_string_number);
-    std::string my_string2 = "my_if_else_"+str(next_unique_string_number);
-    std::string my_string3 = "my_if_post_"+str(next_unique_string_number);
+//    std::string my_string1 = "my_if_then_"+str(next_unique_string_number);
+//    std::string my_string2 = "my_if_else_"+str(next_unique_string_number);
+//    std::string my_string3 = "my_if_post_"+str(next_unique_string_number);
     // end of atomic transaction
-    return std::tuple<string, string, string>(my_string1, my_string2, my_string3);
+    return next_unique_string_number;
 }

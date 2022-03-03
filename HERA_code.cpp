@@ -139,14 +139,13 @@ string A_expList_::HERA_code()
 
 string A_ifExp_::HERA_code()
 {
-    std::tuple<string, string, string> labels = this->branch_labels();
-    string test_cond = _test->HERA_code() + "\nCMP(" + _test->result_reg_s() + ", R0)" + "\nBZ(" + get<1>(labels) + ")\n";
-    string then_clause = "\nLABEL(" + get<0>(labels)+ ")\n" +  _then->HERA_code() + "\nBR(" + get<2>(labels) + ")\n";
+    string test_cond = _test->HERA_code() + "\nCMP(" + _test->result_reg_s() + ", R0)" + "\nBZ(" + this->branch_label_else() + ")\n";
+    string then_clause = "\nLABEL(" + this->branch_label_then() + ")\n" +  _then->HERA_code() + "\nBR(" + this->branch_label_post() + ")\n";
 
     string else_clause = "";
     if (_else_or_null != 0){
-        else_clause =  "\nLABEL(" + get<1>(labels)+ ")\n"  + _else_or_null->HERA_code() + "\nBR(" + get<2>(labels) + ")\n";
+        else_clause =  "\nLABEL(" + this->branch_label_else() + ")\n"  + _else_or_null->HERA_code() + "\nBR(" + this->branch_label_post() + ")\n";
     }
 
-    return test_cond + then_clause + else_clause + "LABEL(" + get<2>(labels)+ ")";
+    return test_cond + then_clause + else_clause + "LABEL(" + this->branch_label_post() + ")";
 }

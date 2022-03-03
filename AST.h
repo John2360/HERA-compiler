@@ -495,15 +495,25 @@ public:
 	A_ifExp_(A_pos pos, A_exp test, A_exp then, A_exp else_or_0_pointer_for_no_else);
 	virtual string print_rep(int indent, bool with_attributes);
 
-    std::tuple<string, string, string> branch_labels() {
+    void do_init(){
         if (this->stored_then_label == "" && this->stored_else_label == "" && this->stored_post_label == ""){
-            std::tuple<string, string, string> results = this->init_if_labels();
-            this->stored_then_label = get<0>(results);
-            this->stored_else_label = get<1>(results);
-            this->stored_post_label = get<2>(results);
+            int results = this->init_if_labels();
+            this->stored_then_label = "my_if_then_"+str(results);
+            this->stored_else_label = "my_if_else_"+str(results);
+            this->stored_post_label = "my_if_post_"+str(results);
         }
-
-        return std::tuple<string, string, string> (stored_then_label, stored_else_label, stored_post_label);
+    }
+    string branch_label_then() {
+        do_init();
+        return stored_then_label;
+    }
+    string branch_label_else() {
+        do_init();
+        return stored_else_label;
+    }
+    string branch_label_post() {
+        do_init();
+        return stored_post_label;
     }
 
     virtual string HERA_data();
@@ -515,7 +525,7 @@ private:
 	A_exp _then;
 	A_exp _else_or_null;
 
-    virtual std::tuple<string, string, string> init_if_labels();
+    virtual int init_if_labels();
 
     int stored_result_reg = -1;
     string stored_then_label = "";
