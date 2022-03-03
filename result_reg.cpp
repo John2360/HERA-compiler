@@ -120,8 +120,8 @@ string A_stringExp_::init_result_dlabel()  // generate unique numbers, starting 
 int A_ifExp_::init_if_labels()
 {
     int my_number = next_unique_if_number;
-    next_unique_string_number = my_number + 1;
-    return next_unique_string_number;
+    next_unique_if_number = my_number + 1;
+    return next_unique_if_number;
 }
 
 int A_ifExp_::init_result_reg()
