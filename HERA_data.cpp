@@ -54,7 +54,6 @@ string A_stringExp_::HERA_data()
     return my_code;
 }
 
-string A_ifExp_::HERA_data()
-{
-    return "";
+string A_ifExp_::HERA_data() {
+    return _test->HERA_data()+_then->HERA_data()+_else_or_null->HERA_data();
 }
