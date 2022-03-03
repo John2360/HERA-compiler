@@ -5,7 +5,6 @@
 
 // Define the types of the attributes of various kinds of nodes in the parse tree
 struct expAttrs {
-		Ty_ty type;
 		A_exp AST;
 };
 #include "tiger-grammar.tab.hpp"

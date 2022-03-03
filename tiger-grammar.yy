@@ -43,12 +43,14 @@ class tigerParseDriver;
 
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
+%left IF
+%left THEN
+%left ELSE
 %left MINUS PLUS
 %left TIMES DIVIDE
 
+
 /* https://www.gnu.org/software/bison/manual/html_node/Precedence-Only.html */
-%precedence THEN
-%precedence ELSE
 %nonassoc UMINUS
 
 /* Attributes types for nonterminals are next, e.g. struct's from tigerParseDriver.h */

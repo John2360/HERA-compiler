@@ -104,7 +104,13 @@ Ty_ty A_ifExp_::typecheck()
         EM_error("Oops, if expression requires boolean", true);
         return Ty_Error();
     } else {
-        return Ty_Void();
+        // return children type and make sure have same type
+        if (_then->typecheck() != _else_or_null->typecheck()) {
+            EM_error("Oops, if requires then and else to be of the same type", true);
+            return Ty_Error();
+        }
+
+        return _then->typecheck();
     }
 }
 
