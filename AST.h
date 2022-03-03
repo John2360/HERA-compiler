@@ -495,6 +495,10 @@ public:
 	A_ifExp_(A_pos pos, A_exp test, A_exp then, A_exp else_or_0_pointer_for_no_else);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    int result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
     void do_init(){
         if (this->stored_then_label == "" && this->stored_else_label == "" && this->stored_post_label == ""){
             int results = this->init_if_labels();
@@ -526,6 +530,7 @@ private:
 	A_exp _else_or_null;
 
     virtual int init_if_labels();
+    virtual int init_result_reg();
 
     int stored_result_reg = -1;
     string stored_then_label = "";

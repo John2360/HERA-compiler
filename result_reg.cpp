@@ -24,11 +24,6 @@ int A_intExp_::init_result_reg()  // generate unique numbers, starting from 1, e
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
     // TODO: Put this back to one once we have different function parameters on the stack
     return 4;
-
-//    int my_number = next_unique_number;
-//    next_unique_number = next_unique_number + 1;
-//    // end of atomic transaction
-//    return my_number;
 }
 
 int A_stringExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
@@ -126,9 +121,10 @@ int A_ifExp_::init_if_labels()
 {
     int my_number = next_unique_if_number;
     next_unique_string_number = my_number + 1;
-//    std::string my_string1 = "my_if_then_"+str(next_unique_string_number);
-//    std::string my_string2 = "my_if_else_"+str(next_unique_string_number);
-//    std::string my_string3 = "my_if_post_"+str(next_unique_string_number);
-    // end of atomic transaction
     return next_unique_string_number;
+}
+
+int A_ifExp_::init_result_reg()
+{
+    return std::max(_else_or_null->result_reg(), std::max(_test->result_reg(), _then->result_reg()));
 }
