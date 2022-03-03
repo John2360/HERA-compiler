@@ -122,11 +122,6 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }
-    | IF exp[seq1] THEN exp[seq2] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq2.AST->pos()),
-                                                                                $seq1.AST,
-                                                                                $seq2.AST,
-                                                                                0);
-                                            }
     | IF exp[seq1] THEN exp[seq2] ELSE exp[seq3] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq3.AST->pos()),
                                                                        $seq1.AST,
                                                                        $seq2.AST,

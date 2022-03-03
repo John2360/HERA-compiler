@@ -139,6 +139,7 @@ string A_expList_::HERA_code()
 
 string A_ifExp_::HERA_code()
 {
+    EM_debug("if", false);
     string test_cond = _test->HERA_code() + "\nCMP(" + _test->result_reg_s() + ", R0)" + "\nBZ(" + this->branch_label_else() + ")\n";
     string then_clause = "\nLABEL(" + this->branch_label_then() + ")\n" +  _then->HERA_code() + "\nBR(" + this->branch_label_post() + ")\n";
 
