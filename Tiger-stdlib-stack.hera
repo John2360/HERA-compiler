@@ -1,0 +1,1148 @@
+#if ! defined TIGER_STDLIB_INCLUDED
+#define TIGER_STDLIB_INCLUDED 1
+
+// This is the HERA standard library for TIGER,
+//  containing the functions listed by Appel (A.4) plus a few more (*).
+// Those marked ** are generally not called explicitly from Tiger programs.
+// In this (the "stack" variant),
+//  parameters are passed in stack frame elements FP+3, FP+4, etc., and
+//  the result is retured in stack frame element FP+3.
+// See "Function Calls with Parameters on Stack, ``Callee-Save'' of Registers"
+//  under Idioms in the HERA documentation.
+//
+// For library configuration parameters (e.g. if you are in CS356),
+//   see the "tunable parameters" section below
+//
+// STRING MANIPULATION
+//    ord(s:string) : int   // returns the character number for a 1-char string
+//    chr(i:int) : string   // returns a 1-char string such that ord(chr(x)) == x
+//    size(s:string) : int  // length of the string; also works for Tiger arrays
+//    substring(s:string, first:int, n:int) : string  // indices start at 0
+//    concat(s1:string, s2:string) : string           // concatenation
+// ** tstrcmp(s1:string, s2:string) : int
+//       // tstrcmp(a,b) returns neg # if a < b, 0 if =, pos # if a > b
+//
+// ARITHMETIC/BOOLEAN OPERATIONS
+// ** div(num:int, den:int): int    // finds floor(num/den), assuming no overflow
+// ** mod(num:int, den:int): int    // finds the remainder of num/den
+//    not(i:int) : int              // binary negation; makes false true and vice-versa
+//    
+// OUTPUT AND INPUT
+// *  getchar_ord(): int    // read one character, return as a number (like C's getchar(), but no EOF check)
+// *  putchar_ord(i:int)    // print the character chr(i) (like C's putchar(c))
+//    flush()               // makes sure output has been written to the terminal
+// *  printint(i:int)       // print an integer (currently uses base 16)
+// *  printbool(b:bool)     // print true or false
+//    print(s:string)       // print a string
+// *  println(s:string)		// print s and a newline character
+//    getchar() : string    // read a one-character string
+// *  ungetchar()	    // make next 'getchar' or 'getchar_ord' return previously read character
+// *  getline() : string    // read a one-line string
+// *  getint() : int        // read an integer (not yet implemented) ... in particular, need to specify failure result somehow
+//  
+//
+// OTHER
+//    exit(i:int)                   // halts the program
+// ** malloc(n_cells: int): int     // address of allocated space
+// ** free(address: int)            // release region returned by above (currently does nothing)
+//
+//   
+// Strings are allocated as they are in the HERA-C simulator:
+//   Memory cell 16384 is assumed to contain the address of the
+//   next available memory cell, and strings are built there.
+//
+// WARNING -- all of these assume that the carry block flag is set,
+//   as is the case when running tiger programs.
+//
+// Technically, all of these functions should be written in HERA.
+// However, since the simulator does not include an operating
+//  system, we can't do system calls for the I/O stuff.
+// Also, I don't have time to mess with all of this.
+// So much is written in C++, though this fraction decreases with time...
+
+// Tunable library configuration parameters are
+//	  WROTE_CS356_MALLOC, WROTE_CS356_IO, INTEGER_IO_IN_HEX, USE_IOSTREAMS, ALWAYS_FLUSH
+// (if needed, these should be set with #define
+//  before the #include of this file or its "-data").:
+//
+
+//
+// Parameter WROTE_CS356_MALLOC -- if defined as 1 (True),
+//  something else _must_ define a HERA function "malloc"
+
+#if ! defined WROTE_CS356_MALLOC
+#define WROTE_CS356_MALLOC 0
+#endif
+
+// Parameter WROTE_CS356_IO -- if defined as 1 (True),
+//  something else _must_ define HERA functions:
+//	getchar_ord (if used)
+//	ungetchar   (if used)
+//	putchar_ord (if used)
+//	flush       (if used)
+//	getchar
+//	getline
+//	print
+// (also makes the default for IOSTREAMS be false not true)
+
+#if ! defined WROTE_CS356_IO
+#define WROTE_CS356_IO 0
+#endif
+
+
+// Parameter INTEGER_IO_IN_HEX (currently defaults to 1 (true) due to bugs in decimal IO)
+//  makes Integer IO be in hexidecimal
+
+#if ! defined INTEGER_IO_IN_HEX
+#define INTEGER_IO_IN_HEX 1
+#endif
+
+// Parameter IOSTREAMS useful mostly for HERA-C (note also ALWAYS_FLUSH)
+
+#if ! defined USE_IOSTREAMS
+#if WROTE_CS356_IO || ! defined HERA_C
+#define USE_IOSTREAMS 0
+#else
+#define USE_IOSTREAMS 1
+#endif
+#endif
+// can't just include iostream here, as this file is typically #include'd inside HERA_main()  :-(
+
+#if USE_IOSTREAMS && ! defined CIN_FAIL_MAX
+#define CIN_FAIL_MAX 8
+#endif
+
+// Parameter ALWAYS_FLUSH --- if defined AND USE_IOSTREAMS is on,
+//  every call to print, printint, etc. will do a flush rather than waiting for end-of-line to show output
+// Currently (Spring 2012) this defaults to ON for CMSC 350,
+//  even though in future we should set it in HERA_main.cc)
+
+#if ! defined ALWAYS_FLUSH
+#define ALWAYS_FLUSH 1
+#endif
+
+#define UNDEFINED_FAIL_ASSUMING_FP_ALT_IS_SET() \
+	SET(Rt,  tstdlib_not_implemented) \
+	STORE(Rt,  3,FP_alt) \
+	CALL(FP_alt, print)  \
+	HALT()
+
+#if USE_IOSTREAMS
+print(" ************************************************************************ ")
+print(" OOPS ... It looks like this program is about to run")
+print("          the first instructions from Tiger-stdlib-stack.hera") 
+print("          Did you forget to put a \"HALT()\" before including the library?")
+print(" ************************************************************************ ")
+#endif
+
+
+     HALT()   // Don't let program run into the library without a call
+     NOP()    // And make the program/library boundary visible in the debugger memory with this pattern
+     HALT()
+     HALT()
+
+//   ord(s:string) : int
+LABEL(ord)
+     INC(SP,1)
+     STORE(R1,4,FP)
+     LOAD(R1,3,FP) // Reg 1 <-- argument (address of string)
+     LOAD(R1,1,R1)  // Reg 1 now has the 1st character of the string
+     STORE(R1,3,FP) // put it (the character) into return area
+     LOAD(R1,4,FP)
+     DEC(SP, 1)
+     RETURN(FP_alt, PC_ret)
+
+ //   chr(i:int) : string
+LABEL(chr)
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt,1,FP)
+     INC(SP,2)
+     STORE(R1,4,FP)
+     STORE(R2,5,FP)
+     MOVE(FP_alt,SP) // malloc(2)
+     INC(SP,5)
+     SET(r1,2)
+     STORE(r1,3,FP_alt)
+     CALL(FP_alt,malloc)
+     LOAD(r2,3,FP_alt)  // Reg 2 <-- result of malloc
+     DEC(SP, 5)
+     SET(R1,1)
+     STORE(R1,0,R2)	// set string length
+     LOAD(R1,3,FP)	// Reg 1 <-- argument (the integer value)
+     STORE(R1,1,R2)	// set string's one character
+     STORE(R2,3,FP)	// address of string into return area
+     LOAD(R1,4,FP)
+     LOAD(R2,5,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP,2)
+     RETURN(FP_alt, PC_ret)
+
+//    size(s:string) : int
+LABEL(size)
+     INC(SP,1)
+     STORE(R1,4,FP)
+     LOAD(R1,3,FP) // Reg 1 <-- argument (address of string)
+     LOAD(R1,0,R1)  // Reg 1 now has the size of string
+     STORE(R1,3,FP) // put it (the size) into return area
+     LOAD(R1,4,FP)
+     DEC(SP,1)
+     RETURN(FP_alt, PC_ret)
+
+
+LABEL(tstdlib_label_local_memcpy_reg)
+     // move n(reg 3) bytes from location sptr(reg 1) to location nptr (reg 2)
+     // modifies registers 1, 2, 3, and 4
+     //  (after end, r2 and r1 have been increased by original r3)
+     ADD(R4,TMP,R0)
+// while(n>0)
+     LABEL(tstdlib_label_memcpy_while_begin)
+     OR(R0,R0,R3)  // set flags for R3
+     BZR(tstdlib_label_memcpy_while_end)
+//   *(nptr++) = *(sptr++)
+     LOAD(TMP,0,R1)
+     INC(R1,1)
+     STORE(TMP,0,R2)
+     INC(R2,1)
+//   n--
+     DEC(R3,1)
+     BR(tstdlib_label_memcpy_while_begin)
+     LABEL(tstdlib_label_memcpy_while_end)
+     ADD(TMP,R4,R0)
+     RETURN(FP_alt, PC_ret)
+
+//   substring(s:string, first:int, n:int) : string
+LABEL(substring)
+// vars & reg: sptr(1), nptr(2), n(3), tmp(4)
+// store needed registers
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt,1,FP)
+     INC(SP,4) // Space for 4 registers (after 3 params), frame grows from FP+0 ... FP+5 to be FP+0 ... FP+9 (so SP = FP+9)
+     STORE(R1,6,FP)
+     STORE(R2,7,FP)
+     STORE(R3,8,FP)
+     STORE(R4,9,FP)
+
+// first check parameters
+     LOAD(R1,3,FP)	// address of s  (points to its size)
+     LOAD(R3,5,FP)      // R3 now "n" from here on
+
+     LOAD(R4,4,FP)	// "first"
+     ADD(R0,R4,R0)
+     BS(substring_bad_params)   // check for first <0
+     
+     ADD(R0,R3,R0)
+     BS(substring_bad_params)   // check for n<0
+
+     ADD(R4,R4,R3)      // first+n
+     LOAD(R2,0,R1)      // size of s
+     CMP(R2,R4)
+     BL(substring_bad_params)  // check for size(s)<first+n
+     
+// nptr = next free address   (allocate n+1 cells, save address for later)
+     ADD(R4,R3,R0)      // R4 = n
+     INC(R4,1)
+     MOVE(FP_alt,SP)
+     INC(SP, 4) // space for MALLOC's frame
+     STORE(R4,3,FP_alt)
+     CALL(FP_alt,malloc)
+     LOAD(R2,3,FP_alt)	// R2 now nptr from here on
+     DEC(SP, 4)
+
+// save result of malloc (nptr) as return value   AND KILL "s"
+     STORE(R2,3,FP)
+
+// sptr = &s[first]
+     INC(R1,1)  	// R1 is sptr from here on
+     LOAD(R4,4,FP)	// "first"
+     ADD(R1,R4,R1) 	// sptr now points to 1st char to grab
+// *(nptr++) = n
+     STORE(R3,0,R2)
+     INC(R2,1)
+     CALL(FP_alt,tstdlib_label_local_memcpy_reg)   // memcpy(sptr,nptr,n) ... note no frame needed
+     LOAD(R1,6,FP)
+     LOAD(R2,7,FP)
+     LOAD(R3,8,FP)
+     LOAD(R4,9,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP, 4)
+     RETURN(FP_alt, PC_ret)		// value saved a while ago
+
+     LABEL(substring_bad_params)
+     MOVE(FP_alt, SP)
+     INC(SP, 4)
+     SET(R1,substring_got_bad_params)
+     STORE(R1,3,FP_alt)
+     CALL(FP_alt,print)
+
+     // leave SP, fp_alt, where they were, and print s, first, n
+
+     SET(Rt, '"')
+     STORE(Rt, 3,FP_alt)
+     CALL(FP_alt, putchar_ord)
+     LOAD(Rt, 3,FP)
+     STORE(Rt, 3,FP_alt)
+     CALL(FP_alt, print)
+     SET(Rt, '"')
+     STORE(Rt, 3,FP_alt)
+     CALL(FP_alt, putchar_ord)
+
+     SET(Rt, ',')
+     STORE(Rt, 3,FP_alt)
+     CALL(FP_alt, putchar_ord)
+     LOAD(Rt, 4,FP)
+     STORE(Rt, 3,FP_alt)
+     CALL(FP_alt, printint)
+
+     SET(Rt, ',')
+     STORE(Rt, 3,FP_alt)
+     CALL(FP_alt, putchar_ord)
+     LOAD(Rt, 5,FP)
+     STORE(Rt, 3,FP_alt)
+     CALL(FP_alt, printint)
+
+     INC(SP, 3)
+     CALL(FP_alt,exit)
+     DEC(SP, 3)// won't get here, but it looks better this way
+     HALT() // won't get here either
+
+//   concat(s1:string, s2:string) : string
+LABEL(concat)
+// vars & reg: s1ptr/s2ptr(1), nptr(2), n(3), tmp(4), tmp2(5)
+
+// store needed registers
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt,1,FP)
+     INC(SP,5) // space for registers and calling functions
+
+     STORE(R1,5,FP)
+     STORE(R2,6,FP)
+     STORE(R3,7,FP)
+     STORE(R4,8,FP)
+     STORE(R5,9,FP)
+
+     MOVE(FP_alt,SP)
+     INC(SP, 4)
+     
+// malloc length(s1)+length(s2)+1
+     LOAD(R3,3,FP)
+     LOAD(R3,0,R3)	// get s1's length
+     LOAD(R2,4,FP)
+     LOAD(R2,0,R2)	// get s2's length
+     ADD(R3,R2,R3)
+     INC(R3,1)
+     STORE(R3, 3,FP_alt)
+     CALL(FP_alt,malloc)     // get space
+
+     LOAD(R2, 3,FP_alt)     // allocated space
+     DEC(SP, 4)
+
+     DEC(R3,1)   	// sum of the lengths again
+     STORE(R3, 0,R2)    // Set result's size
+     LOAD(R1, 3,FP)	// s1
+     STORE(R2, 3,FP)    // SAVE RESULT, AND KILL S1
+     INC(R2,1)  	// R2 now next available space
+
+     LOAD(R3, 0,R1)	// s1's size
+     INC(R1,1)  	// sptr is now s1's initial character
+
+// memcpy(nptr,s1ptr,length(s1))
+     CALL(FP_alt,tstdlib_label_local_memcpy_reg)   // memcpy(sptr,nptr,n)
+// memcpy(nptr,s2ptr,length(s2))
+     LOAD(R1,4,FP)
+     LOAD(R3,0,R1)	// get s2's length
+     INC(R1,1)		// sptr is now s2's initial character
+     CALL(FP_alt,tstdlib_label_local_memcpy_reg)   // memcpy(sptr,nptr,n)
+
+     LOAD(R1,5,FP)
+     LOAD(R2,6,FP)
+     LOAD(R3,7,FP)
+     LOAD(R4,8,FP)
+     LOAD(R5,9,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP, 5)
+     RETURN(FP_alt, PC_ret)		// value saved a while ago
+
+
+// ** tstrcmp(s1:string, s2:string) : int
+LABEL(tstrcmp)  // tiger strcmp -- like C strcmp
+		// tstrcmp(a,b) returns neg # if a < b, 0 if =, pos # if a > b
+		//  Note that this is also similar to doing CMP(a,b)
+// Get some space, save some registers
+     STORE(PC_ret, 0,FP) // For good practice
+     STORE(FP_alt, 1,FP)
+     INC(SP,6)		// was FP+0..FP+4 (inclusive), now FP+0..FP+10 (inclusive)
+     STORE(R1,10,FP)
+     STORE(R2,5,FP)
+     STORE(R3,6,FP)
+     STORE(R4,7,FP)
+     STORE(R5,8,FP)
+     STORE(R6,9,FP)
+
+// r3 = min(size(a), size(b))
+     LOAD(R1,3,FP)	// r1 points to size of a
+     LOAD(R2,4,FP)
+     LOAD(R5,0,R1)		// r5 has size of a
+     LOAD(R6,0,R2)		// r6 has size of b
+     CMP(R5,R6)
+     BLR(tstdlib_label_b_was_longer)
+     ADD(R3,R5,R0)	// r3 = r5
+     BR(tstdlib_label_got_min)
+     LABEL(tstdlib_label_b_was_longer)
+     ADD(R3,R6,R0)	// r3 = r6
+     LABEL(tstdlib_label_got_min)  // now r3 is min. size
+// r1 = address of 1st "real" char of a,
+     INC(R1,1)
+// r2 = address of 1st "real" char of b
+// could also use this first:  LOAD(R2,4,FP)
+     INC(R2,1)
+// r4 = 0
+     ADD(R4,R0,R0)
+// while(r4<r3) {
+     LABEL(tstdlib_label_start_of_while_in_tstrcmp)
+     CMP(R4,R3)
+     BGER(tstdlib_label_get_out_of_while_in_tstrcmp)
+//  if (a[r4] < b[r4])  // add *(r4 + a) < *(r4 + b)
+     ADD(R5,R4,R1)  // r5 = r4+a
+     LOAD(R5,0,R5) // r5 = *(r4+a)
+     ADD(R6,R4,R2)
+     LOAD(R6,0,R6)
+     CMP(R5,R6)
+     BGER(tstdlib_label_not_a_smaller)
+//  	return -1
+     SET(R5,-1)
+     STORE(R5,3,FP)
+     BR(tstdlib_label_do_return)
+     LABEL(tstdlib_label_not_a_smaller)
+//  if (a[r4] > b[r4])
+     CMP(R6,R5)
+     BGER(tstdlib_label_not_b_smaller)
+//		return 1
+     SET(R5,1)
+     STORE(R5,3,FP)
+     BR(tstdlib_label_do_return)
+     LABEL(tstdlib_label_not_b_smaller)
+// 	r4++;
+     INC(R4,1)
+// }
+     BR(tstdlib_label_start_of_while_in_tstrcmp)
+     LABEL(tstdlib_label_get_out_of_while_in_tstrcmp)
+// return size(a) - size(b)
+     LOAD(R1,3,FP)	// r1 points to size of a
+     LOAD(R2,4,FP)
+     LOAD(R5,0,R1)		// r5 has size of a
+     LOAD(R6,0,R2)		// r6 has size of b
+     SUB(R5,R5,R6)		// r5 has size of a - size of b
+     STORE(R5,3,FP)
+     LABEL(tstdlib_label_do_return)
+     LOAD(R1,10,FP)
+     LOAD(R2,5,FP)
+     LOAD(R3,6,FP)
+     LOAD(R4,7,FP)
+     LOAD(R5,8,FP)
+     LOAD(R6,9,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP,6)
+     RETURN(FP_alt, PC_ret)
+
+
+#define LOCAL_DIV_BROKEN 1  /* remove this to use local div/mod routine */
+#if defined LOCAL_DIV_BROKEN
+
+LABEL(DIV)
+LABEL(div)
+#if defined HERA_C
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt, 1,FP)
+
+     LOAD(FP_alt, 4,FP)
+
+     // cheat and use C/C++ routine for now
+     if (reg(FP_alt) == 0) {
+        print("Error in Tiger-stdlib function 'div': dividing by 0")
+     } else {
+	SETMEM(reg(FP)+3, REFMEM(reg(FP)+3)/REFMEM(reg(FP)+4));
+     }
+
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     RETURN(FP_alt, PC_ret)
+#else
+UNDEFINED_FAIL_ASSUMING_FP_ALT_IS_SET()
+#endif
+
+LABEL(MOD)
+LABEL(mod)
+#if defined HERA_C
+     STORE(PC_ret,  0,FP)
+     STORE(FP_alt, 1,FP)
+
+     LOAD(FP_alt, 4,FP)
+
+     // cheat and use C/C++ routine for now
+     if (reg(FP_alt) == 0) {
+          print("Error in Tiger-stdlib function 'mod': dividing by 0")
+     } else {
+          SETMEM(reg(FP)+3, REFMEM(reg(FP)+3)%REFMEM(reg(FP)+4));
+     }
+
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     RETURN(FP_alt, PC_ret)
+#else
+UNDEFINED_FAIL_ASSUMING_FP_ALT_IS_SET()
+#endif
+
+#else
+
+LABEL(tstdlib_local_divide_subroutine)
+
+	// DIV and MOD routine from CS240 Fall 2006
+	//  expects registers to be set for n and d,
+	//  leaves "n div d" in "q"
+	//  leaves remainder in final "n", I think
+
+	// Note that this does *not* do the normal stack management of parameters, etc, or preserve registers
+
+	// VARIABLES:
+	//  R1 is n
+	//  R2 is d
+	//  R3 is pq
+	//  R4 is q
+
+#define n  R1	/* n of div(n, d) */
+#define d  R2	/* initially d, but gets doubled until big, then shrunk */
+#define pq R3	/* bah ... fix this in CS240 some time */
+#define q  R4	/* q, the integer quotient of n/d, initially  */
+
+	// NOTE that this was originally written without CB
+	//      presumed on, and then relevant parts commented out.
+
+////	STORE(PC_ret,0,FP)
+////	STORE(FP_alt,1,FP)
+	// 0b: set up values used in the algorithm
+	SETLO(pq, 1)   // pq = 1
+	SETLO(q,  0)   // q  = 0
+	
+	// Phase 1: shift d and pq left,
+	//	 	keeping invariants  d == pq * d0
+	//		and		    n + d * q == n0
+	//		where n0 and d0 are original values of n and d
+	
+	// go on UNTIL d>=n  OR d >= 2**15
+	LABEL(KEEP_IN_PHASE_ONE)
+//	SETC()  // Not needed when carry block is on
+	SUB(r0, n,d)
+	BULER(OUT_OF_PHASE_ONE)
+//	CLRC()  // Not needed when carry block is on
+	ADD(r0, d,r0)  // is d >= 2**15
+	BSR(OUT_OF_PHASE_ONE)
+//	CLRC()  // Not needed when carry block is on
+	LSL(pq, pq)
+//	CLRC()  // Not needed when carry block is on
+	LSL(d,  d)
+	BRR(KEEP_IN_PHASE_ONE)
+	LABEL(OUT_OF_PHASE_ONE)
+
+	// now we typically have d >= n, d == pq * d, n + d0 * q == n0
+	
+	// Phase 2: shift d and pq back to right,
+	//			adding pq to q when possible etc.
+
+	// Phase 2 goes until pq==0 OR n==0
+	//  maintains 
+	LABEL(KEEP_IN_PHASE_TWO)
+	// if want ouf of phase two, branch out
+//	CLRC()  // Not needed when carry block is on
+	ADD(r0, pq,r0)
+	BZR(OUT_OF_PHASE_TWO)
+//	CLRC()  // Not needed when carry block is on
+	ADD(r0, n,r0)
+	BZR(OUT_OF_PHASE_TWO)
+	//  "if d <= n..." ; if d>n, skip stuff controlled by the "if"
+//	SETC()  // Not needed when carry block is on
+	SUB(r0, d,n)
+	BUGR(DONT_ADD_PQ)
+//		SETC()  // Not needed when carry block is on
+		SUB(n, n,d)   // n = n-d
+//		CLRC()  // Not needed when carry block is on
+		ADD(q, q,pq)  // q = q+pq
+	// end of if
+	LABEL(DONT_ADD_PQ)
+//	CLRC()  // Not needed when carry block is on
+	LSR(d, d)  // d = d/2
+//	CLRC()  // Not needed when carry block is on
+	LSR(pq,pq) // pq = pq/2
+	BRR(KEEP_IN_PHASE_TWO)
+	LABEL(OUT_OF_PHASE_TWO)
+	
+/////	LOAD(PC_ret, 0,FP)
+/////	LOAD(FP_alt,1,FP)
+	RETURN(FP_alt, PC_ret)  // Branch back to whereever we came from
+	// END OF DIVIDE SUBROUTINE
+
+// ** div(num:int, den:int): int
+LABEL(div)
+     STORE(PC_ret,  0,FP)
+     STORE(FP_alt, 1,FP)
+     INC(SP, 7)  // temp. and for calling local_divide
+     STORE(n,  5,FP) // save old val of register we'll use for n
+     STORE(d,  6,FP)
+     STORE(pq, 7,FP)
+     STORE(q,  8,FP)
+
+     MOVE(FP_alt,SP)
+
+     LOAD(n,   3,FP)
+     LOAD(d,   4,FP)
+     CALL(FP_alt, tstdlib_local_divide_subroutine)
+     STORE(q,  3,FP)  // set up return value
+
+     LOAD(n,  5,FP)
+     LOAD(d,  6,FP)
+     LOAD(pq, 7,FP)
+     LOAD(q,  8,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP, 7)
+     RETURN(FP_alt, PC_ret)
+
+// ** mod(num:int, den:int): int
+LABEL(mod)
+//     SETMEM(reg(FP)+3, REFMEM(reg(FP)+3)%REFMEM(reg(FP)+4));
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt,1,FP)
+     INC(SP, 7)
+     STORE(n,  5,FP)
+     STORE(d,  6,FP)
+     STORE(pq, 7,FP)
+     STORE(q,  8,FP)
+
+     MOVE(FP_alt,SP)
+
+     LOAD(n,   3,FP)
+     LOAD(d,   4,FP)
+     CALL(FP_alt, tstdlib_local_divide_subroutine)
+     STORE(n,  3,FP)  // set up return value
+
+     LOAD(n,  5,FP)
+     LOAD(d,  6,FP)
+     LOAD(pq, 7,FP)
+     LOAD(q,  8,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP, 7)
+     RETURN(FP_alt, PC_ret)
+
+#undef n
+#undef d
+#undef pq
+#undef q
+
+#endif  /* if local div/mod broken, don't use them */
+
+
+//    not(i:int) : int
+LABEL(not)
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt,1,FP)
+     INC(SP,1)
+     STORE(R1,4,FP)
+     LOAD(R1,3,FP) // Reg 1 <-- argument
+     CMP(R1,R0)
+     BZR(tstdlib_label_arg_was_false)
+     SET(R1,0)
+     STORE(R1,3,FP) // put false into return area
+     BR(tstdlib_label_return_from_not)
+     LABEL(tstdlib_label_arg_was_false)
+     SET(R1,1)
+     STORE(R1,3,FP) // put true into return area
+     LABEL(tstdlib_label_return_from_not)
+     LOAD(R1,4,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP,1)
+     RETURN(FP_alt, PC_ret)
+
+LABEL(exit)
+     HALT()
+
+// *  printint(b:bool)
+LABEL(printbool)
+#if USE_IOSTREAMS
+#if defined HERA_C_DETECT_CALLS_TO_PRINT
+    HERA_C_DETECTED_A_CALL_TO_PRINT = true;
+#endif
+     std::cout << REFMEM(reg(FP)+3)?"true":"false";
+#if ALWAYS_FLUSH
+	 std::cout.flush();
+#endif
+     RETURN(FP_alt, PC_ret)
+#else
+
+UNDEFINED_FAIL_ASSUMING_FP_ALT_IS_SET()
+
+#endif
+
+
+// *  printint(i:int)
+LABEL(printint)
+#if USE_IOSTREAMS
+#if defined HERA_C_DETECT_CALLS_TO_PRINT
+    HERA_C_DETECTED_A_CALL_TO_PRINT = true;
+#endif
+     std::cout << REFMEM(reg(FP)+3);
+#if ALWAYS_FLUSH
+	 std::cout.flush();
+#endif
+     RETURN(FP_alt, PC_ret)
+#else
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt,1,FP)
+     INC(SP,11)  // registers and function calls, all at once
+     STORE(R1, 4,FP)
+     STORE(R2, 5,FP)
+     STORE(R3, 6,FP)
+     STORE(R4, 7,FP)
+     STORE(R5, 8,FP)
+     STORE(R6, 9,FP)
+
+     MOVE(FP_alt, SP)
+
+#if INTEGER_IO_IN_HEX
+     SET(R1, tiger_stdlib_hex_prefix)
+     STORE(R1, 3,FP_alt)
+     CALL(FP_alt,print)
+     LOAD(R1, 3,FP)   // number to be printed
+     LSR8(R1,R1)
+     LSR(R1,R1)
+     LSR(R1,R1)
+     LSR(R1,R1)
+     LSR(R1,R1)
+    CALL(FP_alt,tstdlib_local_print_hex_digit_R1)
+     LOAD(R1, 3,FP)   // number to be printed
+     SET(R2, 0x0f00)
+     AND(R1, R1,R2)
+     LSR8(R1,R1)
+    CALL(FP_alt,tstdlib_local_print_hex_digit_R1)
+     LOAD(R1, 3,FP)   // number to be printed
+     SET(R2, 0x00f0)
+     AND(R1, R1,R2)
+     LSR(R1,R1)
+     LSR(R1,R1)
+     LSR(R1,R1)
+     LSR(R1,R1)
+    CALL(FP_alt,tstdlib_local_print_hex_digit_R1)
+     LOAD(R1, 3,FP)   // number to be printed
+     SET(R2, 0x000f)
+     AND(R1, R1,R2)
+    CALL(FP_alt,tstdlib_local_print_hex_digit_R1)
+     LOAD(R6, 9,FP)
+     LOAD(R5, 8,FP)
+     LOAD(R4, 7,FP)
+     LOAD(R3, 6,FP)
+     LOAD(R2, 5,FP)
+     LOAD(R1, 4,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP, 11)
+     RETURN(FP_alt, PC_ret)  // main return in #if INTEGER_IO_IN_HEX
+
+    LABEL(tstdlib_local_print_hex_digit_R1)  // local function, doesn't do stack management or preserve registers
+     OR(R3,Rt, R0)   // copy TMP without stack
+     SET(R2, 9)
+     CMP(R1, R2)
+    BLE(tstdlib_local_print_dec_digit)
+     SET(R2, 55)        // 'a'-10 is 0x41 - a is 55 decimal
+     ADD(R1, R1,R2)   // R1 -10 + 'a'
+    BR(tstdlib_local_print_the_digit)
+    LABEL(tstdlib_local_print_dec_digit)
+     SET(R2, 0x30)    // '0')
+     ADD(R1, R1,R2)   // R1 + '0'
+    LABEL(tstdlib_local_print_the_digit)
+
+     SET(R2, tiger_stdlib_printing_one_char_tmp)
+     STORE(R1, 1,R2)
+     STORE(R2, 3,FP_alt)
+     CALL(FP_alt, print)
+
+     OR(Rt, R3,R0)   // restore TMP without stack
+    RETURN(FP_alt, PC_ret)  // return from local function that didn't increment SP
+#else	/* NOT INTEGER_IO_IN_HEX */
+
+/******************************************/
+     SET(R1, tstdlib_not_tested)
+     STORE(R1, 3,FP_alt)
+     CALL(FP_alt, print)
+/******************************************/
+
+     LOAD(R1, 3,FP)   // number to be printed
+     OR(R0,R0,R1)  // set flags
+    BNS(PRINTINT_NON_NEGATIVE)
+     SET(R2, tiger_stdlib_printing_one_char_tmp)
+     SET(R3, '-')
+     STORE(R3, 1,R2)
+     STORE(R2, 3,FP_alt)
+     CALL(FP_alt, print)
+     SUB(R1, 0,R1)  // now it's non-negative!
+  LABEL(PRINTINT_NON_NEGATIVE)
+     SET(R2, 10000)  // R2 = which digit
+     CALL(FP_alt,tstdlib_local_divide_subroutine)  // R1= number//10000, R2=number % 10000
+     SET(R3, '0')
+     ADD(R1, R1,R3)  // character for number//10000
+     SET(R3, tiger_stdlib_printing_one_char_tmp)
+     STORE(R1, 1,R3)
+     STORE(R3, 3,FP_alt)
+     CALL(FP_alt, print)
+     OR(R1, R2,R0)   // R1 is now number % 10000
+
+     SET(R2, 1000)  // R2 = which digit
+     CALL(FP_alt,tstdlib_local_divide_subroutine)  // R1= number//1000, R2=number % 1000
+     SET(R3, '0')
+     ADD(R1, R1,R3)  // character for number//1000
+     SET(R3, tiger_stdlib_printing_one_char_tmp)
+     STORE(R1, 1,R3)
+     STORE(R3, 3,FP_alt)
+     CALL(FP_alt, print)
+     OR(R1, R2,R0)   // R1 is now number % 1000
+
+     SET(R2, 100)  // R2 = which digit
+     CALL(FP_alt,tstdlib_local_divide_subroutine)  // R1= number//100, R2=number % 100
+     SET(R3, '0')
+     ADD(R1, R1,R3)  // character for number//100
+     SET(R3, tiger_stdlib_printing_one_char_tmp)
+     STORE(R1, 1,R3)
+     STORE(R3, 3,FP_alt)
+     CALL(FP_alt, print)
+     OR(R1, R2,R0)   // R1 is now number % 100
+
+     SET(R2, 10)  // R2 = which digit
+     CALL(FP_alt,tstdlib_local_divide_subroutine)  // R1= number//10, R2=number % 10
+     SET(R3, '0')
+     ADD(R1, R1,R3)  // character for number//10
+     SET(R3, tiger_stdlib_printing_one_char_tmp)
+     STORE(R1, 1,R3)
+     STORE(R3, 3,FP_alt)
+     CALL(FP_alt, print)
+
+     // R2 is still number % 10
+     SET(R3, '0')
+     ADD(R2, R2,R3)  // character for number%10
+     SET(R3, tiger_stdlib_printing_one_char_tmp)
+     STORE(R2, 1,R3)
+     STORE(R3, 3,FP_alt)
+     CALL(FP_alt, print)
+
+
+     LOAD(R6, 9,FP)
+     LOAD(R5, 8,FP)
+     LOAD(R4, 7,FP)
+     LOAD(R3, 6,FP)
+     LOAD(R2, 5,FP)
+     LOAD(R1, 4,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP, 11)
+     RETURN(FP_alt, PC_ret)  // main return in #if INTEGER_IO_IN_HEX
+
+#endif
+#endif
+
+
+// * getint() : int
+LABEL(getint)
+#if USE_IOSTREAMS
+     {
+       int i;
+       static int n_cin_fails = CIN_FAIL_MAX;
+       if (!cin && n_cin_fails-->0) {std::cerr<<"READ PAST VALID INPUT " << CIN_FAIL_MAX << " TIMES, GIVING UP"; HALT() }
+       std::cin >> i;
+       if (!cin) {std::cerr<<"Note: getint read past end of input\n"; }
+       SETMEM(reg(FP)+3, i);
+     }
+     RETURN(FP_alt, PC_ret)
+#else
+// This has not been done in HERA yet -- just return 0; or, better yet, halt.
+	STORE(PC_ret, 0,FP)
+	STORE(FP_alt, 1,FP)
+	MOVE(FP_alt,SP)
+	INC(SP,4)
+
+UNDEFINED_FAIL_ASSUMING_FP_ALT_IS_SET()
+
+	SET(Rt,  0)
+	STORE(Rt,  3,FP)  // return value
+	LOAD(PC_ret, 0,FP)
+	LOAD(FP_alt,1,FP)
+	DEC(SP,4)
+	RETURN(FP_alt, PC_ret);
+#endif
+
+
+//   println(s:string)
+LABEL(println)
+	STORE(PC_ret, 0,FP)
+	STORE(FP_alt,1,FP)
+
+	MOVE(FP_alt,SP)
+	INC(SP,4)
+
+	LOAD(Rt,  3,FP)  // load first parameter
+	STORE(Rt,  3,FP_alt)
+	CALL(FP_alt, print)
+	SET(Rt,  tiger_stdlib_endl)
+	STORE(Rt,  3,FP_alt)
+	CALL(FP_alt, print)
+	LOAD(PC_ret, 0,FP)
+	LOAD(FP_alt,1,FP)
+	DEC(SP,4)
+    RETURN(FP_alt, PC_ret)
+
+#if ! WROTE_CS356_IO
+// *  getchar_ord(): int    // read one character, return as a number (like C's getchar())
+LABEL(getchar_ord)
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt, 1,FP)
+     INC(SP, 2)
+     STORE(R1, 4,FP)
+     STORE(R2, 5,FP)
+     SET(R1, tiger_stdlib_ungetchar_one_char_tmp)
+     LOAD(R2, 0,R1)
+     BNZ(USE_UNGETCHAR_VALUE)
+
+#if USE_IOSTREAMS
+     {
+       char c;
+       static int n_cin_fails = CIN_FAIL_MAX;
+       if (!cin && n_cin_fails-->0) {std::cerr<<"READ PAST VALID INPUT " << CIN_FAIL_MAX << " TIMES, GIVING UP"; HALT() }
+       std::cin.get(c);
+       if (!cin) c=-1;
+       SET(R2, c);
+     }
+#else
+/// NOT UPDATED FOR NO IOSTREAMS YET --- THIS NEEDS TO BE WRITTEN
+	// THIS is also covered in CS356, and shouldn't be needed there... Try defining USE_IOSTREAMS otherwise
+
+UNDEFINED_FAIL_ASSUMING_FP_ALT_IS_SET()
+
+#endif
+
+     STORE(R2, 1,R1) // define next ungetchar in case we need it
+     BR(getchar_ord_finish)
+
+  LABEL(USE_UNGETCHAR_VALUE)
+     SET(R2, 0)
+     STORE(R2, 0,R1) // invalidate old ungetchar
+     LOAD(R2, 1,R1)  // but still grab the value
+     STORE(R2, 3,FP)
+
+  LABEL(getchar_ord_finish)
+     STORE(R2, 3,FP)
+     LOAD(R2, 5,FP)
+     LOAD(R1, 4,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP, 2)
+     RETURN(FP_alt, PC_ret)
+
+
+// *  ungetchar()	    // make next input include most recently read character
+LABEL(ungetchar)
+     // Result is undefined if we've not done a getchar/getchar_ord/getline since last ungetchar or start
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt,1,FP)
+     INC(SP, 3)
+     STORE(R1, 4,FP)
+     STORE(R2, 5,FP)
+
+     SET(R1, tiger_stdlib_ungetchar_one_char_tmp)
+     SET(R2, 1)
+     STORE(R2, 0,R1)
+
+     LOAD(R2, 5,FP)
+     LOAD(R1, 4,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP, 3)
+     RETURN(FP_alt, PC_ret)
+
+     
+
+// *  putchar_ord(i:int)    // print the character chr(i) (like C's putchar(c))
+LABEL(putchar_ord)
+#if USE_IOSTREAMS
+#if defined HERA_C_DETECT_CALLS_TO_PRINT
+    HERA_C_DETECTED_A_CALL_TO_PRINT = true;
+#endif
+    std::cout << (char) (REFMEM(reg(FP)+3));
+#if ALWAYS_FLUSH
+	 std::cout.flush();
+#endif
+#else
+#if HERA_C
+    Hprintchar((char) (REFMEM(reg(FP)+3)));
+#else
+    UNDEFINED_FAIL_ASSUMING_FP_ALT_IS_SET()
+#endif
+#endif
+    RETURN(FP_alt, PC_ret)
+
+//   print(s:string)
+LABEL(print)
+#if defined HERA_C
+#if defined HERA_C_DETECT_CALLS_TO_PRINT
+    HERA_C_DETECTED_A_CALL_TO_PRINT = true;
+#endif
+#if USE_IOSTREAMS
+     for (int __print_i=1; __print_i<=REFMEM(REFMEM(reg(FP)+3)); __print_i++) \
+	 std::cout << (char) REFMEM(REFMEM(reg(FP)+3) + __print_i);
+#if ALWAYS_FLUSH
+	 std::cout.flush();
+#endif
+#else
+     for (int __print_i=1; __print_i<=REFMEM(REFMEM(reg(FP)+3)); __print_i++) \
+         Hprintchar((char) REFMEM(REFMEM(reg(FP)+3) + __print_i));
+#endif
+#else
+
+
+UNDEFINED_FAIL_ASSUMING_FP_ALT_IS_SET()
+
+     HALT()  // left for CS356; try setting USE_IOSTREAMS until then
+     
+#endif
+     RETURN(FP_alt, PC_ret)
+
+
+//   flush()
+LABEL(flush)
+#if USE_IOSTREAMS
+     std::cout.flush();
+#else
+     // don't need to do anything
+#endif
+     RETURN(FP_alt, PC_ret)
+
+
+//   getchar() : string
+LABEL(getchar)
+    STORE(PC_ret, 0,FP)
+    STORE(FP_alt, 1,FP)
+    INC(SP, 2)  // Frame expands from FP+0..FP+3 to FP+0..FP+5 (SP=FP+6)
+    STORE(R1, 4,FP)
+    STORE(R2, 5,FP)
+
+    MOVE(FP_alt,SP)
+    INC(SP, 4)
+    SET(R1, 2)
+    STORE(R1, 3,FP_alt)
+    CALL(FP_alt, malloc)
+    LOAD(R2, 3,FP_alt)
+    // DEC(SP, 4) after malloc
+    // INC(SP, 4) before getchar_ord
+    STORE(R2, 3,FP)     // this is the string we'll return
+    SETLO(R1, 1)	// Size of string we're reading
+    STORE(R1, 0,R2)
+    CALL(FP_alt, getchar_ord)
+    LOAD(R1, 3,FP_alt)	// R1 is now the character
+    DEC(SP, 4)
+    STORE(R1, 1,R2)
+    LOAD(R2, 5,FP)
+    LOAD(R1, 4,FP)
+    LOAD(PC_ret, 0,FP)
+    LOAD(FP_alt, 1,FP)
+    DEC(SP, 2)
+    RETURN(FP_alt, PC_ret)
+
+// * getline() : string
+LABEL(getline)
+#if USE_IOSTREAMS
+     {
+       char c; word start = next_free_memory; INC_NEXT_FREE_MEMORY_BY(1);
+       static int n_cin_fails = CIN_FAIL_MAX; \
+       if (!cin && n_cin_fails-->0) {std::cerr<<"READ PAST VALID INPUT " << CIN_FAIL_MAX << " TIMES, GIVING UP"; HALT() } \
+       if (!cin && n_cin_fails-->0) {std::cerr<<"Note: getline called after EOF\n"; }
+       while (std::cin.get(c) && c != '\n') {	\
+	 SETMEM(next_free_memory,c);		\
+	 INC_NEXT_FREE_MEMORY_BY(1);		\
+       }
+       SETMEM(start,next_free_memory-start-1);
+       SETMEM(reg(FP)+3, start);
+     }
+     RETURN(FP_alt, PC_ret)
+#else
+
+UNDEFINED_FAIL_ASSUMING_FP_ALT_IS_SET()
+
+	HALT()
+	// THIS is covered in CS356, and not yet updated for no-iostreames in 350; try setting USE_IOSTREAMS
+
+#endif
+
+#endif /* ! #if ! WROTE_CS356_IO */
+
+
+#if ! WROTE_CS356_MALLOC
+
+// fail if wrapped past 0xffff, hard-coded, but check
+// ** malloc(n_cells: int) : int  // returns address of allocated space
+LABEL(malloc)
+     STORE(PC_ret, 0,FP)
+     STORE(FP_alt,1,FP)
+     INC(SP,3)
+     STORE(R1,4,FP)
+     STORE(R2,5,FP)
+     STORE(R3,6,FP)
+
+     LOAD(R1,3,FP) // Reg 1 <-- argument (number of cells needed)
+     SET(R3,first_space_for_fsheap)
+     LOAD(R2,0,R3) // R2 is address of first free
+   BNZ(fsheap_already_initialized)
+     MOVE(R2, R3)
+     INC(R2, 1)    // initialize fs heap to its first free element then allocate from there
+     STORE(R2,0,R3) // defensive programming --- this should be overwritten later and thus dead
+   LABEL(fsheap_already_initialized)
+     STORE(R2,3,FP)// RETURN VALUE DEFINED HERE
+
+     ADD(R2,R2,R1) // ALLOCATE -- FAIL BELOW IF WRAPPED PAST END OF ADDRESS SPACE OR "last_space_for_heap"
+     BC(malloc_give_up)
+     SET(R1,last_space_for_fsheap)
+     CMP(R2, R1)   // want (unsigned) R2 < R1, so R2-R1 should BORROW, i.e. NOT carry!
+     BC(malloc_give_up)
+     STORE(R2,0,R3)   // STORE BACK THE NEXT FREE SPACE
+
+     LOAD(R1,4,FP)
+     LOAD(R2,5,FP)
+     LOAD(R3,6,FP)
+     LOAD(PC_ret, 0,FP)
+     LOAD(FP_alt,1,FP)
+     DEC(SP, 3)
+     RETURN(FP_alt, PC_ret)	// Normal return from malloc
+
+
+   LABEL(malloc_inconsistent)
+     SET(R1, malloc_inconsistent_error)
+     BR(malloc_exit)
+   LABEL(malloc_give_up)
+     SET(R1,malloc_out_of_memory_error)
+   LABEL(malloc_exit)
+  
+    MOVE(FP_alt,SP)
+    INC(SP,4)
+
+     STORE(R1,3,FP_alt)
+     CALL(FP_alt,print)
+     CALL(FP_alt,exit)
+    DEC(SP, 4) // just to match
+     
+
+// ** free(address: int)            // release region returned by above (currently does nothing)
+LABEL(free)
+     RETURN(FP_alt, PC_ret)
+
+#endif /* ! WROTE_CS356_MALLOC */
+
+#endif

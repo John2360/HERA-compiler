@@ -1,0 +1,29 @@
+#if ! defined TIGER_STDLIB_DATA_INCLUDED
+#define TIGER_STDLIB_DATA_INCLUDED 1
+
+  DLABEL(tiger_stdlib_endl)  /* manually build an "end-of-line" string */
+  INTEGER(1)
+  INTEGER(10)  /* control-j -- an end-of-line */
+
+  DLABEL(tiger_stdlib_hex_prefix)
+  TIGER_STRING("0x")
+  DLABEL(tiger_stdlib_printing_one_char_tmp)
+  TIGER_STRING(" ")
+  DLABEL(tiger_stdlib_ungetchar_one_char_tmp)  // size = defined; char = the char
+  INTEGER(0)  // 0=undefined; 1=defined
+  INTEGER(0)  // the character
+
+  DLABEL(malloc_inconsistent_error)
+  TIGER_STRING("internal inconsistency in malloc -- program terminated\n")
+
+  DLABEL(malloc_out_of_memory_error)
+  TIGER_STRING("out of memory in malloc -- program terminated\n")
+
+  DLABEL(substring_got_bad_params)
+  TIGER_STRING("bad parameters to substring -- program will be terminated ... s, first, n are: ")
+
+  DLABEL(tstdlib_not_implemented)
+  TIGER_STRING("this function is not yet implemented it tiger standard libarry; halting\n")
+  DLABEL(tstdlib_not_tested)
+  TIGER_STRING("WARNING: Entering untested territory in tiger stdlib\n") 
+#endif

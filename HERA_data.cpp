@@ -12,7 +12,8 @@ string AST_node_::HERA_data()  // Default used during development; could be remo
     return "#error " + message;  //if somehow we try to HERA-C-Run this, it will fail
 }
 
-string A_opExp_::HERA_data() {
+string A_opExp_::HERA_data()
+{
     return _left->HERA_data() + _right->HERA_data();
 }
 

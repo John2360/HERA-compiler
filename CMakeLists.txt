@@ -53,7 +53,7 @@ add_executable(tiger
   parent
   result_reg
   static_checks
-  ST
+  ST-2024
   tiger
   tigerParseDriver
   typecheck

@@ -174,7 +174,7 @@ int main(int argc, char **argv)
 
 			if (! EM_recorded_any_errors()) {
                 driver.AST->typecheck();
-				String code = driver.AST->HERA_code();
+				String code = driver.AST->HERA_code() + "\n\n#include Tiger-stdlib-stack.hera";
 				if (! EM_recorded_any_errors()) {
 					cout << code;
 					return 0; // no errors
