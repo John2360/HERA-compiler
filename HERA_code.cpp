@@ -19,7 +19,7 @@ string AST_node_::HERA_code()  // Default used during development; could be remo
 
 string A_root_::HERA_code()
 {
-	return  "#include Tiger-stdlib-stack-data.hera\n\n" + main_expr->HERA_data() +"CBON()\n\n" + main_expr->HERA_code();  // was SETCB for HERA 2.3
+	return  "#include \"Tiger-stdlib-stack-data.hera\"\n\n" + main_expr->HERA_data() +"CBON()\n\n" + main_expr->HERA_code();  // was SETCB for HERA 2.3
 }
 
 
