@@ -161,11 +161,31 @@
 typedef Position A_pos;
 #include "symbol.h"
 #include "types.h"  // we'll need this for attributes
+#include <hc_list.h>	// gets files from /home/courses/include folder, thanks to -I flag on compiler
+#include <hc_list_helpers.h>
 #include "ST-2024.h"
+
+struct function_type_info {
+public:
+    function_type_info(
+            Ty_ty return_type,
+            HaverfordCS::list<Ty_ty> param_types
+    );
+    // leave data public, which is the default for 'struct'
+    Ty_ty return_type;
+    HaverfordCS::list<Ty_ty> param_types;
+
+//    string __repr__();
+//    string __str__();
+
+};
+// make an abbreviation "ST_example" for a symbol table with the example sym info
+//   (also would be in a .h, usually)
+typedef ST<function_type_info> tiger_standard_library;
+extern tiger_standard_library data_shell;
 
 
 void AST_examples();  // Examples, to help understand what't going on here ... see AST.cc
-
 
 /*
   Following the notation/techniques used in Appel'c C code,

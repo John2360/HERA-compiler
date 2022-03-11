@@ -15,6 +15,13 @@
 // To run the examples, use the command
 //	g++ -std=c++0x -I/home/courses/include -D AST_EXAMPLES_IS_MAIN=1 -D ERRORMSG_SKIP_LEX=1 AST.cc AST-print.cc AST-print-attributes.cc HERA_code.cc result_reg.cc util.cc errormsg.cc -L/home/courses/lib -lcourses -o AST_examples && ./AST_examples
 
+function_type_info::function_type_info(Ty_ty the_return_type,  HaverfordCS::list<Ty_ty> the_param_types) : return_type(the_return_type), param_types(the_param_types) {};
+
+tiger_standard_library data_shell =
+        tiger_standard_library({
+               std::pair(to_Symbol("print"), function_type_info(Ty_Void(), HaverfordCS::ez_list(Ty_String()))),
+               std::pair(to_Symbol("printint"), function_type_info(Ty_Void(), HaverfordCS::ez_list(Ty_String())))
+       });
 
 void AST_examples()
 {

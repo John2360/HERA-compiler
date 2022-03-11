@@ -18,33 +18,6 @@
 #include <hc_list_helpers.h>
 
 
-struct function_type_info {
-public:
-    function_type_info(
-            Ty_ty return_type,
-            HaverfordCS::list<Ty_ty> param_types
-    );
-    // leave data public, which is the default for 'struct'
-    Ty_ty return_type;
-    HaverfordCS::list<Ty_ty> param_types;
-
-//    string __repr__();
-//    string __str__();
-
-};
-// make an abbreviation "ST_example" for a symbol table with the example sym info
-//   (also would be in a .h, usually)
-typedef ST<function_type_info> tiger_standard_library;
-
-function_type_info::function_type_info(Ty_ty the_return_type,  HaverfordCS::list<Ty_ty> the_param_types) : return_type(the_return_type), param_types(the_param_types) {};
-
-tiger_standard_library data_shell =
-    tiger_standard_library({
-           std::pair(to_Symbol("print"), function_type_info(Ty_Void(), HaverfordCS::ez_list(Ty_String()))),
-           std::pair(to_Symbol("printint"), function_type_info(Ty_Void(), HaverfordCS::ez_list(Ty_String())))
-    });
-
-
 
 /* Note that this is just some examples, since most C++ compilers require that the implementation of template functions be #included and thus I put it in ST.t */
 

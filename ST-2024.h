@@ -24,6 +24,7 @@
 typedef Symbol name_type;  // This would let us change to using something other than Symbols (e.g. Strings) as names
 #include <list>  // std::list used for easy initialization
 
+
 // some pre-declarations keep G++ happy:
 template <class symbol_info> class ST;
 template <class symbol_info> class ST_node; // should be private to class ST, but this breaks g++
@@ -31,7 +32,6 @@ template <class symbol_info> class ST_node; // should be private to class ST, bu
 template <class symbol_info> bool is_name_there(const name_type &look_for_me, const ST<symbol_info> &in_this_table);
 template <class symbol_info> symbol_info &lookup(const name_type &must_find_this, const ST<symbol_info> &in_this_table);
 template <class symbol_info> ST<symbol_info> merge_or_fuse(const ST<symbol_info> &inner, const ST<symbol_info> &outer, bool merge_dups);
-
 
 
 template <class symbol_info> class ST {
@@ -129,6 +129,7 @@ template <class symbol_info> String to_String(const ST<symbol_info> &table);
 
 void ST_test();   // check internal consistency
 void ST_examples();  // show some interesting examples to understand how ST works
+
 
 #include "ST-2024.t"
 

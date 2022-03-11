@@ -93,21 +93,22 @@ string A_callExp_::HERA_code()
 {
 
     string my_code;
-    int call_registers = 1;
+    my_code += "MOVE(FP_alt, SP)\nINC("+str(_args->length()+2)+")\n";
+    int stack_pointer = 3;
 
     A_expList my_pointer = _args;
     while (true) {
 
         my_code += my_pointer->_head->HERA_code();
-        my_code += "MOVE(R"+str(call_registers)+", "+my_pointer->_head->result_reg_s()+") \n";
-        call_registers += 1;
+        my_code += "STORE("+my_pointer->_head->result_reg_s()+", "+str(stack_pointer)+", FP_alt) \n";
+        stack_pointer += 1;
 
         if (my_pointer->_tail == 0) break;
         my_pointer = my_pointer->_tail;
 
     }
 
-    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+")\n MOVE("+this->result_reg_s()+", R1) \n\n";
+    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+")\nLOAD("+this->result_reg_s()+", 3, FP_alt)\nDEC(SP, "+str(_args->length()+2)+") \n\n";
 
     return my_code;
 }

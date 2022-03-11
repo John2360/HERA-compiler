@@ -6,8 +6,8 @@
 #include <map>
 #include <list>
 
-#include <hc_list.h>	// gets files from /home/courses/include folder, thanks to -I flag on compiler
-#include <hc_list_helpers.h>
+//#include <hc_list.h>	// gets files from /home/courses/include folder, thanks to -I flag on compiler
+//#include <hc_list_helpers.h>
 
 
 //
@@ -116,39 +116,36 @@ Ty_ty A_ifExp_::typecheck()
 
 Ty_ty A_callExp_::typecheck()
 {
-    std::map<std::string, HaverfordCS::list<Ty_ty>> function_lookup = {
-            { "print", HaverfordCS::ez_list(Ty_String(), Ty_Void() ) },
-            { "printint", HaverfordCS::ez_list(Ty_Int(), Ty_Void()) }
-    };
+    try {
+        function_type_info my_func = lookup(_func, data_shell);
 
-    std::list<Ty_ty> my_args;
-
-    A_expList my_pointer = _args;
-    while (true) {
-        my_args.push_back(my_pointer->_head->typecheck());
-
-        if (my_pointer->_tail == 0) break;
-        my_pointer = my_pointer->_tail;
-    }
-
-    if (my_args.size() != length(function_lookup[Symbol_to_string(_func)])-1 ) {
-        EM_error("Oops, function call "+Symbol_to_string(_func)+ " received too many or too few arguments", true); return Ty_Error();
-    }
-
-    HaverfordCS::list correct_arg_pointer = function_lookup[Symbol_to_string(_func)];
-    while (my_args.size() != 0){
-        Ty_ty my_arg = my_args.front();
-
-        if (my_arg != head(function_lookup[Symbol_to_string(_func)])) {
-            EM_error("Oops, function call "+Symbol_to_string(_func)+ " has incorrect parameter types; expected " + to_String(head(function_lookup[Symbol_to_string(_func)])) + " and got " + to_String(my_arg) , true);
+        // check num of args
+        if (length(my_func.param_types) != _args->length()){
+            EM_error("Oops, the number of parameters do not match", true);
             return Ty_Error();
         }
 
-        my_args.pop_front();
-        correct_arg_pointer = rest(correct_arg_pointer);
-    }
+        // check args match
+        HaverfordCS::list<Ty_ty> my_pointer_func_list = my_func.param_types;
+        A_expList my_pointer_func = _args;
+        while (true){
+            if (head(my_pointer_func_list) != my_pointer_func->_head->typecheck()) {
+                EM_error("Oops, the function inputs do not match the expected types", true);
+                return Ty_Error();
+            }
 
-    return first(correct_arg_pointer);
+            if (my_pointer_func->_tail == 0 || empty(my_pointer_func_list)) break;
+            my_pointer_func_list = rest(my_pointer_func_list);
+            my_pointer_func = my_pointer_func->_tail;
+        }
+
+        return my_func.return_type;
+
+    }
+    catch(const tiger_standard_library::undefined_symbol &missing) {
+        EM_debug("Oops, the function " + str(missing.name) + " is not defined");
+        return Ty_Error();
+    }
 }
 
 // The bodies of other type checking functions,
