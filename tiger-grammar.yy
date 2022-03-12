@@ -56,6 +56,7 @@ class tigerParseDriver;
 /* Attributes types for nonterminals are next, e.g. struct's from tigerParseDriver.h */
 %type <expAttrs>  exp
 %type <expAttrs>  seq
+%type <expListAttrs>  args
 
 
 // The line below means our grammar must not have conflicts
@@ -79,6 +80,14 @@ seq: exp[i]					{ $$.AST = $i.AST;
                                                                             A_ExpList($seq1.AST, 0)
                                                                        ));
                                         EM_debug("Got semicolon seq expression.", $$.AST->pos());
+}
+;
+
+args: exp[i]					{ $$.AST = A_ExpList($i.AST, 0);
+      								  EM_debug("Got exp in args", $$.AST->pos());
+      								}
+    | exp[exp1] COMMA args[seq1]    { $$.AST = A_ExpList($exp1.AST, $seq1.AST);
+                                        EM_debug("Got comma arg expression.", $$.AST->pos());
 }
 ;
 
@@ -121,12 +130,20 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
     | LPAREN seq[seq1] RPAREN { $$.AST = $seq1.AST;
                                 EM_debug("Got seq expression.", $$.AST->pos());
                                 }
-    | ID[name] LPAREN seq[exp1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $exp1.AST->pos()),
+    | ID[name] LPAREN args[arg1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $arg1.AST->pos()),
                                                                 to_Symbol($name),
-                                                                A_ExpList($exp1.AST, 0));
+                                                                $arg1.AST
+                                                                 );
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }
+    | ID[name] LPAREN RPAREN { $$.AST = A_CallExp( Position::undefined(),
+                                                 to_Symbol($name),
+                                                 A_ExpList(A_NilExp(Position::undefined()), 0)
+                                                  );
+
+                                       EM_debug("Got void function call to "+$name, $$.AST->pos());
+                                     }
     | IF exp[seq1] THEN exp[seq2] ELSE exp[seq3] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq3.AST->pos()),
                                                                        $seq1.AST,
                                                                        $seq2.AST,

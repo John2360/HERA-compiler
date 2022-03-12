@@ -120,7 +120,18 @@ Ty_ty A_callExp_::typecheck()
         function_type_info my_func = lookup(_func, data_shell);
 
         // check num of args
-        if (length(my_func.param_types) != _args->length()){
+        int total_func_args = 0;
+        A_expList my_pointer = _args;
+
+        while (true) {
+            total_func_args += 1;
+
+            if (my_pointer->_tail == 0) break;
+            my_pointer = my_pointer->_tail;
+
+        }
+
+        if (length(my_func.param_types) != total_func_args) {
             EM_error("Oops, the number of parameters do not match", true);
             return Ty_Error();
         }
@@ -128,15 +139,21 @@ Ty_ty A_callExp_::typecheck()
         // check args match
         HaverfordCS::list<Ty_ty> my_pointer_func_list = my_func.param_types;
         A_expList my_pointer_func = _args;
-        while (true){
-            if (head(my_pointer_func_list) != my_pointer_func->_head->typecheck()) {
-                EM_error("Oops, the function inputs do not match the expected types", true);
-                return Ty_Error();
-            }
 
-            if (my_pointer_func->_tail == 0 || empty(my_pointer_func_list)) break;
-            my_pointer_func_list = rest(my_pointer_func_list);
-            my_pointer_func = my_pointer_func->_tail;
+        if (head(my_pointer_func_list) != Ty_Void()) {
+            while (true){
+                if (head(my_pointer_func_list) != my_pointer_func->_head->typecheck()) {
+                    EM_error("Oops, the function inputs do not match the expected types", true);
+                    return Ty_Error();
+                }
+
+                if (my_pointer_func->_tail == 0 || empty(my_pointer_func_list)) break;
+                my_pointer_func_list = rest(my_pointer_func_list);
+                my_pointer_func = my_pointer_func->_tail;
+            }
+        } else if (head(my_pointer_func_list) == Ty_Void() && _args->length() > 0) {
+            EM_error("Oops, the function should return void", true);
+            return Ty_Error();
         }
 
         return my_func.return_type;

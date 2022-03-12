@@ -172,6 +172,7 @@ string \"(.|\s)+?\"
 \-      { return yy::tigerParser::make_MINUS(loc); }
 \*		{ return yy::tigerParser::make_TIMES(loc); }
 \/		{ return yy::tigerParser::make_DIVIDE(loc); }
+\,		{ return yy::tigerParser::make_COMMA(loc); }
 
 
 \(		{ return yy::tigerParser::make_LPAREN(loc); }

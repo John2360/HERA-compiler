@@ -7,6 +7,10 @@
 struct expAttrs {
 		A_exp AST;
 };
+
+struct expListAttrs {
+    A_expList AST;
+};
 #include "tiger-grammar.tab.hpp"
 
 
