@@ -318,8 +318,19 @@ public:
 	A_nilExp_(A_pos p);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    int    result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+
     virtual string HERA_code(){return "";}
     virtual string HERA_data(){return "";}
+private:
+    virtual int init_result_reg();
+    int stored_result_reg = -1;
 };
 
 

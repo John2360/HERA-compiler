@@ -40,6 +40,13 @@ int A_boolExp_::init_result_reg()  // generate unique numbers, starting from 1, 
     return 4;
 }
 
+int A_nilExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
+{
+    // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
+    // TODO: Put this back to one once we have different function parameters on the stack
+    return 4;
+}
+
 int A_opExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
