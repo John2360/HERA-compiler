@@ -51,7 +51,7 @@ string A_expList_::HERA_data() {
     my_code += _head->HERA_data();
 
     A_expList my_pointer = _tail;
-    while (true){
+    while (true && my_pointer != 0){
         my_code += my_pointer->HERA_data();
         if (my_pointer->_tail == 0) break;
         my_pointer = my_pointer->_tail;
