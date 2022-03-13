@@ -149,6 +149,11 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                                                        $seq2.AST,
                                                                        $seq3.AST);
                                    }
+    | IF exp[seq1] THEN exp[seq2] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq2.AST->pos()),
+                                                                           $seq1.AST,
+                                                                           $seq2.AST,
+                                                                           0);
+                                       }
 
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,

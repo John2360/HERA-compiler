@@ -68,5 +68,5 @@ string A_stringExp_::HERA_data()
 }
 
 string A_ifExp_::HERA_data() {
-    return _test->HERA_data()+_then->HERA_data()+_else_or_null->HERA_data();
+    return (_else_or_null != 0) ? _test->HERA_data()+_then->HERA_data()+_else_or_null->HERA_data() : _test->HERA_data()+_then->HERA_data();
 }

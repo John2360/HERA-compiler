@@ -144,10 +144,11 @@ string A_ifExp_::HERA_code()
     string test_cond = _test->HERA_code() + "\nCMP(" + _test->result_reg_s() + ", R0)" + "\nBZ(" + this->branch_label_else() + ")\n";
     string then_clause = "\nLABEL(" + this->branch_label_then() + ")\n" +  _then->HERA_code() + "\nBR(" + this->branch_label_post() + ")\n";
 
-    string else_clause = "";
+    string else_clause = "\nLABEL(" + this->branch_label_else() + ")\n";
     if (_else_or_null != 0){
-        else_clause =  "\nLABEL(" + this->branch_label_else() + ")\n"  + _else_or_null->HERA_code() + "\nBR(" + this->branch_label_post() + ")\n";
+        else_clause += _else_or_null->HERA_code();
     }
+    else_clause += "\nBR(" + this->branch_label_post() + ")\n";
 
     return test_cond + then_clause + else_clause + "LABEL(" + this->branch_label_post() + ")";
 }
