@@ -93,7 +93,7 @@ string A_callExp_::HERA_code()
 {
 
     string my_code;
-    my_code += "MOVE(FP_alt, SP)\nINC(SP, "+str(_args->length()+2)+")\n";
+    my_code += "MOVE(FP_alt, SP)\nINC(SP, "+str(_args->length()+3)+")\n";
     int stack_pointer = 3;
 
     A_expList my_pointer = _args;

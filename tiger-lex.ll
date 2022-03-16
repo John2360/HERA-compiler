@@ -167,6 +167,10 @@ string \"(.|\s)+?\"
     \n            { loc.lines(yyleng); loc.step(); }
 }
 
+\&		{ return yy::tigerParser::make_AND(loc); }
+\|		{ return yy::tigerParser::make_OR(loc); }
+\!		{ return yy::tigerParser::make_NOT(loc); }
+
 \;		{ return yy::tigerParser::make_SEMICOLON(loc); }
 \+		{ return yy::tigerParser::make_PLUS(loc); }
 \-      { return yy::tigerParser::make_MINUS(loc); }
@@ -174,6 +178,12 @@ string \"(.|\s)+?\"
 \/		{ return yy::tigerParser::make_DIVIDE(loc); }
 \,		{ return yy::tigerParser::make_COMMA(loc); }
 
+\<\=		{ return yy::tigerParser::make_GE(loc); }
+\>\=		{ return yy::tigerParser::make_LE(loc); }
+\=\=		{ return yy::tigerParser::make_EQ(loc); }
+\!\=		{ return yy::tigerParser::make_NEQ(loc); }
+\>		{ return yy::tigerParser::make_GT(loc); }
+\<		{ return yy::tigerParser::make_LT(loc); }
 
 \(		{ return yy::tigerParser::make_LPAREN(loc); }
 \)		{ return yy::tigerParser::make_RPAREN(loc); }
