@@ -82,15 +82,13 @@ string A_condExp_::HERA_code()
     if (_left->result_reg() >= _right->result_reg()){
         pre_build = left_side + indent_math + "MOVE(R"+str( _left->result_reg()+1)+", "+_left->result_reg_s()+")\n" + right_side;
 
-        my_code = indent_math + ("CMP(" +
-                                 this->result_reg_s() + ", " +
-                "R"+str( _left->result_reg()+1) + ", " +
+        my_code = indent_math + ("CMP(R" +
+                            str( _left->result_reg()+1) + ", " +
                                  _right->result_reg_s() + ")\n");
     } else {
         pre_build = right_side + indent_math + "MOVE(R"+str( _right->result_reg()+1)+", "+ _right->result_reg_s()+")\n" + left_side;
 
-        my_code = indent_math + ("CMP(" +
-                                 this->result_reg_s() + ", " +
+        my_code = indent_math + ("CMP("+
                                  _left->result_reg_s() + ", " +
                 "R"+str( _right->result_reg()+1)+")\n\n");
     }
