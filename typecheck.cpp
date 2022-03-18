@@ -88,13 +88,24 @@ Ty_ty A_seqExp_::typecheck()
     return my_node->typecheck();
 }
 
-Ty_ty A_opExp_::typecheck()
+Ty_ty A_arithExp_::typecheck()
 {
     if (_left->typecheck() != Ty_Int() || _right->typecheck() != Ty_Int()) {
         EM_error("Oops, math operation expects two INTs as parameter types", true);
         return Ty_Error();
     } else {
         return Ty_Int();
+    }
+}
+
+Ty_ty A_condExp_::typecheck()
+{
+    // Fix inputs
+    if (false) {
+        EM_error("Oops, math operation expects two INTs as parameter types", true);
+        return Ty_Error();
+    } else {
+        return Ty_Bool();
     }
 }
 

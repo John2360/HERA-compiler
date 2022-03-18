@@ -8,6 +8,7 @@
 static int next_unique_number = 1;
 static int next_unique_string_number = 0;
 static int next_unique_if_number = 0;
+static int next_unique_cond_number = 0;
 
 int A_exp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
@@ -47,7 +48,14 @@ int A_nilExp_::init_result_reg()  // generate unique numbers, starting from 1, e
     return 4;
 }
 
-int A_opExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
+int A_arithExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
+{
+    // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
+    if (_left->result_reg() == _right->result_reg()) return _left->result_reg()+1;
+    return std::max(_left->result_reg(), _right->result_reg());
+}
+
+int A_condExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
     if (_left->result_reg() == _right->result_reg()) return _left->result_reg()+1;
@@ -122,6 +130,13 @@ string A_stringExp_::init_result_dlabel()  // generate unique numbers, starting 
     std::string my_string = "my_string_"+str(next_unique_string_number);
     // end of atomic transaction
     return my_string;
+}
+
+int A_condExp_::init_labels()
+{
+    int my_number = next_unique_cond_number;
+    next_unique_if_number = my_number + 1;
+    return next_unique_if_number;
 }
 
 int A_ifExp_::init_if_labels()

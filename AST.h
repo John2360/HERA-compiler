@@ -47,7 +47,9 @@
 //				A_recordExp_
 //				A_arrayExp_
 //			A_varExp_	(variable use, e.g. "d" in the expression "d+1", but not "a" in "a := 2")
-//			A_opExp_	(-, +, *, /, =, >=, ...)
+//			A_opExp_
+//              A_arithExp_
+//              A_condExp_
 //			A_assignExp_
 //			A_letExp_
 //			A_callExp_
@@ -449,7 +451,14 @@ typedef enum {A_plusOp, A_minusOp, A_timesOp, A_divideOp,
 
 class A_opExp_ : public A_exp_ {
 public:
-	A_opExp_(A_pos pos, A_oper oper, A_exp left, A_exp right);
+    A_opExp_(A_pos p);
+
+//    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);  // this one's easy, by definition :-)
+};
+
+class A_arithExp_ : public A_opExp_ {
+public:
+    A_arithExp_(A_pos pos, A_oper oper, A_exp left, A_exp right);
 	virtual string print_rep(int indent, bool with_attributes);
 
     int    result_reg() {
@@ -474,6 +483,53 @@ private:
 	A_oper _oper;
 	A_exp _left;
 	A_exp _right;
+};
+
+class A_condExp_ : public A_opExp_ {
+public:
+    A_condExp_(A_pos pos, A_oper oper, A_exp left, A_exp right);
+    virtual string print_rep(int indent, bool with_attributes);
+
+    int    result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+    void do_init(){
+        if (this->stored_true_label == "" && this->stored_end_label == ""){
+            int results = this->init_labels();
+            this->stored_true_label = "my_cond_true_"+str(results);
+            this->stored_end_label = "my_cond_end_"+str(results);
+        }
+    }
+    string branch_label_true() {
+        do_init();
+        return stored_true_label;
+    }
+    string branch_label_end() {
+        do_init();
+        return stored_end_label;
+    }
+
+    virtual string HERA_data();
+    virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+    virtual int compute_height();  // just for an example, not needed to compile
+private:
+    virtual int init_result_reg();
+    virtual int init_labels();
+    int stored_result_reg = -1;
+    string stored_true_label = "";
+    string stored_end_label = "";
+
+    A_oper _oper;
+    A_exp _left;
+    A_exp _right;
 };
 
 class A_assignExp_ : public A_exp_ {

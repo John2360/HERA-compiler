@@ -53,12 +53,24 @@ static string HERA_math_op(Position p, A_oper op) // needed for opExp
         return "SUB";
 	case A_timesOp:
 		return "MUL";	// was MULT for HERA 2.3
+    case A_eqOp:
+        return "BZ";
+    case A_geOp:
+        return "BGE";
+    case A_gtOp:
+        return "BG";
+    case A_leOp:
+        return "BLE";
+    case A_ltOp:
+        return "BL";
+    case A_neqOp:
+        return "BNZ";
 	default:
 		EM_error("Unhandled case in HERA_math_op", false, p);
 		return "Oops_unhandled_hera_math_op";
 	}
 }
-string A_opExp_::HERA_code()
+string A_condExp_::HERA_code()
 {
 
     string left_side = _left->HERA_code();
@@ -67,14 +79,46 @@ string A_opExp_::HERA_code()
     string pre_build;
     string my_code;
 
-    EM_debug((HERA_math_op(pos(), _oper)) + " - " + _right->result_reg_s(), false);
+    if (_left->result_reg() >= _right->result_reg()){
+        pre_build = left_side + indent_math + "MOVE(R"+str( _left->result_reg()+1)+", "+_left->result_reg_s()+")\n" + right_side;
+
+        my_code = indent_math + ("CMP(" +
+                                 this->result_reg_s() + ", " +
+                "R"+str( _left->result_reg()+1) + ", " +
+                                 _right->result_reg_s() + ")\n");
+    } else {
+        pre_build = right_side + indent_math + "MOVE(R"+str( _right->result_reg()+1)+", "+ _right->result_reg_s()+")\n" + left_side;
+
+        my_code = indent_math + ("CMP(" +
+                                 this->result_reg_s() + ", " +
+                                 _left->result_reg_s() + ", " +
+                "R"+str( _right->result_reg()+1)+")\n\n");
+    }
+    my_code += HERA_math_op(pos(), _oper) + "(" + this->branch_label_true() + ")\n";
+    my_code += "SET("+this->result_reg_s()+", 0)\n";
+    my_code += "BR("+ this->branch_label_end()+")\n";
+    my_code += "LABEL("+ this->branch_label_true()+")\n";
+    my_code += "SET("+this->result_reg_s()+", 1)\n";
+    my_code += "LABEL("+ this->branch_label_end()+")\n";
+
+	return pre_build + my_code;
+}
+
+string A_arithExp_::HERA_code()
+{
+
+    string left_side = _left->HERA_code();
+    string right_side = _right->HERA_code();
+
+    string pre_build;
+    string my_code;
 
     if (_left->result_reg() >= _right->result_reg()){
         pre_build = left_side + indent_math + "MOVE(R"+str( _left->result_reg()+1)+", "+_left->result_reg_s()+")\n" + right_side;
 
         my_code = indent_math + (HERA_math_op(pos(), _oper) + "(" +
                                  this->result_reg_s() + ", " +
-                "R"+str( _left->result_reg()+1) + ", " +
+                                 "R"+str( _left->result_reg()+1) + ", " +
                                  _right->result_reg_s() + ")\n\n");
     } else {
         pre_build = right_side + indent_math + "MOVE(R"+str( _right->result_reg()+1)+", "+ _right->result_reg_s()+")\n" + left_side;
@@ -82,12 +126,11 @@ string A_opExp_::HERA_code()
         my_code = indent_math + (HERA_math_op(pos(), _oper) + "(" +
                                  this->result_reg_s() + ", " +
                                  _left->result_reg_s() + ", " +
-                "R"+str( _right->result_reg()+1)+")\n\n");
+                                 "R"+str( _right->result_reg()+1)+")\n\n");
     }
 
-	return pre_build + my_code;
+    return pre_build + my_code;
 }
-
 
 string A_callExp_::HERA_code()
 {

@@ -9,8 +9,18 @@ int A_leafExp_::compute_height(){
 	return 0;
 }
 
+int A_condExp_::compute_height() {
+    // This will be exponentially slower than is necessary,
+    //   due to doing two calls where there could be one,
+    //   AT EVERY LEVEL OF THE AST
+    if (_left->compute_height() > _right->compute_height()) {
+        return _left->compute_height() + 1;
+    } else {
+        return _right->compute_height() + 1;
+    }
+}
 
-int A_opExp_::compute_height(){
+int A_arithExp_::compute_height(){
 	// This will be exponentially slower than is necessary,
 	//   due to doing two calls where there could be one,
 	//   AT EVERY LEVEL OF THE AST

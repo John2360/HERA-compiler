@@ -48,6 +48,7 @@ class tigerParseDriver;
 %left ELSE
 %left MINUS PLUS
 %left TIMES DIVIDE
+%left EQ NEQ LT LE GT GE OR AND NOT
 
 
 /* https://www.gnu.org/software/bison/manual/html_node/Precedence-Only.html */
@@ -105,19 +106,19 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                         EM_debug("Got nil", Position::undefined());
                                    }
      //bison manual 75
-    | MINUS exp[exp1] %prec UMINUS  { $$.AST = A_OpExp($exp1.AST->pos(),
+    | MINUS exp[exp1] %prec UMINUS  { $$.AST = A_ArithExp($exp1.AST->pos(),
                                                A_minusOp,  A_IntExp($exp1.AST->pos(), 0),$exp1.AST);
                               EM_debug("Got negative expression.", $$.AST->pos());
                                 }
-	| exp[exp1] PLUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+	| exp[exp1] PLUS exp[exp2]	{ $$.AST = A_ArithExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_plusOp,  $exp1.AST,$exp2.AST);
 								  EM_debug("Got plus expression.", $$.AST->pos());
 								}
-    | exp[exp1] MINUS exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+    | exp[exp1] MINUS exp[exp2]	{ $$.AST = A_ArithExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
     												   A_minusOp,  $exp1.AST,$exp2.AST);
     						      EM_debug("Got minus expression.", $$.AST->pos());
     							}
-	| exp[exp1] TIMES exp[exp2]	{ $$.AST = A_OpExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+	| exp[exp1] TIMES exp[exp2]	{ $$.AST = A_ArithExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
 												   A_timesOp, $exp1.AST,$exp2.AST);
 								  EM_debug("Got times expression.", $$.AST->pos());
 								 }
@@ -127,6 +128,30 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                       EM_debug("Got divide expression.", $$.AST->pos());
 
     								 }
+    | exp[exp1] EQ exp[exp2]	{ $$.AST = A_CondExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+    												   A_eqOp, $exp1.AST,$exp2.AST);
+    								  EM_debug("Got equals expression.", $$.AST->pos());
+    								 }
+    | exp[exp1] NEQ exp[exp2]	{ $$.AST = A_CondExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+        												   A_neqOp, $exp1.AST,$exp2.AST);
+        								  EM_debug("Got not equals expression.", $$.AST->pos());
+        								 }
+    | exp[exp1] LT exp[exp2]	{ $$.AST = A_CondExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+        												   A_ltOp, $exp1.AST,$exp2.AST);
+        								  EM_debug("Got less than expression.", $$.AST->pos());
+        								 }
+    | exp[exp1] LE exp[exp2]	{ $$.AST = A_CondExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+        												   A_leOp, $exp1.AST,$exp2.AST);
+        								  EM_debug("Got less than equals expression.", $$.AST->pos());
+        								 }
+    | exp[exp1] GT exp[exp2]	{ $$.AST = A_CondExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+        												   A_gtOp, $exp1.AST,$exp2.AST);
+        								  EM_debug("Got greator than expression.", $$.AST->pos());
+        								 }
+    | exp[exp1] GE exp[exp2]	{ $$.AST = A_CondExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+        												   A_geOp, $exp1.AST,$exp2.AST);
+        								  EM_debug("Got greator than equals expression.", $$.AST->pos());
+        								 }
     | LPAREN seq[seq1] RPAREN { $$.AST = $seq1.AST;
                                 EM_debug("Got seq expression.", $$.AST->pos());
                                 }

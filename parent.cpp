@@ -16,13 +16,22 @@ void A_root_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent
 	// main_expr->set_parent_pointers_for_me_and_my_descendants(this);
 }
 
-void A_opExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+void A_arithExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
 {
 	// record my parent
 	stored_parent = my_parent_or_null_if_i_am_the_root;
 	// now, tell my children to record me as theirs... they'll tell the grandkids
 	_right->set_parent_pointers_for_me_and_my_descendants(this);
 	 _left->set_parent_pointers_for_me_and_my_descendants(this);
+}
+
+void A_condExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+	// record my parent
+	stored_parent = my_parent_or_null_if_i_am_the_root;
+	// now, tell my children to record me as theirs... they'll tell the grandkids
+	_right->set_parent_pointers_for_me_and_my_descendants(this);
+	_left->set_parent_pointers_for_me_and_my_descendants(this);
 }
 
 

@@ -50,7 +50,7 @@ void AST_examples()
 	// 14+6
 	A_exp fourteen	= A_IntExp(Position::undefined(), 14);  // 14
 	A_exp six	= A_IntExp(Position::undefined(), 6);  // 6
-	A_exp twenty	= A_OpExp(Position::undefined(), A_plusOp, fourteen, six);  // 14+6
+	A_exp twenty	= A_ArithExp(Position::undefined(), A_plusOp, fourteen, six);  // 14+6
 
 	// "Some AST examples"
 	A_exp title	= A_StringExp(Position::undefined(), "Some AST\texamples\n");
@@ -61,8 +61,8 @@ void AST_examples()
 
 	// 36*2+14+6
 	Position undef	= Position::undefined();  // an abbreviation; I'm getting tired
-	A_exp exp_92	= A_OpExp(undef, A_plusOp,
-				  A_OpExp(undef, A_timesOp, A_IntExp(undef, 36), A_IntExp(undef, 2)),
+	A_exp exp_92	= A_ArithExp(undef, A_plusOp,
+                                 A_ArithExp(undef, A_timesOp, A_IntExp(undef, 36), A_IntExp(undef, 2)),
 				  twenty);
 
 	// print("Some AST examples"); printint(mod(32*2+14+6, 50))
@@ -128,7 +128,7 @@ void AST_example_let()
 
 	A_exp fourteen = A_IntExp(Position::undefined(), 14);  // 14
 	A_exp six      = A_IntExp(Position::undefined(), 6);  // 6
-	A_exp twenty   = A_OpExp(Position::undefined(), A_plusOp, fourteen, six);  // 14+6
+	A_exp twenty   = A_ArithExp(Position::undefined(), A_plusOp, fourteen, six);  // 14+6
 
 	A_dec wombat1  = A_VarDec(Position::undefined(), to_Symbol("wombat"), 0, twenty); // no type info given
 	A_dec arth1    = A_VarDec(Position::undefined(), to_Symbol("arthropod"), 0, A_IntExp(Position::undefined(), 2));
@@ -143,7 +143,7 @@ void AST_example_let()
 	A_var w_var2   = A_SimpleVar(Position::undefined(), to_Symbol("wombat"));
 	A_exp w_use2   = A_VarExp(Position::undefined(), w_var2);  // for the use of "wombat" in "wombat+arthropod"
 	A_exp a_use2   = A_VarExp(Position::undefined(), A_SimpleVar(Position::undefined(), to_Symbol("arthropod")));
-	A_exp sum2     = A_OpExp(Position::undefined(), A_plusOp, w_use2, a_use2);
+	A_exp sum2     = A_ArithExp(Position::undefined(), A_plusOp, w_use2, a_use2);
 
 	// arthropod := 
 	A_var a_var2   = A_SimpleVar(Position::undefined(), to_Symbol("arthropod"));
@@ -159,14 +159,14 @@ void AST_example_let()
 	A_exp let3     = A_LetExp(Position::undefined(),
 				  A_DecList(A_VarDec(Position::undefined(), to_Symbol("arthropod"), 0, A_IntExp(Position::undefined(), 4)),
 					    0),
-				  A_OpExp(Position::undefined(), A_divideOp,
+                              A_ArithExp(Position::undefined(), A_divideOp,
 					  A_VarExp(Position::undefined(), A_SimpleVar(Position::undefined(), to_Symbol("wombat"))),
 					  A_VarExp(Position::undefined(), A_SimpleVar(Position::undefined(), to_Symbol("arthropod")))));
 
 	// *** At long last, we can build that "+" that sums the two inner lets, and the main let itself:
 	A_exp let1      = A_LetExp(Position::undefined(),
 				   let1_decs,
-				   A_OpExp(Position::undefined(), A_plusOp, let2, let3));
+                               A_ArithExp(Position::undefined(), A_plusOp, let2, let3));
 
 	A_root_ *local_AST_root = new A_root_(let1);
 
@@ -217,7 +217,7 @@ void AST_example_functions()
 	A_root_ *r = A_RootExp(A_LetExp(u,
 					A_DecList(A_VarDec(u, to_Symbol("two"), tig_int, A_IntExp(u, 2)),
 						  A_DecList(A_FunctionDec(u, A_FundecList(A_Fundec(u, to_Symbol("half_answer"), 0, tig_int, A_IntExp(u, 21)),
-											  A_FundecList(A_Fundec(u, to_Symbol("answer"), 0, tig_int, A_OpExp(u, A_timesOp,
+											  A_FundecList(A_Fundec(u, to_Symbol("answer"), 0, tig_int, A_ArithExp(u, A_timesOp,
 																			    A_CallExp(u, to_Symbol("half_answer"), 0),
 																			    A_CallExp(u, to_Symbol("get_two"), 0))),
 												       A_FundecList(A_Fundec(u, to_Symbol("get_two"),     0, tig_int, A_VarExp(u, A_SimpleVar(u, to_Symbol("two")))),
@@ -313,10 +313,18 @@ A_varExp_::A_varExp_(A_pos pos, A_var var) :  A_exp_(pos), _var(var)
 	precondition(var != 0);
 }
 
+A_opExp_::A_opExp_(A_pos p) : A_exp_(p)
+{
+}
 
-A_opExp_::A_opExp_(A_pos pos, A_oper oper, A_exp left, A_exp right) :  A_exp_(pos), _oper(oper), _left(left), _right(right)
+A_arithExp_::A_arithExp_(A_pos pos, A_oper oper, A_exp left, A_exp right) :  A_opExp_(pos), _oper(oper), _left(left), _right(right)
 {
 	precondition(left != 0 && right != 0);
+}
+
+A_condExp_::A_condExp_(A_pos pos, A_oper oper, A_exp left, A_exp right) :  A_opExp_(pos), _oper(oper), _left(left), _right(right)
+{
+    precondition(left != 0 && right != 0);
 }
 
 A_assignExp_::A_assignExp_(A_pos pos, A_var var, A_exp exp) : A_exp_(pos), _var(var), _exp(exp)

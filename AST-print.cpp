@@ -158,12 +158,19 @@ String A_varExp_::print_rep(int indent, bool with_attributes)
 		linebreak(indent+tab) + _var->print_rep(indent+tab, with_attributes) +
 		(with_attributes?linebreak(indent+tab)+as_comment(attributes_for_printing()):"") + ")";
 }
-String A_opExp_::print_rep(int indent, bool with_attributes) 
+String A_arithExp_::print_rep(int indent, bool with_attributes)
 {
-	return "A_OpExp(" + print_pos_rep(pos(), ", ") + ::print_rep(_oper) + ", " + 
+	return "A_ArithExp(" + print_pos_rep(pos(), ", ") + ::print_rep(_oper) + ", " +
 		linebreak(indent+tab) + _left->print_rep(indent+tab, with_attributes) + ", " + 
 		linebreak(indent+tab) + _right->print_rep(indent+tab, with_attributes) +
 		(with_attributes?linebreak(indent+tab)+as_comment(attributes_for_printing()):"") + ")";
+}
+String A_condExp_::print_rep(int indent, bool with_attributes)
+{
+    return "A_CondExp(" + print_pos_rep(pos(), ", ") + ::print_rep(_oper) + ", " +
+           linebreak(indent+tab) + _left->print_rep(indent+tab, with_attributes) + ", " +
+           linebreak(indent+tab) + _right->print_rep(indent+tab, with_attributes) +
+           (with_attributes?linebreak(indent+tab)+as_comment(attributes_for_printing()):"") + ")";
 }
 String A_assignExp_::print_rep(int indent, bool with_attributes)
 {

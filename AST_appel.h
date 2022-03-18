@@ -31,9 +31,13 @@ inline A_exp A_VarExp(A_pos pos, A_var var)
 {
 	return new A_varExp_(pos, var);
 }
-inline A_exp A_OpExp(A_pos pos, A_oper oper, A_exp left, A_exp right)
+inline A_exp A_ArithExp(A_pos pos, A_oper oper, A_exp left, A_exp right)
 {
-	return new A_opExp_(pos, oper, left, right);
+	return new A_arithExp_(pos, oper, left, right);
+}
+inline A_exp A_CondExp(A_pos pos, A_oper oper, A_exp left, A_exp right)
+{
+    return new A_condExp_(pos, oper, left, right);
 }
 inline A_exp A_AssignExp(A_pos pos, A_var var, A_exp exp)
 {
