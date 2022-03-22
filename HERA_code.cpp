@@ -104,9 +104,9 @@ string A_condExp_::HERA_code()
         A_callExp_ my_call = A_callExp_(Position::undefined(), to_Symbol("tstrcmp"), A_ExpList(_left, A_ExpList(_right, 0)));
 
         my_code += my_call.HERA_code();
-        my_code += "CMP("+my_call.result_reg_s()+", 0)\n";
+        my_code += "CMP("+my_call.result_reg_s()+", R0)\n";
         //returns neg # if a < b, 0 if =, pos # if a > b
-        my_code += HERA_math_op(pos(), _oper) + "("+this->stored_true_label+")\n";
+        my_code += HERA_math_op(pos(), _oper) + "(" + this->branch_label_true() + ")\n";
 
 
     }
