@@ -101,9 +101,6 @@ string A_condExp_::HERA_code()
         my_code += HERA_math_op(pos(), _oper) + "(" + this->branch_label_true() + ")\n";
 
     } else if (left_type == Ty_String()){
-        my_code += "SET("+this->result_reg_s()+", "+_left->result_dlabel()+")\n";
-        my_code += "SET("+str(this->result_reg()+1)+", "+_right->result_dlabel()+")\n";
-
         A_callExp_ my_call = A_callExp_(Position::undefined(), to_Symbol("tstrcmp"), A_ExpList(_left, A_ExpList(_right, 0)));
 
         my_code += my_call.HERA_code();
