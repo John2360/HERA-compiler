@@ -101,8 +101,8 @@ Ty_ty A_arithExp_::typecheck()
 Ty_ty A_condExp_::typecheck()
 {
     // Fix inputs
-    if (false) {
-        EM_error("Oops, math operation expects two INTs as parameter types", true);
+    if (_right->typecheck() != _left->typecheck()) {
+        EM_error("Oops, left and right of conditional operator must be of the same type", true);
         return Ty_Error();
     } else {
         return Ty_Bool();

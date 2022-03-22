@@ -78,28 +78,49 @@ string A_condExp_::HERA_code()
 
     string pre_build;
     string my_code;
+    Ty_ty left_type = _left->typecheck();
 
-    if (_left->result_reg() >= _right->result_reg()){
-        pre_build = left_side + indent_math + "MOVE(R"+str( _left->result_reg()+1)+", "+_left->result_reg_s()+")\n" + right_side;
+    if(left_type == Ty_Int()) {
 
-        my_code = indent_math + ("CMP(R" +
-                            str( _left->result_reg()+1) + ", " +
-                                 _right->result_reg_s() + ")\n");
-    } else {
-        pre_build = right_side + indent_math + "MOVE(R"+str( _right->result_reg()+1)+", "+ _right->result_reg_s()+")\n" + left_side;
+        if (_left->result_reg() >= _right->result_reg()) {
+            pre_build =
+                    left_side + indent_math + "MOVE(R" + str(_left->result_reg() + 1) + ", " + _left->result_reg_s() +
+                    ")\n" + right_side;
 
-        my_code = indent_math + ("CMP("+
-                                 _left->result_reg_s() + ", " +
-                "R"+str( _right->result_reg()+1)+")\n\n");
+            my_code = indent_math + ("CMP(R" +
+                                     str(_left->result_reg() + 1) + ", " +
+                                     _right->result_reg_s() + ")\n");
+        } else {
+            pre_build = right_side + indent_math + "MOVE(R" + str(_right->result_reg() + 1) + ", " +
+                        _right->result_reg_s() + ")\n" + left_side;
+
+            my_code = indent_math + ("CMP(" +
+                                     _left->result_reg_s() + ", " +
+                                     "R" + str(_right->result_reg() + 1) + ")\n\n");
+        }
+        my_code += HERA_math_op(pos(), _oper) + "(" + this->branch_label_true() + ")\n";
+
+    } else if (left_type == Ty_String()){
+        my_code += "SET("+this->result_reg_s()+", "+_left->result_dlabel()+")\n";
+        my_code += "SET("+str(this->result_reg()+1)+", "+_right->result_dlabel()+")\n";
+
+        A_callExp_ my_call = A_callExp_(Position::undefined(), to_Symbol("tstrcmp"), A_ExpList(_left, A_ExpList(_right, 0)));
+
+        my_code += my_call.HERA_code();
+        my_code += "CMP("+my_call.result_reg_s()+", 0)\n";
+        //returns neg # if a < b, 0 if =, pos # if a > b
+        my_code += HERA_math_op(pos(), _oper) + "("+this->stored_true_label+")\n";
+
+
     }
-    my_code += HERA_math_op(pos(), _oper) + "(" + this->branch_label_true() + ")\n";
-    my_code += "SET("+this->result_reg_s()+", 0)\n";
-    my_code += "BR("+ this->branch_label_end()+")\n";
-    my_code += "LABEL("+ this->branch_label_true()+")\n";
-    my_code += "SET("+this->result_reg_s()+", 1)\n";
-    my_code += "LABEL("+ this->branch_label_end()+")\n";
 
-	return pre_build + my_code;
+    my_code += "SET(" + this->result_reg_s() + ", 0)\n";
+    my_code += "BR(" + this->branch_label_end() + ")\n";
+    my_code += "LABEL(" + this->branch_label_true() + ")\n";
+    my_code += "SET(" + this->result_reg_s() + ", 1)\n";
+    my_code += "LABEL(" + this->branch_label_end() + ")\n";
+
+    return pre_build + my_code;
 }
 
 string A_arithExp_::HERA_code()

@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 # Bison/Flex stuff documented here: https://cmake.org/cmake/help/v2.8.8/cmake.html#module:FindFLEX
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
+    set(CMAKE_CXX_COMPILER "clang++")
     execute_process(
             COMMAND brew --prefix bison
             RESULT_VARIABLE BREW_BISON

@@ -275,12 +275,23 @@ public:
         return "R" + std::to_string(this->result_reg());
     }
 
+    string result_dlabel() {
+        if (stored_dlabel == "") this->stored_dlabel = this->init_result_dlabel();
+        return stored_dlabel;
+    }
+    bool is_dlabel(){
+        if (stored_dlabel == "") return false;
+        return true;
+    }
+
 	// we'll need to print the register number attribute for exp's
 	virtual String attributes_for_printing();
 
 private:
     virtual int init_result_reg();
+    virtual string init_result_dlabel();
 	int stored_result_reg = -1;  // Initialize to -1 to be sure it gets replaced by "if" in result_reg() above
+    string stored_dlabel = "";
 };
 
 class A_root_ : public AST_node_ {
