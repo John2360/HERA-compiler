@@ -48,8 +48,8 @@ class tigerParseDriver;
 %left ELSE
 %left MINUS PLUS
 %left TIMES DIVIDE
-%left EQ NEQ LT LE GT GE OR AND NOT
-
+%left EQ NEQ LT LE GT GE OR AND
+%left NOT
 
 /* https://www.gnu.org/software/bison/manual/html_node/Precedence-Only.html */
 %nonassoc UMINUS
