@@ -7,8 +7,8 @@
 
 static int next_unique_number = 1;
 static int next_unique_string_number = 0;
-static int next_unique_if_number = 0;
-static int next_unique_cond_number = 0;
+static int next_unique_if_arith_number = 0;
+static int next_unique_if_cond_number = 0;
 
 int A_exp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
@@ -136,16 +136,16 @@ string A_stringExp_::init_result_dlabel()  // generate unique numbers, starting 
 
 int A_condExp_::init_labels()
 {
-    int my_number = next_unique_cond_number;
-    next_unique_if_number = my_number + 1;
-    return next_unique_if_number;
+    int my_number = next_unique_if_cond_number;
+    next_unique_if_cond_number = my_number + 1;
+    return next_unique_if_cond_number;
 }
 
 int A_ifExp_::init_if_labels()
 {
-    int my_number = next_unique_if_number;
-    next_unique_if_number = my_number + 1;
-    return next_unique_if_number;
+    int my_number = next_unique_if_arith_number;
+    next_unique_if_arith_number = my_number + 1;
+    return next_unique_if_arith_number;
 }
 
 int A_ifExp_::init_result_reg()
