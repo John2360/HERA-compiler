@@ -169,6 +169,27 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 
                                        EM_debug("Got void function call to "+$name, $$.AST->pos());
                                      }
+    | exp[seq1] AND exp[seq2] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq2.AST->pos()),
+                                                              $seq1.AST,
+                                                              $seq2.AST,
+                                                              A_BoolExp(Position::undefined(), false));
+
+                        EM_debug("Got and exp", $$.AST->pos());
+                        }
+    | exp[seq1] OR exp[seq2] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq2.AST->pos()),
+                                                                  $seq1.AST,
+                                                                  A_BoolExp(Position::undefined(), true),
+                                                                  $seq2.AST);
+
+                            EM_debug("Got or exp", $$.AST->pos());
+                            }
+    | NOT exp[seq1] {  $$.AST = A_IfExp($seq1.AST->pos(),
+                                                      $seq1.AST,
+                                                      A_BoolExp(Position::undefined(), false),
+                                                      A_BoolExp(Position::undefined(), true));
+
+                                EM_debug("Got not exp", $$.AST->pos());
+                                }
     | IF exp[seq1] THEN exp[seq2] ELSE exp[seq3] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq3.AST->pos()),
                                                                        $seq1.AST,
                                                                        $seq2.AST,
