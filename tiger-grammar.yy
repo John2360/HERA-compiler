@@ -46,9 +46,11 @@ class tigerParseDriver;
 %left IF
 %left THEN
 %left ELSE
+%left EQ NEQ LT LE GT GE
+%left OR AND
 %left MINUS PLUS
 %left TIMES DIVIDE
-%left EQ NEQ LT LE GT GE OR AND
+
 %left NOT
 
 /* https://www.gnu.org/software/bison/manual/html_node/Precedence-Only.html */
@@ -184,9 +186,9 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                             EM_debug("Got or exp", $$.AST->pos());
                             }
     | NOT exp[seq1] {  $$.AST = A_IfExp($seq1.AST->pos(),
-                                                      $seq1.AST,
-                                                      A_BoolExp(Position::undefined(), false),
-                                                      A_BoolExp(Position::undefined(), true));
+                                          $seq1.AST,
+                                          A_BoolExp(Position::undefined(), false),
+                                          A_BoolExp(Position::undefined(), true));
 
                                 EM_debug("Got not exp", $$.AST->pos());
                                 }

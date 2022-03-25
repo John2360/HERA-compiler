@@ -26,28 +26,28 @@ int A_intExp_::init_result_reg()  // generate unique numbers, starting from 1, e
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
     // TODO: Put this back to one once we have different function parameters on the stack
-    return 4;
+    return 1;
 }
 
 int A_stringExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
     // TODO: Put this back to one once we have different function parameters on the stack
-    return 4;
+    return 1;
 }
 
 int A_boolExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
     // TODO: Put this back to one once we have different function parameters on the stack
-    return 4;
+    return 1;
 }
 
 int A_nilExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
     // TODO: Put this back to one once we have different function parameters on the stack
-    return 4;
+    return 1;
 }
 
 int A_arithExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
@@ -150,5 +150,6 @@ int A_ifExp_::init_if_labels()
 
 int A_ifExp_::init_result_reg()
 {
-    return std::max(_else_or_null->result_reg(), std::max(_test->result_reg(), _then->result_reg()));
+    if (_then->result_reg() == _else_or_null->result_reg()) return _then->result_reg()+1;
+    return std::max(_then->result_reg(), _else_or_null->result_reg());
 }
