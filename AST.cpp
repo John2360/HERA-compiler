@@ -351,6 +351,11 @@ A_ifExp_::A_ifExp_(A_pos pos, A_exp test, A_exp then, A_exp else_or_0_pointer_fo
 	precondition(test != 0 && then != 0);
 }
 
+A_whileExp_::A_whileExp_(A_pos pos, A_exp cond, A_exp body) :  A_controlExp_(pos), _cond(cond), _body(body)
+{
+    precondition(cond != 0 && body != 0);
+}
+
 
 A_forExp_::A_forExp_(A_pos pos, Symbol var, A_exp lo, A_exp hi, A_exp body) :  A_controlExp_(pos), _var(var), _lo(lo), _hi(hi), _body(body)
 {

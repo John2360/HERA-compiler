@@ -127,6 +127,15 @@ Ty_ty A_ifExp_::typecheck()
     }
 }
 
+Ty_ty A_whileExp_::typecheck() {
+    if (_cond->typecheck() != Ty_Bool()){
+        EM_error("Oops, while cond requires boolean", true);
+        return Ty_Error();
+    }
+
+    return Ty_Void();
+}
+
 Ty_ty A_callExp_::typecheck()
 {
     try {

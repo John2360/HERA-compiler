@@ -7,6 +7,7 @@
 
 static int next_unique_number = 1;
 static int next_unique_string_number = 0;
+static int next_unique_while_number = 0;
 static int next_unique_if_arith_number = 0;
 static int next_unique_if_cond_number = 0;
 
@@ -148,8 +149,20 @@ int A_ifExp_::init_if_labels()
     return next_unique_if_arith_number;
 }
 
+int A_whileExp_::init_labels()
+{
+    int my_number = next_unique_while_number;
+    next_unique_while_number = my_number + 1;
+    return next_unique_while_number;
+}
+
 int A_ifExp_::init_result_reg()
 {
     if (_then->result_reg() == _else_or_null->result_reg()) return _then->result_reg()+1;
     return std::max(_then->result_reg(), _else_or_null->result_reg());
+}
+
+int A_whileExp_::init_result_reg()
+{
+    return _body->result_reg();
 }

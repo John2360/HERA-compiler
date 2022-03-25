@@ -640,6 +640,46 @@ private:
     string stored_post_label = "";
 };
 
+class A_whileExp_ : public A_controlExp_ {
+public:
+    A_whileExp_(A_pos pos, A_exp cond, A_exp body);
+    virtual string print_rep(int indent, bool with_attributes);
+
+    int result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    void do_init(){
+        if (this->stored_cond_label == "" && this->stored_post_label == ""){
+            int results = this->init_labels();
+            this->stored_cond_label = "my_while_cond_"+str(results);
+            this->stored_post_label = "my_while_post_"+str(results);
+        }
+    }
+    string branch_label_cond() {
+        do_init();
+        return stored_cond_label;
+    }
+    string branch_label_post() {
+        do_init();
+        return stored_post_label;
+    }
+
+    virtual string HERA_data();
+    virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
+private:
+    A_exp _cond;
+    A_exp _body;
+
+    virtual int init_labels();
+    virtual int init_result_reg();
+
+    int stored_result_reg = -1;
+    string stored_cond_label = "";
+    string stored_post_label = "";
+};
 
 class A_forExp_ : public A_controlExp_ {
 public:
