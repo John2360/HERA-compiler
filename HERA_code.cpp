@@ -213,14 +213,14 @@ string A_ifExp_::HERA_code()
 
 string A_whileExp_::HERA_code() {
     string my_code;
-    my_code += "LABEL("+this->branch_label_cond()+")";
-    my_code += _cond->HERA_code();
+    my_code += "LABEL("+this->branch_label_cond()+")\n";
+    my_code += _cond->HERA_code() + "\n";
     my_code += "CMP("+_cond->result_reg_s()+", R0)\n";
-    my_code += "BZ("+this->branch_label_post()+")";
+    my_code += "BZ("+this->branch_label_post()+")\n";
 
-    my_code += _body->HERA_code();
-    my_code += "BR("+this->branch_label_cond()+")";
-    my_code += "LABEL("+this->branch_label_post()+")";
+    my_code += _body->HERA_code()  + "\n";
+    my_code += "BR("+this->branch_label_cond()+")\n";
+    my_code += "LABEL("+this->branch_label_post()+")\n";
 
     return my_code;
 }

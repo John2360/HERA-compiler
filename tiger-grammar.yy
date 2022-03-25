@@ -43,7 +43,7 @@ class tigerParseDriver;
 
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
-%left IF
+%left IF WHILE DO
 %left THEN
 %left ELSE
 %left EQ NEQ LT LE GT GE
@@ -192,6 +192,12 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 
                                 EM_debug("Got not exp", $$.AST->pos());
                                 }
+    | WHILE exp[seq1] DO exp[seq2] {  $$.AST = A_WhileExp(Position::range($seq1.AST->pos(), $seq2.AST->pos()),
+                                              $seq1.AST,
+                                              $seq2.AST);
+
+                                    EM_debug("Got not exp", $$.AST->pos());
+                                    }
     | IF exp[seq1] THEN exp[seq2] ELSE exp[seq3] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq3.AST->pos()),
                                                                        $seq1.AST,
                                                                        $seq2.AST,
