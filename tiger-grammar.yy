@@ -43,7 +43,7 @@ class tigerParseDriver;
 
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
-%left IF WHILE DO
+%left IF WHILE DO BREAK
 %left THEN
 %left ELSE
 %left EQ NEQ LT LE GT GE
@@ -164,7 +164,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }
-    | ID[name] LPAREN RPAREN { $$.AST = A_CallExp( Position::undefined(),
+    | ID[name] LPAREN RPAREN { $$.AST = A_CallExp( Position::fromLex(@name),
                                                  to_Symbol($name),
                                                  A_ExpList(A_NilExp(Position::undefined()), 0)
                                                   );
@@ -196,8 +196,11 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                               $seq1.AST,
                                               $seq2.AST);
 
-                                    EM_debug("Got not exp", $$.AST->pos());
+                                    EM_debug("Got while loop", $$.AST->pos());
                                     }
+    | BREAK {  $$.AST = A_BreakExp(Position::undefined());
+                    EM_debug("Got break exp", $$.AST->pos());
+                                        }
     | IF exp[seq1] THEN exp[seq2] ELSE exp[seq3] { $$.AST = A_IfExp(Position::range($seq1.AST->pos(), $seq3.AST->pos()),
                                                                        $seq1.AST,
                                                                        $seq2.AST,

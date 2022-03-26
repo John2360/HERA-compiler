@@ -224,3 +224,7 @@ string A_whileExp_::HERA_code() {
 
     return my_code;
 }
+
+string A_breakExp_::HERA_code() {
+    return "BR("+ this->break_label() +")\n";
+}

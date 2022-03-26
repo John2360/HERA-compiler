@@ -21,3 +21,4 @@ Debug
 /my-tests/*
 .gitignore
 /my-tests/
+test.hera

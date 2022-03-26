@@ -1,15 +1,18 @@
 #include "Tiger-stdlib-stack-data.hera"
 
 DLABEL(my_string_1) 
-    LP_STRING("D'oh!\012") 
+    LP_STRING("Starting the 'while true' loop, now try a break:\012   ") 
 
 DLABEL(my_string_2) 
-    LP_STRING("If this is the only output, the 'while false' test seems to work\012") 
+    LP_STRING("We should never ever see this get printed") 
+
+DLABEL(my_string_3) 
+    LP_STRING("If we get here after seeing one 'Starting...', then 'break' seems to work\012") 
 
 CBON()
 
 LABEL(my_while_cond_1)
-    SET(R1, 0)
+    SET(R1, 1)
 
 CMP(R1, R0)
 BZ(my_while_post_1)
@@ -21,12 +24,23 @@ CALL(FP_alt, print)
 LOAD(R2, 3, FP_alt)
 DEC(SP, 3) 
 
+BR(my_while_post_1)
+MOVE(FP_alt, SP)
+INC(SP, 4)
+SET(R1, my_string_2)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, print)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 3) 
+
+MOVE(R2, R2)
+MOVE(R2, R2)
 
 BR(my_while_cond_1)
 LABEL(my_while_post_1)
 MOVE(FP_alt, SP)
 INC(SP, 4)
-SET(R1, my_string_2)
+SET(R1, my_string_3)
 STORE(R1, 3, FP_alt) 
 CALL(FP_alt, print)
 LOAD(R2, 3, FP_alt)

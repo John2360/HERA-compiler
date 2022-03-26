@@ -34,6 +34,63 @@ void A_condExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_par
 	_left->set_parent_pointers_for_me_and_my_descendants(this);
 }
 
+void A_whileExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _cond->set_parent_pointers_for_me_and_my_descendants(this);
+    _body->set_parent_pointers_for_me_and_my_descendants(this);
+}
+
+void A_ifExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _test->set_parent_pointers_for_me_and_my_descendants(this);
+    _then->set_parent_pointers_for_me_and_my_descendants(this);
+
+    if (_else_or_null != 0){
+        _else_or_null->set_parent_pointers_for_me_and_my_descendants(this);
+    }
+}
+
+void A_seqExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _seq->set_parent_pointers_for_me_and_my_descendants(this);
+}
+
+void A_callExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _args->set_parent_pointers_for_me_and_my_descendants(this);
+}
+
+void A_breakExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+}
+
+void A_expList_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _head->set_parent_pointers_for_me_and_my_descendants(this);
+
+    if (_tail != 0){
+        _tail->set_parent_pointers_for_me_and_my_descendants(this);
+    }
+}
+
 
 
 // The following should never be called, but this "general" version

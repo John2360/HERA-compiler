@@ -193,6 +193,7 @@ then    { return yy::tigerParser::make_THEN(loc); }
 else    { return yy::tigerParser::make_ELSE(loc); }
 while    { return yy::tigerParser::make_WHILE(loc); }
 do    { return yy::tigerParser::make_DO(loc); }
+break    { return yy::tigerParser::make_BREAK(loc); }
 
 {bool}	{
    return yy::tigerParser::make_BOOL(textToBool(yytext), loc);

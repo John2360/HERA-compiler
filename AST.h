@@ -251,6 +251,8 @@ public:
 	int depth();   // example we'll play with in class, not actually needed to compile
 	virtual int compute_depth();   // just for an example, not needed to compile
     virtual Ty_ty typecheck();
+    virtual string break_label() { if (branch_label_post() != "") return branch_label_post(); else return parent()->break_label(); }
+    virtual string branch_label_post() { return ""; }
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
 	AST_node_ *stored_parent = 0;
@@ -579,6 +581,8 @@ public:
 
     virtual Ty_ty typecheck();
 
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
 private:
 	Symbol _func;
 	A_expList _args;
@@ -626,6 +630,8 @@ public:
     virtual string HERA_code();
 
     virtual Ty_ty typecheck();
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 private:
 	A_exp _test;
 	A_exp _then;
@@ -669,6 +675,8 @@ public:
     virtual string HERA_code();
 
     virtual Ty_ty typecheck();
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 private:
     A_exp _cond;
     A_exp _body;
@@ -698,6 +706,31 @@ public:
 	A_breakExp_(A_pos p);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    int result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+
+    virtual string break_label(){
+        if (stored_break_label == "") {
+            stored_break_label = this->init_break_label();
+        }
+
+        return stored_break_label;
+    }
+
+    virtual string HERA_code();
+    virtual string HERA_data();
+
+    virtual int init_result_reg();
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
+private:
+    virtual string init_break_label();
+    string stored_break_label = "";
+    int stored_result_reg = -1;
+
 };
 
 class A_seqExp_ : public A_controlExp_ {
@@ -718,6 +751,8 @@ public:
     virtual string HERA_code();
 
     virtual Ty_ty typecheck();
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 private:
 	A_expList _seq;
     int stored_result_reg = -1;
@@ -779,6 +814,7 @@ public:
 	A_exp _head;
 	A_expList _tail;
 
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 private:
     int stored_result_reg = -1;
 };

@@ -166,3 +166,11 @@ int A_whileExp_::init_result_reg()
 {
     return _body->result_reg();
 }
+
+int A_breakExp_::init_result_reg(){
+    return 1;
+}
+
+string A_breakExp_::init_break_label(){
+    return this->parent()->break_label();
+}
