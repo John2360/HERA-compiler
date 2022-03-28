@@ -151,8 +151,9 @@ string A_callExp_::HERA_code()
 {
 
     string my_code;
-    my_code += "MOVE(FP_alt, SP)\nINC(SP, "+str(_args->length()+3)+")\n";
-    int stack_pointer = 3;
+    int starting_frame_size = 3;
+    int stack_pointer = starting_frame_size;
+    my_code += "MOVE(FP_alt, SP)\nINC(SP, "+str(_args->length()+starting_frame_size)+")\n";
 
     A_expList my_pointer = _args;
     while (true) {
@@ -166,7 +167,7 @@ string A_callExp_::HERA_code()
 
     }
 
-    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+")\nLOAD("+this->result_reg_s()+", 3, FP_alt)\nDEC(SP, "+str(_args->length()+2)+") \n\n";
+    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+")\nLOAD("+this->result_reg_s()+", 3, FP_alt)\nDEC(SP, "+str(_args->length()+starting_frame_size)+") \n\n";
 
     return my_code;
 }
