@@ -178,8 +178,8 @@ string \"(.|\s)+?\"
 \/		{ return yy::tigerParser::make_DIVIDE(loc); }
 \,		{ return yy::tigerParser::make_COMMA(loc); }
 
-\<\=		{ return yy::tigerParser::make_GE(loc); }
-\>\=		{ return yy::tigerParser::make_LE(loc); }
+\<\=		{ return yy::tigerParser::make_LE(loc); }
+\>\=		{ return yy::tigerParser::make_GE(loc); }
 \=\=		{ return yy::tigerParser::make_EQ(loc); }
 \!\=		{ return yy::tigerParser::make_NEQ(loc); }
 \>		{ return yy::tigerParser::make_GT(loc); }
