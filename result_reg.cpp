@@ -158,8 +158,10 @@ int A_whileExp_::init_labels()
 
 int A_ifExp_::init_result_reg()
 {
-    if (_then->result_reg() == _else_or_null->result_reg()) return _then->result_reg()+1;
-    return std::max(_then->result_reg(), _else_or_null->result_reg());
+    int else_reg_num = -1;
+    if (_else_or_null != 0) {else_reg_num = _else_or_null->result_reg();};
+    if (_then->result_reg() == else_reg_num) return _then->result_reg()+1;
+    return std::max(_then->result_reg(), else_reg_num);
 }
 
 int A_whileExp_::init_result_reg()
