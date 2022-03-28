@@ -215,7 +215,7 @@ string A_whileExp_::HERA_code() {
     my_code += "LABEL("+this->branch_label_cond()+")\n";
     my_code += _cond->HERA_code() + "\n";
     my_code += "CMP("+_cond->result_reg_s()+", R0)\n";
-    my_code += "BNZ("+this->branch_label_post()+")\n";
+    my_code += "BZ("+this->branch_label_post()+")\n";
 
     my_code += _body->HERA_code()  + "\n";
     my_code += "BR("+this->branch_label_cond()+")\n";
