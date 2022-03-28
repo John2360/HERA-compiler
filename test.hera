@@ -1,29 +1,66 @@
 #include "Tiger-stdlib-stack-data.hera"
 
+DLABEL(my_string_1) 
+    LP_STRING("Enter some numbers ending with a negative number\012") 
+
+DLABEL(my_string_2) 
+    LP_STRING("got one, thanks\012") 
+
+DLABEL(my_string_3) 
+    LP_STRING("please enter another: ") 
+
 CBON()
 
-    SET(R1, 1)
-
-CMP(R1, R0)
-BZ(my_if_else_1)
-
-LABEL(my_if_then_1)
 MOVE(FP_alt, SP)
 INC(SP, 4)
-    SET(R1, 42)
+SET(R1, my_string_1)
 STORE(R1, 3, FP_alt) 
-CALL(FP_alt, printint)
+CALL(FP_alt, print)
 LOAD(R2, 3, FP_alt)
 DEC(SP, 3) 
 
+LABEL(my_while_cond_1)
+MOVE(FP_alt, SP)
+INC(SP, 4)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, getint)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 3) 
+
+    MOVE(R3, R2)
+    SET(R1, 0)
+    CMP(R3, R1)
+BLE(my_cond_true_1)
+SET(R2, 0)
+BR(my_cond_end_1)
+LABEL(my_cond_true_1)
+SET(R2, 1)
+LABEL(my_cond_end_1)
+
+CMP(R2, R0)
+BZ(my_while_post_1)
+MOVE(FP_alt, SP)
+INC(SP, 4)
+SET(R1, my_string_2)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, print)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 3) 
+
+MOVE(FP_alt, SP)
+INC(SP, 4)
+SET(R1, my_string_3)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, print)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 3) 
 
 MOVE(R2, R2)
-BR(my_if_post_1)
 
-LABEL(my_if_else_1)
+BR(my_while_cond_1)
+LABEL(my_while_post_1)
+MOVE(R2, R2)
 
-BR(my_if_post_1)
-LABEL(my_if_post_1)
 
 HALT()
 #include "Tiger-stdlib-stack.hera"

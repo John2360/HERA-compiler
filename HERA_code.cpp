@@ -130,19 +130,19 @@ string A_arithExp_::HERA_code()
     string my_code;
 
     if (_left->result_reg() >= _right->result_reg()){
-        pre_build = left_side + indent_math + "MOVE(R"+str( _left->result_reg()+1)+", "+_left->result_reg_s()+")\n" + right_side;
+        pre_build = left_side + indent_math + "MOVE("+this->result_reg_s()+", "+_left->result_reg_s()+")\n" + right_side;
 
         my_code = indent_math + (HERA_math_op(pos(), _oper) + "(" +
                                  this->result_reg_s() + ", " +
-                                 "R"+str( _left->result_reg()+1) + ", " +
+                                 this->result_reg_s()+", " +
                                  _right->result_reg_s() + ")\n\n");
     } else {
-        pre_build = right_side + indent_math + "MOVE(R"+str( _right->result_reg()+1)+", "+ _right->result_reg_s()+")\n" + left_side;
+        pre_build = right_side + indent_math + left_side;
 
         my_code = indent_math + (HERA_math_op(pos(), _oper) + "(" +
                                  this->result_reg_s() + ", " +
                                  _left->result_reg_s() + ", " +
-                                 "R"+str( _right->result_reg()+1)+")\n\n");
+                                 this->result_reg_s()+")\n\n");
     }
 
     return pre_build + my_code;
