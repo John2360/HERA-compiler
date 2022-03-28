@@ -84,19 +84,18 @@ string A_condExp_::HERA_code()
 
         if (_left->result_reg() >= _right->result_reg()) {
             pre_build =
-                    left_side + indent_math + "MOVE(R" + str(_left->result_reg() + 1) + ", " + _left->result_reg_s() +
+                    left_side + indent_math + "MOVE(" + this->result_reg_s() + ", " + _left->result_reg_s() +
                     ")\n" + right_side;
 
-            my_code = indent_math + ("CMP(R" +
-                                     str(_left->result_reg() + 1) + ", " +
+            my_code = indent_math + ("CMP(" +
+                    this->result_reg_s() + ", " +
                                      _right->result_reg_s() + ")\n");
         } else {
-            pre_build = right_side + indent_math + "MOVE(R" + str(_right->result_reg() + 1) + ", " +
-                        _right->result_reg_s() + ")\n" + left_side;
+            pre_build = right_side + indent_math + left_side;
 
             my_code = indent_math + ("CMP(" +
-                                     _left->result_reg_s() + ", " +
-                                     "R" + str(_right->result_reg() + 1) + ")\n\n");
+                                     _left->result_reg_s() + ", "
+                                      + this->result_reg_s() + ")\n\n");
         }
         my_code += HERA_math_op(pos(), _oper) + "(" + this->branch_label_true() + ")\n";
 
@@ -216,7 +215,7 @@ string A_whileExp_::HERA_code() {
     my_code += "LABEL("+this->branch_label_cond()+")\n";
     my_code += _cond->HERA_code() + "\n";
     my_code += "CMP("+_cond->result_reg_s()+", R0)\n";
-    my_code += "BZ("+this->branch_label_post()+")\n";
+    my_code += "BNZ("+this->branch_label_post()+")\n";
 
     my_code += _body->HERA_code()  + "\n";
     my_code += "BR("+this->branch_label_cond()+")\n";

@@ -251,7 +251,7 @@ public:
 	int depth();   // example we'll play with in class, not actually needed to compile
 	virtual int compute_depth();   // just for an example, not needed to compile
     virtual Ty_ty typecheck();
-    virtual string break_label() { if (branch_label_post() != "") return branch_label_post(); else return parent()->break_label(); }
+    virtual string break_label() { if (branch_label_post() != "") return branch_label_post(); else { if (parent() != 0 ) {return parent()->break_label(); } else { EM_error("Oops, break point could not be associated with a while loop", true); return "Label_Error";};} }
     virtual string branch_label_post() { return ""; }
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
