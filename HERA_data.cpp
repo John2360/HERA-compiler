@@ -80,6 +80,10 @@ string A_whileExp_::HERA_data() {
     return _cond->HERA_data() + _body->HERA_data();
 }
 
+string A_forExp_::HERA_data() {
+    return _hi->HERA_data() + _lo->HERA_data() + _body->HERA_data();
+}
+
 string A_breakExp_::HERA_data() {
     return "";
 }

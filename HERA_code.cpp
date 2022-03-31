@@ -228,3 +228,31 @@ string A_whileExp_::HERA_code() {
 string A_breakExp_::HERA_code() {
     return "BR("+ this->break_label() +")\n";
 }
+
+string A_forExp_::HERA_code() {
+    string my_code;
+
+    variable_type_info my_var = this->find_local_variables(_var);
+    int starting_frame_size = 1;
+    int stack_pointer = my_var.fp_plus;
+
+    my_code += _lo->HERA_code();
+    my_code += "INC(SP, "+str(starting_frame_size)+")\n";
+    my_code += "STORE("+_lo->result_reg_s()+", "+str(stack_pointer)+", FP) \n\n";
+    my_code += "LABEL("+this->branch_label_cond()+")\n";
+    my_code +=  _hi->HERA_code() + "\n";
+    my_code += "LOAD("+ this->result_reg_s()+", "+str(stack_pointer)+", FP)\n";
+    my_code += "CMP("+this->result_reg_s()+", "+_hi->result_reg_s()+")\n";
+    my_code += "BZ("+this->branch_label_post()+")\n\n";
+
+    my_code += _body->HERA_code() + "\n";
+
+    my_code += "LOAD("+ this->result_reg_s()+", "+str(stack_pointer)+", FP)\n";
+    my_code += "INC("+this->result_reg_s()+", 1)\n";
+    my_code += "STORE("+this->result_reg_s()+", "+str(stack_pointer)+", FP) \n\n";
+    my_code += "BR("+this->branch_label_cond()+")\n";
+    my_code += "LABEL("+this->branch_label_post()+")\n";
+    my_code += "DEC(SP, "+str(starting_frame_size)+")\n";
+
+    return my_code;
+}

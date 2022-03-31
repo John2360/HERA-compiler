@@ -186,6 +186,25 @@ public:
 typedef ST<function_type_info> tiger_standard_library;
 extern tiger_standard_library data_shell;
 
+struct variable_type_info {
+public:
+    variable_type_info(
+            Ty_ty type,
+            int fp_plus
+    );
+    // leave data public, which is the default for 'struct'
+    Ty_ty type;
+    int fp_plus;
+
+//    string __repr__();
+//    string __str__();
+
+};
+// make an abbreviation "ST_example" for a symbol table with the example sym info
+//   (also would be in a .h, usually)
+typedef ST<variable_type_info> local_variable_scope;
+extern local_variable_scope local_data_shell;
+
 
 void AST_examples();  // Examples, to help understand what't going on here ... see AST.cc
 
@@ -254,12 +273,42 @@ public:
     virtual string break_label() { if (branch_label_post() != "") return branch_label_post(); else { if (parent() != 0 ) {return parent()->break_label(); } else { EM_error("Oops, break point could not be associated with a while loop", true); return "Label_Error";};} }
     virtual string branch_label_post() { return ""; }
 
+    virtual function_type_info find_local_functions(Symbol name) {
+        try {
+            function_type_info my_func = lookup(name, funcs_data_shell);
+            return my_func;
+        } catch(const tiger_standard_library::undefined_symbol &missing) {
+                return parent()->find_local_functions(name);
+        }
+    }
+
+    virtual variable_type_info find_local_variables(Symbol name) {
+        try {
+            variable_type_info my_var = lookup(name, vars_data_shell);
+            return my_var;
+        } catch(const local_variable_scope::undefined_symbol &missing) {
+            if (parent() != 0) {
+                return parent()->find_local_variables(name);
+            } else {
+                EM_error("Oops, the function "+ str(name) +" was not found in scope", true);
+                return variable_type_info(nullptr, 0);
+            }
+        }
+    }
+
+    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus) {
+        vars_data_shell = MergeAndShadow(vars_data_shell, local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))));
+    };
+
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
 	AST_node_ *stored_parent = 0;
 
 private:
 	virtual AST_node_ *get_parent_without_checking();	// NOT FOR GENERAL USE: get the parent node, either before or after the 'set all parent nodes' pass, but note it will be incorrect if done before (this is usually just done for assertions)
 	A_pos stored_pos;
+
+    local_variable_scope vars_data_shell = local_variable_scope();
+    tiger_standard_library funcs_data_shell = tiger_standard_library();
 };
 
 class A_exp_ : public AST_node_ {
@@ -306,6 +355,16 @@ public:
 	string print_rep(int indent, bool with_attributes);
 
     virtual Ty_ty typecheck();
+
+    virtual function_type_info find_local_functions(Symbol name) {
+        try {
+            function_type_info my_func = lookup(name, data_shell);
+            return my_func;
+        } catch(const tiger_standard_library::undefined_symbol &missing) {
+               EM_error("Oops, the function "+ str(name) +" was not found in scope", true);
+               return function_type_info(nullptr, HaverfordCS::ez_list(Ty_Nil()));
+        }
+    }
 
 	virtual void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);  // should not be called, since it's in-line in the constructor
 	virtual int compute_depth();  // just for an example, not needed to compile
@@ -693,11 +752,45 @@ class A_forExp_ : public A_controlExp_ {
 public:
 	A_forExp_(A_pos pos, Symbol var, A_exp lo, A_exp hi, A_exp body);
 	virtual string print_rep(int indent, bool with_attributes);
+    void do_init(){
+        if (this->stored_cond_label == "" && this->stored_post_label == ""){
+            int results = this->init_labels();
+            this->stored_cond_label = "my_for_cond_"+str(results);
+            this->stored_post_label = "my_for_post_"+str(results);
+        }
+    }
+    string branch_label_cond() {
+        do_init();
+        return stored_cond_label;
+    }
+    string branch_label_post() {
+        do_init();
+        return stored_post_label;
+    }
+
+    int    result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+
+    virtual string HERA_data();
+    virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
 private:
 	Symbol _var;
 	A_exp _lo;
 	A_exp _hi;
 	A_exp _body;
+
+    int init_result_reg();
+    int init_labels();
+    int stored_result_reg = -1;
+    string stored_cond_label = "";
+    string stored_post_label = "";
 };
 
 

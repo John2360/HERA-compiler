@@ -167,6 +167,8 @@ string \"(.|\s)+?\"
     \n            { loc.lines(yyleng); loc.step(); }
 }
 
+\:\=    { return yy::tigerParser::make_ASSIGN(loc); }
+
 \&		{ return yy::tigerParser::make_AND(loc); }
 \|		{ return yy::tigerParser::make_OR(loc); }
 \!		{ return yy::tigerParser::make_NOT(loc); }
@@ -180,8 +182,8 @@ string \"(.|\s)+?\"
 
 \<\=		{ return yy::tigerParser::make_LE(loc); }
 \>\=		{ return yy::tigerParser::make_GE(loc); }
-\=\=		{ return yy::tigerParser::make_EQ(loc); }
-\!\=		{ return yy::tigerParser::make_NEQ(loc); }
+\=		{ return yy::tigerParser::make_EQ(loc); }
+\<\>		{ return yy::tigerParser::make_NEQ(loc); }
 \>		{ return yy::tigerParser::make_GT(loc); }
 \<		{ return yy::tigerParser::make_LT(loc); }
 
@@ -194,6 +196,8 @@ else    { return yy::tigerParser::make_ELSE(loc); }
 while    { return yy::tigerParser::make_WHILE(loc); }
 do    { return yy::tigerParser::make_DO(loc); }
 break    { return yy::tigerParser::make_BREAK(loc); }
+for    { return yy::tigerParser::make_FOR(loc); }
+to    { return yy::tigerParser::make_TO(loc); }
 
 {bool}	{
    return yy::tigerParser::make_BOOL(textToBool(yytext), loc);

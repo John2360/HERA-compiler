@@ -43,7 +43,7 @@ class tigerParseDriver;
 
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
-%left IF WHILE DO BREAK
+%left IF WHILE DO BREAK FOR
 %left THEN
 %left ELSE
 %left EQ NEQ LT LE GT GE
@@ -211,6 +211,14 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                                                            $seq2.AST,
                                                                            0);
                                        }
+    | FOR ID[name] ASSIGN exp[seq1] TO exp[seq2] DO exp[seq3] {  $$.AST = A_ForExp(Position::range($seq1.AST->pos(), $seq3.AST->pos()),
+                                                  to_Symbol($name),
+                                                  $seq1.AST,
+                                                  $seq2.AST,
+                                                  $seq3.AST);
+                                        $$.AST->create_variable(to_Symbol($name), Ty_Int(), 0);
+                                        EM_debug("Got for loop", $$.AST->pos());
+                                        }
 
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,

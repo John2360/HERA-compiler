@@ -187,6 +187,17 @@ Ty_ty A_callExp_::typecheck()
     }
 }
 
+Ty_ty A_forExp_::typecheck() {
+
+    if (_hi->typecheck() != Ty_Int() || _lo->typecheck() != Ty_Int()){
+        EM_error("Oops, for requires bounds to be type int", true);
+        return Ty_Error();
+    }
+
+    return Ty_Void();
+
+}
+
 // The bodies of other type checking functions,
 //  including any virtual functions you introduce into
 //  the AST classes, should go here.
