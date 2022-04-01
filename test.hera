@@ -1,24 +1,73 @@
 #include "Tiger-stdlib-stack-data.hera"
 
 DLABEL(my_string_1) 
-    LP_STRING("*") 
+    LP_STRING("this this print a 5x5 grid of *'s, doesn't need any A_VarExp's, just A_For\012") 
+
+DLABEL(my_string_2) 
+    LP_STRING("\0111\0112\0113\0114\0115\012") 
+
+DLABEL(my_string_3) 
+    LP_STRING("\011") 
+
+DLABEL(my_string_4) 
+    LP_STRING("*\011") 
+
+DLABEL(my_string_5) 
+    LP_STRING("\012") 
 
 CBON()
 
+MOVE(FP_alt, SP)
+INC(SP, 4)
+SET(R1, my_string_1)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, print)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 4) 
+
+MOVE(FP_alt, SP)
+INC(SP, 4)
+SET(R1, my_string_2)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, print)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 4) 
+
+// for loop code
     SET(R1, 1)
 INC(SP, 1)
 STORE(R1, 0, FP) 
 
 LABEL(my_for_cond_1)
-    SET(R1, 6)
+    SET(R1, 5)
 
 LOAD(R2, 0, FP)
 CMP(R2, R1)
-BZ(my_for_post_1)
+BG(my_for_post_1)
 
 MOVE(FP_alt, SP)
 INC(SP, 4)
-SET(R1, my_string_1)
+SET(R1, my_string_3)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, print)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 4) 
+
+// for loop code
+    SET(R1, 1)
+INC(SP, 2)
+STORE(R1, 0, FP) 
+
+LABEL(my_for_cond_2)
+    SET(R1, 5)
+
+LOAD(R2, 0, FP)
+CMP(R2, R1)
+BG(my_for_post_2)
+
+MOVE(FP_alt, SP)
+INC(SP, 4)
+SET(R1, my_string_4)
 STORE(R1, 3, FP_alt) 
 CALL(FP_alt, print)
 LOAD(R2, 3, FP_alt)
@@ -29,9 +78,29 @@ LOAD(R2, 0, FP)
 INC(R2, 1)
 STORE(R2, 0, FP) 
 
+BR(my_for_cond_2)
+LABEL(my_for_post_2)
+DEC(SP, 1)
+MOVE(FP_alt, SP)
+INC(SP, 4)
+SET(R1, my_string_5)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, print)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 4) 
+
+MOVE(R2, R2)
+MOVE(R2, R2)
+
+LOAD(R2, 0, FP)
+INC(R2, 1)
+STORE(R2, 0, FP) 
+
 BR(my_for_cond_1)
 LABEL(my_for_post_1)
 DEC(SP, 1)
+MOVE(R2, R2)
+MOVE(R2, R2)
 
 
 HALT()
