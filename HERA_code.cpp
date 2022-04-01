@@ -259,3 +259,11 @@ string A_forExp_::HERA_code() {
 
     return my_code;
 }
+
+string A_varExp_::HERA_code() {
+    return _var->HERA_code();
+}
+
+string A_simpleVar_::HERA_code() {
+    return "//load "+str(_sym)+" from mem\nLOAD("+ this->result_reg_s()+", "+str(this->fp_plus())+", FP)\n";
+};

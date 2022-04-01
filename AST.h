@@ -514,7 +514,24 @@ class A_varExp_ : public A_exp_ {
 public:
 	A_varExp_(A_pos pos, A_var var);
 	virtual string print_rep(int indent, bool with_attributes);
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
+    int result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+
+    virtual string HERA_data();
+    virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
+
 private:
+    virtual int init_result_reg();
+    int stored_result_reg = -1;
 	A_var _var;
 };
 
@@ -752,6 +769,7 @@ class A_forExp_ : public A_controlExp_ {
 public:
 	A_forExp_(A_pos pos, Symbol var, A_exp lo, A_exp hi, A_exp body);
 	virtual string print_rep(int indent, bool with_attributes);
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
     void do_init(){
         if (this->stored_cond_label == "" && this->stored_post_label == ""){
             int results = this->init_labels();
@@ -854,13 +872,39 @@ private:
 class A_var_ : public AST_node_ {
 public:
 	A_var_(A_pos p);
+    int result_reg() {
+        return 1;
+    }
 };
 
 class A_simpleVar_ : public A_var_ {
 public:
 	A_simpleVar_(A_pos pos, Symbol sym);
 	virtual string print_rep(int indent, bool with_attributes);
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
+    int result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+    int fp_plus() {
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_fp_plus();
+        return stored_fp_plus;
+    }
+
+    virtual string HERA_data();
+    virtual string HERA_code();
+
+    virtual Ty_ty typecheck();
 private:
+    int init_result_reg();
+    int init_fp_plus();
+    int stored_result_reg = -1;
+    int stored_fp_plus = -1;
+
 	Symbol _sym;
 };
 

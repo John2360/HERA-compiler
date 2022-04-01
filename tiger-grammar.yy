@@ -104,6 +104,9 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
     | STRING[i]					{ $$.AST = A_StringExp(Position::fromLex(@i), $i);
       								  EM_debug("Got str " + $i, $$.AST->pos());
       								}
+    | ID[i]					{ $$.AST = A_VarExp(Position::fromLex(@i), A_SimpleVar(Position::fromLex(@i), to_Symbol($i)));
+          								  EM_debug("Got simple var " + $i, $$.AST->pos());
+          								}
     | LPAREN RPAREN              {  $$.AST = A_NilExp(Position::undefined());
                                         EM_debug("Got nil", Position::undefined());
                                    }

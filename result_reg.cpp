@@ -147,6 +147,11 @@ int A_forExp_::init_result_reg() {
     return std::max(_hi->result_reg(), std::max(_lo->result_reg(), _body->result_reg()));
 }
 
+int A_varExp_::init_result_reg() {
+    return _var->result_reg();
+
+}
+
 int A_ifExp_::init_if_labels()
 {
     int my_number = next_unique_if_arith_number;
@@ -187,4 +192,12 @@ int A_breakExp_::init_result_reg(){
 
 string A_breakExp_::init_break_label(){
     return this->parent()->break_label();
+}
+
+int A_simpleVar_::init_result_reg() {
+    return 1;
+}
+
+int A_simpleVar_::init_fp_plus() {
+    return this->find_local_variables(_sym).fp_plus;
 }

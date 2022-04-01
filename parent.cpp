@@ -79,6 +79,29 @@ void A_breakExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_pa
     // now, tell my children to record me as theirs... they'll tell the grandkids
 }
 
+void A_varExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root) {
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _var->set_parent_pointers_for_me_and_my_descendants(this);
+}
+
+void A_forExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root) {
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _body->set_parent_pointers_for_me_and_my_descendants(this);
+    _lo->set_parent_pointers_for_me_and_my_descendants(this);
+    _hi->set_parent_pointers_for_me_and_my_descendants(this);
+}
+
+void A_simpleVar_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+}
+
 void A_expList_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
 {
     // record my parent

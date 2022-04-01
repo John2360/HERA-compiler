@@ -198,6 +198,14 @@ Ty_ty A_forExp_::typecheck() {
 
 }
 
+Ty_ty A_varExp_::typecheck() {
+    return _var->typecheck();
+}
+
+Ty_ty A_simpleVar_::typecheck() {
+    return this->find_local_variables(_sym).type;
+}
+
 // The bodies of other type checking functions,
 //  including any virtual functions you introduce into
 //  the AST classes, should go here.
