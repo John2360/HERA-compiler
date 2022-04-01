@@ -243,7 +243,7 @@ string A_forExp_::HERA_code() {
     my_code +=  _hi->HERA_code() + "\n";
     my_code += "LOAD("+ this->result_reg_s()+", "+str(stack_pointer)+", FP)\n";
     my_code += "CMP("+this->result_reg_s()+", "+_hi->result_reg_s()+")\n";
-    my_code += "BZ("+this->branch_label_post()+")\n\n";
+    my_code += "BL("+this->branch_label_post()+")\n\n";
 
     my_code += _body->HERA_code() + "\n";
 
