@@ -805,6 +805,7 @@ private:
 	A_exp _body;
 
     int init_result_reg();
+    int init_fp_plus();
     int init_labels();
     int stored_result_reg = -1;
     string stored_cond_label = "";
