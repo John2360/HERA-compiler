@@ -234,7 +234,8 @@ string A_forExp_::HERA_code() {
 
     variable_type_info my_var = this->find_local_variables(_var);
     int starting_frame_size = 2;
-    int stack_pointer = my_var.fp_plus;
+    int stack_pointer = this->get_fp_plus();
+    _hi->set_floor(stack_pointer);
 
     my_code += "// for loop\n";
     my_code += _lo->HERA_code();

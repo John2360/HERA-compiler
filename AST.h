@@ -198,8 +198,8 @@ public:
     Ty_ty type;
     int fp_plus;
 
-//    string __repr__();
-//    string __str__();
+    string __repr__() {return "type: " + str(type) + "  fp_plus:" + str(fp_plus);};
+    string __str__()  { return this->__repr__(); }
 
 };
 // make an abbreviation "ST_example" for a symbol table with the example sym info
@@ -284,24 +284,42 @@ public:
         }
     }
 
-    virtual variable_type_info find_local_variables(Symbol name) {
+    virtual variable_type_info find_local_variables(Symbol name, int floor = -1) {
         try {
-            variable_type_info my_var = lookup(name, vars_data_shell);
+            variable_type_info my_var = lookup(name, this->vars_data_shell);
+
+            if (my_var.fp_plus <= floor) {
+                return parent()->find_local_variables(name, floor);
+            }
+
             return my_var;
         } catch(const local_variable_scope::undefined_symbol &missing) {
-            if (parent() != 0) {
-                return parent()->find_local_variables(name);
-            } else {
-                EM_error("Oops, the function "+ str(name) +" was not found in scope", true);
-                return variable_type_info(nullptr, 0);
-            }
+            return parent()->find_local_variables(name, floor);
         }
     }
 
     virtual void create_variable(Symbol name, Ty_ty type) {
-        vars_data_shell = MergeAndShadow(vars_data_shell, local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))));
+        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))), this->vars_data_shell);
+        my_fp_plus = fp_plus;
         fp_plus = fp_plus + 1;
     };
+
+    int get_fp_plus(){
+        if (my_fp_plus > -1){
+            return my_fp_plus;
+        } else {
+            EM_error("FP plus requested for wrong node", true);
+            return -1;
+        }
+    }
+
+    int get_floor(){
+        return my_floor;
+    }
+
+    void set_floor(int floor){
+        my_floor = floor;
+    }
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
 	AST_node_ *stored_parent = 0;
@@ -312,6 +330,8 @@ private:
 
     local_variable_scope vars_data_shell = local_variable_scope();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
+    int my_fp_plus = -1;
+    int my_floor = -1;
 
 };
 
@@ -339,6 +359,7 @@ public:
         return true;
     }
 
+
 	// we'll need to print the register number attribute for exp's
 	virtual String attributes_for_printing();
 
@@ -346,7 +367,6 @@ private:
     virtual int init_result_reg();
     virtual string init_result_dlabel();
 	int stored_result_reg = -1;  // Initialize to -1 to be sure it gets replaced by "if" in result_reg() above
-
     string stored_dlabel = "";
 };
 
@@ -913,6 +933,15 @@ public:
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_fp_plus();
         return stored_fp_plus;
     }
+    int get_floor () {
+        set_floor();
+        return my_floor;
+    }
+    void set_floor() {
+        if (parent()->get_floor() != -1){
+            my_floor = parent()->get_floor();
+        }
+    }
 
     virtual string HERA_data();
     virtual string HERA_code();
@@ -923,6 +952,7 @@ private:
     int init_fp_plus();
     int stored_result_reg = -1;
     int stored_fp_plus = -1;
+    int my_floor = -1;
 
 	Symbol _sym;
 };
