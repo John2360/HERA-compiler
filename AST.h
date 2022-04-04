@@ -362,6 +362,17 @@ public:
     virtual Ty_ty typecheck();
 
 
+    virtual variable_type_info find_local_variables(Symbol name) {
+        try {
+            variable_type_info my_var = lookup(name, vars_data_shell);
+            return my_var;
+        } catch(const local_variable_scope::undefined_symbol &missing) {
+            EM_error("Oops, the variable "+ str(name) +" was not found in scope", true);
+            return variable_type_info(nullptr, 0);
+        }
+    }
+
+
     virtual function_type_info find_local_functions(Symbol name) {
         try {
             function_type_info my_func = lookup(name, data_shell);
@@ -376,7 +387,8 @@ public:
 	virtual int compute_depth();  // just for an example, not needed to compile
 private:
 	A_exp main_expr;
-
+    local_variable_scope vars_data_shell = local_variable_scope();
+    tiger_standard_library funcs_data_shell = tiger_standard_library();
 };
 
 
