@@ -1,12 +1,18 @@
 #include "Tiger-stdlib-stack-data.hera"
 
 DLABEL(my_string_1) 
-    LP_STRING("here come numbers from 40 to 42: ") 
+    LP_STRING("Here is the multiplication table for numbers up to 5:\012") 
 
 DLABEL(my_string_2) 
-    LP_STRING(" ") 
+    LP_STRING("\0111's*\0112's\0113's\0114's\0115's\012") 
 
 DLABEL(my_string_3) 
+    LP_STRING("\011") 
+
+DLABEL(my_string_4) 
+    LP_STRING("\011") 
+
+DLABEL(my_string_5) 
     LP_STRING("\012") 
 
 CBON()
@@ -19,28 +25,6 @@ CALL(FP_alt, print)
 LOAD(R2, 3, FP_alt)
 DEC(SP, 4) 
 
-// for loop code
-    SET(R1, 40)
-INC(SP, 1)
-STORE(R1, 0, FP) 
-
-LABEL(my_for_cond_1)
-    SET(R1, 42)
-
-LOAD(R2, 0, FP)
-CMP(R2, R1)
-BG(my_for_post_1)
-INC(FP, 1)
-
-MOVE(FP_alt, SP)
-INC(SP, 4)
-//load i from mem
-LOAD(R1, 0, FP)
-STORE(R1, 3, FP_alt) 
-CALL(FP_alt, printint)
-LOAD(R2, 3, FP_alt)
-DEC(SP, 4) 
-
 MOVE(FP_alt, SP)
 INC(SP, 4)
 SET(R1, my_string_2)
@@ -49,16 +33,26 @@ CALL(FP_alt, print)
 LOAD(R2, 3, FP_alt)
 DEC(SP, 4) 
 
-MOVE(R2, R2)
+// for loop
+    SET(R1, 1)
+INC(SP, 2)
+STORE(R1, 1, FP) 
 
-DEC(FP, 1)
-LOAD(R2, 0, FP)
-INC(R2, 1)
-STORE(R2, 0, FP) 
+LABEL(my_for_cond_1)
+    SET(R1, 5)
 
-BR(my_for_cond_1)
-LABEL(my_for_post_1)
-DEC(SP, 1)
+LOAD(R3, 1, FP)
+CMP(R3, R1)
+BG(my_for_post_1)
+MOVE(FP_alt, SP)
+INC(SP, 4)
+//load row from mem
+LOAD(R1, 1, FP)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, printint)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 4) 
+
 MOVE(FP_alt, SP)
 INC(SP, 4)
 SET(R1, my_string_3)
@@ -67,8 +61,69 @@ CALL(FP_alt, print)
 LOAD(R2, 3, FP_alt)
 DEC(SP, 4) 
 
-MOVE(R2, R2)
-MOVE(R2, R2)
+// for loop
+    SET(R1, 1)
+INC(SP, 2)
+STORE(R1, 0, FP) 
+
+LABEL(my_for_cond_2)
+    SET(R1, 5)
+
+LOAD(R3, 0, FP)
+CMP(R3, R1)
+BG(my_for_post_2)
+MOVE(FP_alt, SP)
+INC(SP, 4)
+//load row from mem
+LOAD(R1, 1, FP)
+    MOVE(R2, R1)
+//load col from mem
+LOAD(R1, 0, FP)
+    MUL(R2, R2, R1)
+
+STORE(R2, 3, FP_alt) 
+CALL(FP_alt, printint)
+LOAD(R3, 3, FP_alt)
+DEC(SP, 4) 
+
+MOVE(FP_alt, SP)
+INC(SP, 4)
+SET(R1, my_string_4)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, print)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 4) 
+
+MOVE(R3, R2)
+
+LOAD(R3, 0, FP)
+INC(R3, 1)
+STORE(R3, 0, FP) 
+
+BR(my_for_cond_2)
+LABEL(my_for_post_2)
+DEC(SP, 2)
+MOVE(FP_alt, SP)
+INC(SP, 4)
+SET(R1, my_string_5)
+STORE(R1, 3, FP_alt) 
+CALL(FP_alt, print)
+LOAD(R2, 3, FP_alt)
+DEC(SP, 4) 
+
+MOVE(R3, R2)
+MOVE(R3, R3)
+MOVE(R3, R3)
+
+LOAD(R3, 1, FP)
+INC(R3, 1)
+STORE(R3, 1, FP) 
+
+BR(my_for_cond_1)
+LABEL(my_for_post_1)
+DEC(SP, 2)
+MOVE(R3, R3)
+MOVE(R3, R3)
 
 
 HALT()

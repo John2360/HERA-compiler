@@ -12,11 +12,13 @@ static int next_unique_if_arith_number = 0;
 static int next_unique_if_cond_number = 0;
 static int next_unique_for_number = 0;
 
+
 int A_exp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
     EM_error("Using old reg method. Please update.", false);
 	return 1;
 }
+
 
 string A_exp_::init_result_dlabel()  // generate unique numbers, starting from 1, each time this is called
 {

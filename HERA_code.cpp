@@ -239,7 +239,6 @@ string A_forExp_::HERA_code() {
     my_code += "// for loop\n";
     my_code += _lo->HERA_code();
     my_code += "INC(SP, "+str(starting_frame_size)+")\n";
-    my_code += "INC(FP, 1)\n\n";
     my_code += "STORE("+_lo->result_reg_s()+", "+str(stack_pointer)+", FP) \n\n";
     my_code += "LABEL("+this->branch_label_cond()+")\n";
     my_code +=  _hi->HERA_code() + "\n";
@@ -254,7 +253,6 @@ string A_forExp_::HERA_code() {
     my_code += "STORE("+this->result_reg_s()+", "+str(stack_pointer)+", FP) \n\n";
     my_code += "BR("+this->branch_label_cond()+")\n";
     my_code += "LABEL("+this->branch_label_post()+")\n";
-    my_code += "DEC(FP, 1)\n";
     my_code += "DEC(SP, "+str(starting_frame_size)+")\n";
 
     return my_code;

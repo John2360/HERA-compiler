@@ -95,6 +95,10 @@ void A_forExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_pare
     _hi->set_parent_pointers_for_me_and_my_descendants(this);
 }
 
+void A_var_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root){
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+}
+
 void A_simpleVar_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
 {
     // record my parent

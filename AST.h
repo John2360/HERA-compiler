@@ -167,6 +167,8 @@ typedef Position A_pos;
 #include <hc_list_helpers.h>
 #include "ST-2024.h"
 
+static int fp_plus = 0;
+
 struct function_type_info {
 public:
     function_type_info(
@@ -296,8 +298,9 @@ public:
         }
     }
 
-    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus) {
+    virtual void create_variable(Symbol name, Ty_ty type) {
         vars_data_shell = MergeAndShadow(vars_data_shell, local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))));
+        fp_plus = fp_plus + 1;
     };
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
@@ -309,6 +312,7 @@ private:
 
     local_variable_scope vars_data_shell = local_variable_scope();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
+
 };
 
 class A_exp_ : public AST_node_ {
@@ -342,6 +346,7 @@ private:
     virtual int init_result_reg();
     virtual string init_result_dlabel();
 	int stored_result_reg = -1;  // Initialize to -1 to be sure it gets replaced by "if" in result_reg() above
+
     string stored_dlabel = "";
 };
 
@@ -356,6 +361,7 @@ public:
 
     virtual Ty_ty typecheck();
 
+
     virtual function_type_info find_local_functions(Symbol name) {
         try {
             function_type_info my_func = lookup(name, data_shell);
@@ -369,8 +375,8 @@ public:
 	virtual void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);  // should not be called, since it's in-line in the constructor
 	virtual int compute_depth();  // just for an example, not needed to compile
 private:
-
 	A_exp main_expr;
+
 };
 
 
@@ -805,7 +811,6 @@ private:
 	A_exp _body;
 
     int init_result_reg();
-    int init_fp_plus();
     int init_labels();
     int stored_result_reg = -1;
     string stored_cond_label = "";
@@ -872,6 +877,7 @@ private:
 
 class A_var_ : public AST_node_ {
 public:
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 	A_var_(A_pos p);
     int result_reg() {
         return 1;
