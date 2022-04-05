@@ -232,26 +232,25 @@ string A_breakExp_::HERA_code() {
 string A_forExp_::HERA_code() {
     string my_code;
 
-    variable_type_info my_var = this->find_local_variables(_var);
-    int starting_frame_size = 2;
-    int stack_pointer = this->get_fp_plus();
-    _hi->set_floor(stack_pointer);
+    int starting_frame_size = 1;
+    int stack_pointer = this->get_my_fp_plus();
 
     my_code += "// for loop\n";
     my_code += _lo->HERA_code();
     my_code += "INC(SP, "+str(starting_frame_size)+")\n";
     my_code += "STORE("+_lo->result_reg_s()+", "+str(stack_pointer)+", FP) \n\n";
-    my_code += "LABEL("+this->branch_label_cond()+")\n";
     my_code +=  _hi->HERA_code() + "\n";
-    my_code += "LOAD("+ this->result_reg_s()+", "+str(stack_pointer)+", FP)\n";
-    my_code += "CMP("+this->result_reg_s()+", "+_hi->result_reg_s()+")\n";
+    my_code += "MOVE("+this->result_reg_s()+", "+_hi->result_reg_s()+")\n";
+    my_code += "LABEL("+this->branch_label_cond()+")\n";
+    my_code += "LOAD(R"+ str(this->result_reg()-1) +", "+str(stack_pointer)+", FP)\n";
+    my_code += "CMP(R"+str(this->result_reg()-1)+", "+this->result_reg_s()+")\n";
     my_code += "BG("+this->branch_label_post()+")\n";
 
     my_code += _body->HERA_code() + "\n";
 
-    my_code += "LOAD("+ this->result_reg_s()+", "+str(stack_pointer)+", FP)\n";
-    my_code += "INC("+this->result_reg_s()+", 1)\n";
-    my_code += "STORE("+this->result_reg_s()+", "+str(stack_pointer)+", FP) \n\n";
+    my_code += "LOAD(R"+ str(this->result_reg()-1) +", "+str(stack_pointer)+", FP)\n";
+    my_code += "INC(R"+ str(this->result_reg()-1) +", 1)\n";
+    my_code += "STORE(R"+ str(this->result_reg()-1) +", "+str(stack_pointer)+", FP) \n\n";
     my_code += "BR("+this->branch_label_cond()+")\n";
     my_code += "LABEL("+this->branch_label_post()+")\n";
     my_code += "DEC(SP, "+str(starting_frame_size)+")\n";

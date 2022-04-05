@@ -219,7 +219,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                                   $seq1.AST,
                                                   $seq2.AST,
                                                   $seq3.AST);
-                                        $$.AST->create_variable(to_Symbol($name), Ty_Int());
+                                        $$.AST->create_variable(to_Symbol($name), Ty_Int(), 0);
                                         EM_debug("Got for loop", $$.AST->pos());
                                         }
 

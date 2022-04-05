@@ -146,6 +146,9 @@ int A_condExp_::init_labels()
 }
 
 int A_forExp_::init_result_reg() {
+    if (_hi->result_reg() == _lo->result_reg() || _hi->result_reg() == _body->result_reg() || _lo->result_reg() == _body->result_reg()){
+        return std::max(_hi->result_reg(), std::max(_lo->result_reg(), _body->result_reg()))+1;
+    }
     return std::max(_hi->result_reg(), std::max(_lo->result_reg(), _body->result_reg()));
 }
 
@@ -201,5 +204,5 @@ int A_simpleVar_::init_result_reg() {
 }
 
 int A_simpleVar_::init_fp_plus() {
-    return this->find_local_variables(_sym, this->get_floor()).fp_plus;
+    return this->find_local_variables_fp(_sym);
 }

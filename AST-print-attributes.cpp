@@ -22,7 +22,6 @@ string A_exp_::attributes_for_printing()
 {
 	return (AST_node_::attributes_for_printing()
 		+ "my_reg() = " + str(result_reg()) + "; "
-                                              + "floor = " + str(get_floor()) + "; "
 		// concatenate any other EXP attributes here for printing
 		);
 }
