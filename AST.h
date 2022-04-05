@@ -286,7 +286,7 @@ public:
         try {
             variable_type_info my_var = lookup(name, this->vars_data_shell);
 
-            return my_var.fp_plus+this->get_my_fp_plus();
+            return my_var.fp_plus;
         } catch(const local_variable_scope::undefined_symbol &missing) {
             return parent()->find_local_variables_fp(name);
         }
@@ -314,6 +314,10 @@ public:
         }
     }
 
+    virtual int my_fp_plus(){
+        return fp_plus;
+    }
+
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
 	AST_node_ *stored_parent = 0;
 
@@ -323,7 +327,6 @@ private:
 
     local_variable_scope vars_data_shell = local_variable_scope();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
-    int my_floor = -1;
     int fp_plus = -1;
 
 };
@@ -840,7 +843,8 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
-    int get_my_fp_plus(){
+
+    virtual int get_my_fp_plus(){
         if (fp_plus == -1){
             fp_plus = parent()->get_my_fp_plus()+1;
         }
@@ -949,6 +953,7 @@ public:
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_fp_plus();
         return stored_fp_plus;
     }
+
 
     virtual string HERA_data();
     virtual string HERA_code();
