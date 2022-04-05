@@ -310,12 +310,17 @@ public:
         if (fp_plus > -1){
             return fp_plus;
         } else {
-            return parent()->get_my_fp_plus();
+            fp_plus = parent()->get_my_fp_plus();
+            return fp_plus;
         }
     }
 
     virtual int my_fp_plus(){
-        return fp_plus;
+        if (fp_plus > -1){
+            return fp_plus;
+        } else {
+            return this->get_my_fp_plus();
+        }
     }
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default

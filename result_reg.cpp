@@ -204,5 +204,5 @@ int A_simpleVar_::init_result_reg() {
 }
 
 int A_simpleVar_::init_fp_plus() {
-    return this->find_local_variables_fp(_sym);
+    return this->find_local_variables_fp(_sym)+my_fp_plus();
 }

@@ -12,7 +12,6 @@ String AST_node_::attributes_for_printing()
 {
 	return (string("")
 		+ ("pos = "            + str(stored_pos)      + "; ")
-          + ("fp_plus = "            + str(this->my_fp_plus())      + "; ")
         + ("vars= " +str(vars_data_shell) + "; ")
 		// concatenate any other attributes here for printing
 		);
