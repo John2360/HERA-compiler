@@ -256,7 +256,7 @@ int A_simpleVar_::init_result_reg() {
 
 int A_simpleVar_::get_offest() {
     if(stored_offest == -1){
-        stored_offest = this->find_local_variables_fp(_sym);
+        stored_offest = this->find_local_variables_fp(_sym, this->result_fp_plus());
     }
     return stored_offest;
 }

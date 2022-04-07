@@ -282,13 +282,17 @@ public:
         }
     }
 
-    virtual int find_local_variables_fp(Symbol name) {
+    virtual int find_local_variables_fp(Symbol name, int ceiling = 1000000000) {
         try {
             variable_type_info my_var = lookup(name, this->vars_data_shell);
 
-            return my_var.fp_plus+this->result_fp_plus();
+            if (this->result_fp_plus() <= ceiling){
+                return my_var.fp_plus+this->result_fp_plus();
+            } else {
+                return parent()->find_local_variables_fp(name, ceiling);
+            }
         } catch(const local_variable_scope::undefined_symbol &missing) {
-            return parent()->find_local_variables_fp(name);
+            return parent()->find_local_variables_fp(name, ceiling);
         }
     }
 
