@@ -282,15 +282,7 @@ public:
         }
     }
 
-    virtual int find_local_variables_fp(Symbol name) {
-        try {
-            variable_type_info my_var = lookup(name, this->vars_data_shell);
-
-            return my_var.fp_plus;
-        } catch(const local_variable_scope::undefined_symbol &missing) {
-            return parent()->find_local_variables_fp(name);
-        }
-    }
+    virtual int find_local_variables_fp(Symbol name){return parent()->find_local_variables(name).fp_plus;}
 
     virtual variable_type_info find_local_variables(Symbol name) {
         try {
@@ -306,21 +298,14 @@ public:
         vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))), this->vars_data_shell);
     };
 
-    virtual int get_my_fp_plus(){
-        if (fp_plus > -1){
-            return fp_plus;
-        } else {
-            fp_plus = parent()->get_my_fp_plus();
-            return fp_plus;
-        }
+    virtual int fp_plus_for_me(A_exp which_child){
+        return -1;
+    };
+    virtual int regular_fp_plus(){
+        return parent()->result_fp_plus();
     }
-
-    virtual int my_fp_plus(){
-        if (fp_plus > -1){
-            return fp_plus;
-        } else {
-            return this->get_my_fp_plus();
-        }
+    virtual int result_fp_plus(){
+        return -1;
     }
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
@@ -332,7 +317,7 @@ private:
 
     local_variable_scope vars_data_shell = local_variable_scope();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
-    int fp_plus = -1;
+
 
 };
 
@@ -359,6 +344,23 @@ public:
         if (stored_dlabel == "") return false;
         return true;
     }
+    int regular_fp_plus(){
+        return parent()->result_fp_plus();
+    }
+    virtual int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
+
+    virtual int find_local_variables_fp(Symbol name) {
+        try {
+            variable_type_info my_var = lookup(name, this->vars_data_shell);
+
+            return my_var.fp_plus+this->result_fp_plus();
+        } catch(const local_variable_scope::undefined_symbol &missing) {
+            return parent()->find_local_variables_fp(name);
+        }
+    }
 
 
 	// we'll need to print the register number attribute for exp's
@@ -366,9 +368,18 @@ public:
 
 private:
     virtual int init_result_reg();
+    int stored_result_reg = -1;  // Initialize to -1 to be sure it gets replaced by "if" in result_reg() above
+    int stored_fp_plus = -1;
+
     virtual string init_result_dlabel();
-	int stored_result_reg = -1;  // Initialize to -1 to be sure it gets replaced by "if" in result_reg() above
     string stored_dlabel = "";
+
+    virtual int init_result_fp_plus();
+    virtual int init_regular_fp_plus();
+    int stored_regular_fp_plus = -1;
+    int stored_result_fp_plus = -1;
+
+    local_variable_scope vars_data_shell = local_variable_scope();
 };
 
 class A_root_ : public AST_node_ {
@@ -380,23 +391,12 @@ public:
 	AST_node_ *parent();	// We should never call this
 	string print_rep(int indent, bool with_attributes);
 
-    virtual int get_my_fp_plus(){
+    int regular_fp_plus() {
         return -1;
     }
 
+
     virtual Ty_ty typecheck();
-
-
-    virtual int find_local_variables_fp(Symbol name) {
-        try {
-            variable_type_info my_var = lookup(name, this->vars_data_shell);
-
-            return my_var.fp_plus+0;
-        } catch(const local_variable_scope::undefined_symbol &missing) {
-            EM_error("Oops, the variable "+ str(name) +" was not found", true);
-            return 0;
-        }
-    }
 
     virtual variable_type_info find_local_variables(Symbol name) {
         try {
@@ -406,6 +406,17 @@ public:
         } catch(const local_variable_scope::undefined_symbol &missing) {
             EM_error("Oops, the variable "+ str(name) +" was not found", true);
             return variable_type_info(nullptr, 0);
+        }
+    }
+
+    virtual int find_local_variables_fp(Symbol name) {
+        try {
+            variable_type_info my_var = lookup(name, this->vars_data_shell);
+
+            return my_var.fp_plus+0;
+        } catch(const local_variable_scope::undefined_symbol &missing) {
+            EM_error("Oops, the variable "+ str(name) +" was not found", true);
+            return 0;
         }
     }
 
@@ -578,6 +589,10 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
+    virtual int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
 
     virtual string HERA_data();
     virtual string HERA_code();
@@ -588,6 +603,8 @@ private:
     virtual int init_result_reg();
     int stored_result_reg = -1;
 	A_var _var;
+    int init_result_fp_plus();
+    int stored_fp_plus = -1;
 };
 
 typedef enum {A_plusOp, A_minusOp, A_timesOp, A_divideOp,
@@ -706,6 +723,10 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
 
     virtual string HERA_data();
     virtual string HERA_code();
@@ -720,6 +741,9 @@ private:
 
     virtual int init_result_reg();
     int stored_result_reg = -1;
+
+    int init_result_fp_plus();
+    int stored_fp_plus = -1;
 };
 
 class A_controlExp_ : public A_exp_ {
@@ -848,12 +872,16 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
-
-    virtual int get_my_fp_plus(){
-        if (fp_plus == -1){
-            fp_plus = parent()->get_my_fp_plus()+1;
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
+    int fp_plus_for_me(A_exp which_child) {
+        if (which_child == _hi || which_child == _lo){
+            return this->parent()->regular_fp_plus();
+        } else {
+            return this->result_fp_plus();
         }
-        return fp_plus;
     }
 
     virtual string HERA_data();
@@ -869,7 +897,8 @@ private:
     int init_result_reg();
     int init_labels();
     int stored_result_reg = -1;
-    int fp_plus = -1;
+    int init_result_fp_plus();
+    int stored_fp_plus = -1;
     string stored_cond_label = "";
     string stored_post_label = "";
 };
@@ -954,11 +983,12 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
-    int fp_plus() {
-        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_fp_plus();
-        return stored_fp_plus;
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
     }
 
+    int get_offest();
 
     virtual string HERA_data();
     virtual string HERA_code();
@@ -966,9 +996,10 @@ public:
     virtual Ty_ty typecheck();
 private:
     int init_result_reg();
-    int init_fp_plus();
     int stored_result_reg = -1;
+    int init_result_fp_plus();
     int stored_fp_plus = -1;
+    int stored_offest = -1;
 
 	Symbol _sym;
 };
@@ -1005,6 +1036,10 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
     virtual int init_result_reg();
 
     virtual string HERA_data();
@@ -1019,6 +1054,8 @@ public:
     void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 private:
     int stored_result_reg = -1;
+    int init_result_fp_plus();
+    int stored_fp_plus = -1;
 };
 
 // The componends of a A_recordExp, e.g. point{X = 4, Y = 12}

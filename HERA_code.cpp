@@ -233,7 +233,7 @@ string A_forExp_::HERA_code() {
     string my_code;
 
     int starting_frame_size = 1;
-    int stack_pointer = this->get_my_fp_plus();
+    int stack_pointer = this->result_fp_plus();
 
     my_code += "// for loop\n";
     my_code += _lo->HERA_code();
@@ -263,5 +263,5 @@ string A_varExp_::HERA_code() {
 }
 
 string A_simpleVar_::HERA_code() {
-    return "//load "+str(_sym)+" from mem\nLOAD("+ this->result_reg_s()+", "+str(this->fp_plus())+", FP)\n";
+    return "//load "+str(_sym)+" from mem\nLOAD("+ this->result_reg_s()+", "+str(this->result_fp_plus()+this->get_offest())+", FP)\n";
 };

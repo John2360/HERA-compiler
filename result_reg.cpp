@@ -12,11 +12,62 @@ static int next_unique_if_arith_number = 0;
 static int next_unique_if_cond_number = 0;
 static int next_unique_for_number = 0;
 
-
+//int AST_node_::fp_plus_for_me(A_exp which_child) {
+//    return which_child->regular_fp_plus();
+//}
 int A_exp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
     EM_error("Using old reg method. Please update.", false);
 	return 1;
+}
+int A_exp_::init_regular_fp_plus() {
+    if (this->stored_result_fp_plus > -1){
+        return this->stored_result_fp_plus;
+    } else {
+        return this->parent()->regular_fp_plus();
+    }
+}
+int A_exp_::init_result_fp_plus() {
+    int for_me = this->parent()->fp_plus_for_me(this);
+
+    if (for_me == -1){
+        return this->parent()->regular_fp_plus();
+    } else {
+        return for_me;
+    }
+}
+int A_callExp_::init_result_fp_plus() {
+    int for_me = this->parent()->fp_plus_for_me(this);
+
+    if (for_me == -1){
+        return this->parent()->regular_fp_plus();
+    } else {
+        return for_me;
+    }
+}
+int A_forExp_::init_result_fp_plus() {
+    int for_me = this->parent()->fp_plus_for_me(this);
+
+    if (for_me == -1){
+        return this->parent()->regular_fp_plus()+1;
+    } else {
+        return for_me+1;
+    }
+}
+int A_varExp_::init_result_fp_plus() {
+    int for_me = this->parent()->fp_plus_for_me(this);
+
+    if (for_me == -1){
+        return this->parent()->regular_fp_plus();
+    } else {
+        return for_me;
+    }
+}
+int A_expList_::init_result_fp_plus() {
+    return this->parent()->result_fp_plus();
+}
+int A_simpleVar_::init_result_fp_plus() {
+    return this->parent()->result_fp_plus();
 }
 
 
@@ -203,6 +254,9 @@ int A_simpleVar_::init_result_reg() {
     return 1;
 }
 
-int A_simpleVar_::init_fp_plus() {
-    return this->find_local_variables_fp(_sym)+my_fp_plus();
+int A_simpleVar_::get_offest() {
+    if(stored_offest == -1){
+        stored_offest = this->find_local_variables_fp(_sym);
+    }
+    return stored_offest;
 }
