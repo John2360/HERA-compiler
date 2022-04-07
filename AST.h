@@ -411,11 +411,16 @@ public:
         }
     }
 
-    virtual int find_local_variables_fp(Symbol name) {
+    virtual int find_local_variables_fp(Symbol name, int ceiling = 10000000) {
         try {
             variable_type_info my_var = lookup(name, this->vars_data_shell);
 
-            return my_var.fp_plus+0;
+            if (this->result_fp_plus() <= ceiling){
+                return my_var.fp_plus;
+            } else {
+                EM_error("Oops, the variable "+ str(name) +" was not found", true);
+                return 0;
+            }
         } catch(const local_variable_scope::undefined_symbol &missing) {
             EM_error("Oops, the variable "+ str(name) +" was not found", true);
             return 0;
