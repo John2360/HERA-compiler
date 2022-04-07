@@ -263,5 +263,5 @@ string A_varExp_::HERA_code() {
 }
 
 string A_simpleVar_::HERA_code() {
-    return "//load "+str(_sym)+" from mem\nLOAD("+ this->result_reg_s()+", "+str(this->result_fp_plus()+this->get_offest())+", FP)\n";
+    return "//load "+str(_sym)+" from mem\nLOAD("+ this->result_reg_s()+", "+str(this->get_offest())+", FP)\n";
 };

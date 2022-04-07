@@ -282,7 +282,15 @@ public:
         }
     }
 
-    virtual int find_local_variables_fp(Symbol name){return parent()->find_local_variables(name).fp_plus;}
+    virtual int find_local_variables_fp(Symbol name) {
+        try {
+            variable_type_info my_var = lookup(name, this->vars_data_shell);
+
+            return my_var.fp_plus+this->result_fp_plus();
+        } catch(const local_variable_scope::undefined_symbol &missing) {
+            return parent()->find_local_variables_fp(name);
+        }
+    }
 
     virtual variable_type_info find_local_variables(Symbol name) {
         try {
@@ -350,16 +358,6 @@ public:
     virtual int result_fp_plus(){
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
         return this->stored_fp_plus;
-    }
-
-    virtual int find_local_variables_fp(Symbol name) {
-        try {
-            variable_type_info my_var = lookup(name, this->vars_data_shell);
-
-            return my_var.fp_plus+this->result_fp_plus();
-        } catch(const local_variable_scope::undefined_symbol &missing) {
-            return parent()->find_local_variables_fp(name);
-        }
     }
 
 
