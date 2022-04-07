@@ -713,6 +713,7 @@ class A_letExp_ : public A_exp_ {
 public:
 	A_letExp_(A_pos pos, A_decList decs, A_exp body);
 	virtual string print_rep(int indent, bool with_attributes);
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 private:
 	A_decList _decs;
 	A_exp _body;
@@ -1095,6 +1096,8 @@ class A_decList_ : public A_dec_ {
 public:
 	A_decList_(A_dec head, A_decList tail);
 	virtual string print_rep(int indent, bool with_attributes);
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
 private:
 	A_dec _head;
 	A_decList _tail;
@@ -1104,6 +1107,8 @@ class A_varDec_ : public A_dec_ {
 public:
 	A_varDec_(A_pos pos, Symbol var, Symbol typ, A_exp init);
 	virtual string print_rep(int indent, bool with_attributes);
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
 private:
 	Symbol _var;
 	Symbol _typ;

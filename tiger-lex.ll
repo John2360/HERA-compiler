@@ -70,6 +70,16 @@ static bool textToBool(std::string the_text)
     return false;
 }
 
+static Ty_ty textToType(std::string the_text)
+{
+    if (the_text == "int"){
+        return Ty_Int();
+    } else if (the_text == "string") {
+        return Ty_String();
+    } else {
+        return Ty_Error();
+    }
+}
 
 // This uses some stuff created by flex, so it's easiest to just put it here.
 int tigerParseDriver::parse (const std::string &f)
@@ -118,6 +128,9 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
     add below newline definition
     {comment}   { loc.lines(yyleng); loc.step(); }
 */
+
+/* type */
+type (int|string)
 
 /* bool */
 bool (true|false)
@@ -173,6 +186,7 @@ string \"(.|\s)+?\"
 \|		{ return yy::tigerParser::make_OR(loc); }
 \!		{ return yy::tigerParser::make_NOT(loc); }
 
+\:		{ return yy::tigerParser::make_COLON(loc); }
 \;		{ return yy::tigerParser::make_SEMICOLON(loc); }
 \+		{ return yy::tigerParser::make_PLUS(loc); }
 \-      { return yy::tigerParser::make_MINUS(loc); }
@@ -198,9 +212,19 @@ do    { return yy::tigerParser::make_DO(loc); }
 break    { return yy::tigerParser::make_BREAK(loc); }
 for    { return yy::tigerParser::make_FOR(loc); }
 to    { return yy::tigerParser::make_TO(loc); }
+in    { return yy::tigerParser::make_IN(loc); }
+let { return yy::tigerParser::make_LET(loc); }
+end { return yy::tigerParser::make_END_LET(loc); }
+var { return yy::tigerParser::make_VAR(loc); }
+
 
 {bool}	{
    return yy::tigerParser::make_BOOL(textToBool(yytext), loc);
+   }
+
+{type}	{
+   //textToType(yytext)
+   return yy::tigerParser::make_MY_TYPE(yytext, loc);
    }
 
 {identifier}   { return yy::tigerParser::make_ID(yytext, loc); }

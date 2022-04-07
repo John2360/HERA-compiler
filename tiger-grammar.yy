@@ -28,7 +28,8 @@ class tigerParseDriver;
 %token END  0
 %token <bool> BOOL
 %token <int>  INT
-%token <std::string> ID STRING
+%token <std::string> ID STRING MY_TYPE
+//%token <Ty_ty> MY_TYPE
 // NOTE that bison complains if you have the same symbol listed as %token (above) and %type (below)
 //      so if you want to add attributes to a token, remove it from the list below
 
@@ -43,7 +44,7 @@ class tigerParseDriver;
 
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
-%left IF WHILE DO BREAK FOR
+%left IF WHILE DO BREAK FOR LET IN END_LET
 %left THEN
 %left ELSE
 %left EQ NEQ LT LE GT GE
@@ -60,6 +61,7 @@ class tigerParseDriver;
 %type <expAttrs>  exp
 %type <expAttrs>  seq
 %type <expListAttrs>  args
+%type <decListAttrs>  let_dec
 
 
 // The line below means our grammar must not have conflicts
@@ -91,6 +93,23 @@ args: exp[i]					{ $$.AST = A_ExpList($i.AST, 0);
       								}
     | exp[exp1] COMMA args[seq1]    { $$.AST = A_ExpList($exp1.AST, $seq1.AST);
                                         EM_debug("Got comma arg expression.", $$.AST->pos());
+}
+;
+
+let_dec: VAR ID[name] COLON MY_TYPE[type] ASSIGN exp[seq1]			{ $$.AST = A_DecList(
+                                  A_VarDec($seq1.AST->pos(),
+                                            to_Symbol($name),
+                                            to_Symbol($type),
+                                            $seq1.AST), 0);
+      								  EM_debug("Got single let dec", $$.AST->pos());
+      								}
+    | VAR ID[name] COLON MY_TYPE[type] ASSIGN exp[seq1] let_dec[decs]    {
+                $$.AST = A_DecList(
+                      A_VarDec($seq1.AST->pos(),
+                                to_Symbol($name),
+                                to_Symbol($type),
+                                $seq1.AST), $decs.AST);
+                          EM_debug("Got multiple let dec", $$.AST->pos());
 }
 ;
 
@@ -222,6 +241,12 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                         $$.AST->create_variable(to_Symbol($name), Ty_Int(), 0);
                                         EM_debug("Got for loop", $$.AST->pos());
                                         }
+    | LET let_dec[decs] IN exp[seq1] END_LET { $$.AST = A_LetExp($seq1.AST->pos(),
+                                                    $decs.AST,
+                                                    $seq1.AST
+                                                    );
+
+                        }
 
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,
