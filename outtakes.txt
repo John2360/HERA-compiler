@@ -1,3 +1,10 @@
+    //char * my_char = new char [the_text.length()+1];
+    //strcpy(my_char, the_text.c_str());
+    //std::bitset<8> x(my_char);
+    //std::string my_bit_set = x.to_string();
+   // my_bit_set[0] = '0';
+    //my_bit_set[1] = '0';
+
 
 DO NOT MODIFY BELOW CODE IS BEAUTIFUL
 STRING REGEX:

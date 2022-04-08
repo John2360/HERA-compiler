@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include "tigerParseDriver.h"
 #include "tiger-grammar.tab.hpp"
+#include <bitset>
+
 
 
 // next line from https://www.gnu.org/software/bison/manual/html_node/Calc_002b_002b-Scanner.html#Calc_002b_002b-Scanner
@@ -68,6 +70,18 @@ static bool textToBool(std::string the_text)
     }
 
     return false;
+}
+
+static char textToControl(std::string the_text)
+{
+    std::string my_binary = std::bitset<8>(the_text[1]).to_string();
+    //my_binary[0] = '0';
+    my_binary[1] = '0';
+    my_binary[2] = '0';
+    unsigned long i = std::bitset<8>(my_binary).to_ulong();
+    unsigned char c = static_cast<unsigned char>( i );
+    return c;
+
 }
 
 static Ty_ty textToType(std::string the_text)
@@ -234,6 +248,7 @@ var { return yy::tigerParser::make_VAR(loc); }
   [^"\\]+       { string_input += yytext; loc.lines(yyleng); loc.step(); }
   \\n           { string_input += '\n'; loc.lines(yyleng); loc.step(); }
   \\t           { string_input += '\t'; loc.lines(yyleng); loc.step(); }
+  \\[a-zA-Z]    { string_input += textToControl(yytext); loc.lines(yyleng); loc.step(); }
    /* Above handle escape strings; Then get out. */
   \"            { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); return yy::tigerParser::make_STRING(string_input, loc); }
      /* See below */
