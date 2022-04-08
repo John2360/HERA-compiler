@@ -248,7 +248,8 @@ var { return yy::tigerParser::make_VAR(loc); }
   [^"\\]+       { string_input += yytext; loc.lines(yyleng); loc.step(); }
   \\n           { string_input += '\n'; loc.lines(yyleng); loc.step(); }
   \\t           { string_input += '\t'; loc.lines(yyleng); loc.step(); }
-  \\[a-zA-Z]    { string_input += textToControl(yytext); loc.lines(yyleng); loc.step(); }
+  \\\"           { string_input += '\"'; loc.lines(yyleng); loc.step(); }
+  (\\[a-zA-Z]|\^[a-zA-Z])    { string_input += textToControl(yytext); loc.lines(yyleng); loc.step(); }
    /* Above handle escape strings; Then get out. */
   \"            { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); return yy::tigerParser::make_STRING(string_input, loc); }
      /* See below */
