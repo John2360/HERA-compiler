@@ -265,3 +265,23 @@ string A_varExp_::HERA_code() {
 string A_simpleVar_::HERA_code() {
     return "//load "+str(_sym)+" from mem\nLOAD("+ this->result_reg_s()+", "+str(this->get_offest())+", FP)\n";
 };
+
+string A_letExp_::HERA_code() {
+    string my_code;
+
+    my_code += _decs->HERA_code();
+    my_code += _body->HERA_code();
+
+    return my_code;
+}
+
+string A_varDec_::HERA_code(){
+    Ty_ty my_type;
+    if (str(_typ) == "int"){
+        my_type = Ty_Int();
+    } else if (str(_typ) == "str") {
+        my_type = Ty_String();
+    }
+    this->create_variable(_var, my_type, this->result_fp_plus());
+
+}

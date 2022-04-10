@@ -75,7 +75,6 @@ static bool textToBool(std::string the_text)
 static char textToControl(std::string the_text)
 {
     std::string my_binary = std::bitset<8>(the_text[1]).to_string();
-    //my_binary[0] = '0';
     my_binary[1] = '0';
     my_binary[2] = '0';
     unsigned long i = std::bitset<8>(my_binary).to_ulong();
@@ -238,7 +237,7 @@ var { return yy::tigerParser::make_VAR(loc); }
 
 {type}	{
    //textToType(yytext)
-   return yy::tigerParser::make_MY_TYPE(yytext, loc);
+   return yy::tigerParser::make_MY_TYPE(textToType(yytext), loc);
    }
 
 {identifier}   { return yy::tigerParser::make_ID(yytext, loc); }
@@ -249,9 +248,10 @@ var { return yy::tigerParser::make_VAR(loc); }
   \\n           { string_input += '\n'; loc.lines(yyleng); loc.step(); }
   \\t           { string_input += '\t'; loc.lines(yyleng); loc.step(); }
   \\\"           { string_input += '\"'; loc.lines(yyleng); loc.step(); }
-  (\\[a-zA-Z]|\^[a-zA-Z])    { string_input += textToControl(yytext); loc.lines(yyleng); loc.step(); }
+  (\\[a-zA-Z]|\\\^[a-zA-Z])    { string_input += textToControl(yytext); loc.lines(yyleng); loc.step(); }
    /* Above handle escape strings; Then get out. */
   \"            { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); return yy::tigerParser::make_STRING(string_input, loc); }
+  . {loc.lines(yyleng); loc.step();}
      /* See below */
 }
 

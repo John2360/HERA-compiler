@@ -63,6 +63,24 @@ int A_varExp_::init_result_fp_plus() {
         return for_me;
     }
 }
+int A_letExp_::init_result_fp_plus() {
+    int for_me = this->parent()->fp_plus_for_me(this);
+
+    if (for_me == -1){
+        return this->parent()->regular_fp_plus();
+    } else {
+        return for_me;
+    }
+}
+
+int A_varDec_::init_result_fp_plus() {
+    return this->parent()->result_fp_plus();
+}
+
+int A_decList_::init_result_fp_plus(){
+    return this->parent()->result_fp_plus()+1;
+}
+
 int A_expList_::init_result_fp_plus() {
     return this->parent()->result_fp_plus();
 }
@@ -201,6 +219,10 @@ int A_forExp_::init_result_reg() {
         return std::max(_hi->result_reg(), std::max(_lo->result_reg(), _body->result_reg()))+1;
     }
     return std::max(_hi->result_reg(), std::max(_lo->result_reg(), _body->result_reg()));
+}
+
+int A_letExp_::init_result_reg(){
+    return _body->result_reg();
 }
 
 int A_varExp_::init_result_reg() {

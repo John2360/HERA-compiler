@@ -72,6 +72,22 @@ string A_stringExp_::HERA_data()
     return my_code;
 }
 
+string A_letExp_::HERA_data() {
+    string my_code;
+    my_code += _decs->_head->HERA_data();
+
+    A_decList my_pointer = _decs->_tail;
+    while (true && my_pointer != 0){
+        my_code += my_pointer->HERA_data();
+        if (my_pointer->_tail == 0) break;
+        my_pointer = my_pointer->_tail;
+    }
+
+    return my_code;
+}
+
+
+
 string A_ifExp_::HERA_data() {
     return (_else_or_null != 0) ? _test->HERA_data()+_then->HERA_data()+_else_or_null->HERA_data() : _test->HERA_data()+_then->HERA_data();
 }
