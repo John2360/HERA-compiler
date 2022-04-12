@@ -291,7 +291,7 @@ public:
             variable_type_info my_var = lookup(name, this->my_local_variables());
 
             if (this->result_fp_plus() <= ceiling){
-                return my_var.fp_plus+this->result_fp_plus();
+                return my_var.fp_plus;
             } else {
                 return parent()->find_local_variables_fp(name, ceiling);
             }
@@ -756,13 +756,13 @@ public:
         return this->result_fp_plus();
     }
 
-//    int fp_plus_for_me(A_exp which_child) {
-//        if (which_child != _body){
-//            return this->result_fp_plus()-1;
-//        } else {
-//            return this->result_fp_plus();
-//        }
-//    }
+    int fp_plus_for_me(A_exp which_child) {
+        if (which_child == _body){
+            return this->result_end_fp_plus();
+        } else {
+            return this->result_fp_plus();
+        }
+    }
     virtual int result_fp_plus(){
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
         return this->stored_fp_plus;

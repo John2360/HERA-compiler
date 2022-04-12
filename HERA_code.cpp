@@ -283,15 +283,15 @@ string A_letExp_::HERA_code() {
     my_code += _decs->HERA_code();
     my_code += _body->HERA_code();
 
-    return my_code + "DEC(SP, "+str(this->result_end_fp_plus()-(this->result_fp_plus()-1))+")";
+    return my_code + "DEC(SP, "+str(this->result_end_fp_plus()-(this->result_fp_plus()-1))+")\n";
 }
 
 string A_varDec_::HERA_code(){
 
     string my_code;
-    my_code += _init->HERA_code();
-
+    my_code += "//store "+str(_var)+"\n";
     my_code += "INC(SP, 1)\n";
+    my_code += _init->HERA_code();
     my_code += "STORE("+_init->result_reg_s()+", "+str(this->result_fp_plus()) + ", FP)\n";
 
     return my_code;
