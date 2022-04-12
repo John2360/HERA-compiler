@@ -67,11 +67,20 @@ int A_letExp_::init_result_fp_plus() {
     int for_me = this->parent()->fp_plus_for_me(this);
 
     if (for_me == -1){
-        return this->parent()->regular_fp_plus();
+        return this->parent()->regular_fp_plus()+1;
     } else {
-        return for_me;
+        return for_me+1;
     }
 }
+
+int A_letExp_::init_result_end_fp_plus() {
+    return _decs->result_end_fp_plus();
+}
+int A_decList_::init_result_end_fp_plus() {
+    if (_tail == 0) return _head->result_fp_plus();
+    return _tail->result_end_fp_plus();
+}
+
 
 int A_varDec_::init_result_fp_plus() {
     return this->parent()->result_fp_plus();
@@ -116,6 +125,13 @@ int A_boolExp_::init_result_reg()  // generate unique numbers, starting from 1, 
     return 1;
 }
 
+int A_varDec_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
+{
+    // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
+    // TODO: Put this back to one once we have different function parameters on the stack
+    return 1;
+}
+
 int A_nilExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
@@ -137,6 +153,7 @@ int A_condExp_::init_result_reg()  // generate unique numbers, starting from 1, 
     return std::max(_left->result_reg(), _right->result_reg());
 }
 
+//posible extra regs
 int A_expList_::init_result_reg()
 {
     A_expList my_pointer = _tail;
@@ -154,6 +171,12 @@ int A_expList_::init_result_reg()
     }
 
     return max_reg;
+}
+
+// possible issue
+int A_decList_::init_result_reg()
+{
+    return 1;
 }
 
 int A_seqExp_::init_result_reg()
@@ -281,4 +304,29 @@ int A_simpleVar_::get_offest() {
         stored_offest = this->find_local_variables_fp(_sym, this->result_fp_plus());
     }
     return stored_offest;
+}
+
+local_variable_scope AST_node_::init_local_variable(){
+    return vars_data_shell;
+}
+
+local_variable_scope A_letExp_::init_local_variable(){
+    return _decs->my_local_variables();
+}
+
+local_variable_scope A_decList_::init_local_variable(){
+    if (_tail == 0) return _head->my_local_variables();
+    return merge(_head->my_local_variables(), _tail->my_local_variables());
+}
+
+local_variable_scope A_varDec_::init_local_variable(){
+    Ty_ty my_type;
+    if (str(_typ) == "Ty_Int()"){
+        my_type = Ty_Int();
+    } else if (str(_typ) == "Ty_Str()") {
+        my_type = Ty_String();
+    }
+    this->create_variable(_var, my_type, this->result_fp_plus());
+
+    return vars_data_shell;
 }

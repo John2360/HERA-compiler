@@ -197,6 +197,17 @@ string A_expList_::HERA_code()
     return my_code;
 }
 
+string A_decList_::HERA_code()
+{
+    string my_code;
+    my_code += _head->HERA_code();
+
+    if (_tail != 0){
+        my_code += _tail->HERA_code();
+    }
+    return my_code;
+}
+
 string A_ifExp_::HERA_code()
 {
     string test_cond = _test->HERA_code() + "\nCMP(" + _test->result_reg_s() + ", R0)" + "\nBZ(" + this->branch_label_else() + ")\n";
@@ -272,16 +283,16 @@ string A_letExp_::HERA_code() {
     my_code += _decs->HERA_code();
     my_code += _body->HERA_code();
 
-    return my_code;
+    return my_code + "DEC(SP, "+str(this->result_end_fp_plus())+")";
 }
 
 string A_varDec_::HERA_code(){
-    Ty_ty my_type;
-    if (str(_typ) == "int"){
-        my_type = Ty_Int();
-    } else if (str(_typ) == "str") {
-        my_type = Ty_String();
-    }
-    this->create_variable(_var, my_type, this->result_fp_plus());
 
+    string my_code;
+    my_code += _init->HERA_code();
+
+    my_code += "INC(SP, 1)\n";
+    my_code += "STORE("+_init->result_reg_s()+", "+str(this->result_fp_plus()) + ", FP)\n";
+
+    return my_code;
 }

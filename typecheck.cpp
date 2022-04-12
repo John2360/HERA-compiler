@@ -206,6 +206,38 @@ Ty_ty A_simpleVar_::typecheck() {
     return this->find_local_variables(_sym).type;
 }
 
+Ty_ty A_decList_::typecheck() {
+
+    A_decList my_pointer = _tail;
+    A_dec my_node = _head;
+
+    while (true) {
+
+        if (my_pointer->_tail == 0) break;
+        my_node = my_pointer->_head;
+        my_node->typecheck();
+        my_pointer = my_pointer->_tail;
+
+    }
+
+    return Ty_Void();
+}
+
+Ty_ty A_letExp_::typecheck(){
+    return _body->typecheck();
+}
+
+Ty_ty A_varDec_::typecheck() {
+    Ty_ty my_type;
+    if (str(_typ) == "Ty_Int()"){
+        my_type = Ty_Int();
+    } else if (str(_typ) == "Ty_Str()") {
+        my_type = Ty_String();
+    }
+
+    if (my_type != _init->typecheck()) {EM_error("Oops, the declared type does not match variable type", true); return Ty_Error();}
+    return my_type;
+}
 // The bodies of other type checking functions,
 //  including any virtual functions you introduce into
 //  the AST classes, should go here.
