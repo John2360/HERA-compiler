@@ -751,6 +751,11 @@ public:
         return "R" + std::to_string(this->result_reg());
     }
 
+    // this might be trouble
+    virtual int regular_fp_plus(){
+        return this->result_fp_plus();
+    }
+
 //    int fp_plus_for_me(A_exp which_child) {
 //        if (which_child != _body){
 //            return this->result_fp_plus()-1;
@@ -814,7 +819,7 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
-    int result_fp_plus(){
+    virtual int result_fp_plus(){
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
         return this->stored_fp_plus;
     }
