@@ -89,7 +89,11 @@ static Ty_ty textToType(std::string the_text)
         return Ty_Int();
     } else if (the_text == "string") {
         return Ty_String();
-    } else {
+    } else if (the_text == "bool") {
+              return Ty_Bool();
+    } else if (the_text == "void") {
+                   return Ty_Void();
+         } else {
         return Ty_Error();
     }
 }
@@ -143,7 +147,7 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 */
 
 /* type */
-type (int|string)
+type (int|string|bool|void)
 
 /* bool */
 bool (true|false)
