@@ -332,13 +332,7 @@ local_variable_scope A_decList_::init_local_variable(){
 }
 
 local_variable_scope A_varDec_::init_local_variable(){
-    Ty_ty my_type;
-    if (str(_typ) == "Ty_Int()"){
-        my_type = Ty_Int();
-    } else if (str(_typ) == "Ty_String()") {
-        my_type = Ty_String();
-    }
-    this->create_variable(_var, my_type, this->result_fp_plus());
+    this->create_variable(_var, from_String(str(_typ)), this->result_fp_plus());
 
     return vars_data_shell;
 }

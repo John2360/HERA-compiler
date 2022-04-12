@@ -294,6 +294,20 @@ string to_String(Ty_tyList tl)
 }
 string Ty_tyList_::__str__() { return to_String(this); }
 
+Ty_ty from_String(string t){
+    Ty_ty my_type;
+    if (t == "Ty_Int()"){
+        my_type = Ty_Int();
+    } else if (t == "Ty_String()") {
+        my_type = Ty_String();
+    }  else if (t == "Ty_Bool()") {
+        my_type = Ty_Bool();
+    } else {
+        my_type = Ty_Void();
+    }
+
+    return my_type;
+}
 
 
 void Ty_print(Ty_ty t)

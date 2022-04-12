@@ -93,4 +93,5 @@ struct Ty_fieldList_ {Ty_field head; Ty_fieldList tail; string __str__();};
 string to_String(Ty_ty t);
 string to_String(Ty_fieldList fl);
 string to_String(Ty_tyList tl);
+Ty_ty from_String(string t);
 #endif

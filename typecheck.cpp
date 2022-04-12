@@ -207,7 +207,6 @@ Ty_ty A_simpleVar_::typecheck() {
 }
 
 Ty_ty A_decList_::typecheck() {
-
     A_decList my_pointer = _tail;
     A_dec my_node = _head;
 
@@ -228,15 +227,8 @@ Ty_ty A_letExp_::typecheck(){
 }
 
 Ty_ty A_varDec_::typecheck() {
-    Ty_ty my_type;
-    if (str(_typ) == "Ty_Int()"){
-        my_type = Ty_Int();
-    } else if (str(_typ) == "Ty_String()") {
-        my_type = Ty_String();
-    }
-
-    if (my_type != _init->typecheck()) {EM_error("Oops, the declared type does not match variable type", true); return Ty_Error();}
-    return my_type;
+    if (from_String(str(_typ)) != _init->typecheck()) {EM_error("Oops, the declared type does not match variable type", true); return Ty_Error();}
+    return from_String(str(_typ));
 }
 // The bodies of other type checking functions,
 //  including any virtual functions you introduce into
