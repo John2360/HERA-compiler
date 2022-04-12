@@ -335,7 +335,7 @@ local_variable_scope A_varDec_::init_local_variable(){
     Ty_ty my_type;
     if (str(_typ) == "Ty_Int()"){
         my_type = Ty_Int();
-    } else if (str(_typ) == "Ty_Str()") {
+    } else if (str(_typ) == "Ty_String()") {
         my_type = Ty_String();
     }
     this->create_variable(_var, my_type, this->result_fp_plus());

@@ -231,7 +231,7 @@ Ty_ty A_varDec_::typecheck() {
     Ty_ty my_type;
     if (str(_typ) == "Ty_Int()"){
         my_type = Ty_Int();
-    } else if (str(_typ) == "Ty_Str()") {
+    } else if (str(_typ) == "Ty_String()") {
         my_type = Ty_String();
     }
 
