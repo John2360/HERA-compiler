@@ -243,7 +243,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                         $$.AST->create_variable(to_Symbol($name), Ty_Int(), 0);
                                         EM_debug("Got for loop", $$.AST->pos());
                                         }
-    | LET let_dec[decs] IN exp[seq1] END_LET { $$.AST = A_LetExp($seq1.AST->pos(),
+    | LET let_dec[decs] IN seq[seq1] END_LET { $$.AST = A_LetExp($seq1.AST->pos(),
                                                     $decs.AST,
                                                     $seq1.AST
                                                     );
