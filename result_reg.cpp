@@ -36,6 +36,17 @@ int A_exp_::init_result_fp_plus() {
         return for_me;
     }
 }
+
+int A_arithExp_::init_result_fp_plus(){
+    int for_me = this->parent()->fp_plus_for_me(this);
+
+    if (for_me == -1){
+        return this->parent()->regular_fp_plus();
+    } else {
+        return for_me;
+    }
+}
+
 int A_callExp_::init_result_fp_plus() {
     int for_me = this->parent()->fp_plus_for_me(this);
 
@@ -87,6 +98,7 @@ int A_varDec_::init_result_fp_plus() {
 }
 
 int A_decList_::init_result_fp_plus(){
+    if (parent()->my_let_fp_plus() != -1) return parent()->my_let_fp_plus();
     return this->parent()->result_fp_plus()+1;
 }
 

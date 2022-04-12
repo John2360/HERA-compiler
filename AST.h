@@ -273,6 +273,10 @@ public:
     virtual string break_label() { if (branch_label_post() != "") return branch_label_post(); else { if (parent() != 0 ) {return parent()->break_label(); } else { EM_error("Oops, break point could not be associated with a while loop", true); return "Label_Error";};} }
     virtual string branch_label_post() { return ""; }
 
+    virtual int my_let_fp_plus(){
+        return -1;
+    }
+
     virtual function_type_info find_local_functions(Symbol name) {
         try {
             function_type_info my_func = lookup(name, funcs_data_shell);
@@ -653,6 +657,10 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
     virtual int init_result_reg();
 
     virtual string HERA_data();
@@ -663,6 +671,9 @@ public:
 	void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 	virtual int compute_height();  // just for an example, not needed to compile
 private:
+    int stored_fp_plus = -1;
+    int init_result_fp_plus();
+
     int stored_result_reg = -1;
 
 	A_oper _oper;
@@ -740,9 +751,20 @@ public:
         return "R" + std::to_string(this->result_reg());
     }
 
+//    int fp_plus_for_me(A_exp which_child) {
+//        if (which_child != _body){
+//            return this->result_fp_plus()-1;
+//        } else {
+//            return this->result_fp_plus();
+//        }
+//    }
     virtual int result_fp_plus(){
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
         return this->stored_fp_plus;
+    }
+
+    virtual int my_let_fp_plus(){
+        return this->result_fp_plus();
     }
 
     virtual int result_end_fp_plus(){
