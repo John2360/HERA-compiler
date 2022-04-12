@@ -283,7 +283,7 @@ string A_letExp_::HERA_code() {
     my_code += _decs->HERA_code();
     my_code += _body->HERA_code();
 
-    return my_code + "DEC(SP, "+str(this->result_end_fp_plus())+")";
+    return my_code + "DEC(SP, "+str(this->result_end_fp_plus()-(this->result_fp_plus()-1))+")";
 }
 
 string A_varDec_::HERA_code(){
