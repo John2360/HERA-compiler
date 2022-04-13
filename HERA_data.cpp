@@ -36,12 +36,20 @@ string A_callExp_::HERA_data()
 {
     string my_code;
 
-    A_expList my_pointer = _args;
-    while (true){
-        my_code += my_pointer->_head->HERA_data();
-        if (my_pointer->_tail == 0) break;
-        my_pointer = my_pointer->_tail;
-    }
+//    A_expList my_pointer = _args;
+//    while (true){
+//        my_code += my_pointer->_head->HERA_data();
+//        if (my_pointer->_tail == 0) break;
+//        my_pointer = my_pointer->_tail;
+//    }
+    my_code += _args->HERA_data();
+
+//    A_expList my_pointer = _args->;
+//    while (true && my_pointer != 0){
+//        my_code += my_pointer->HERA_data();
+//        if (my_pointer->_tail == 0) break;
+//        my_pointer = my_pointer->_tail;
+//    }
     return my_code;
 }
 
@@ -80,11 +88,8 @@ string A_decList_::HERA_data() {
     string my_code;
     my_code += _head->HERA_data();
 
-    A_decList my_pointer = _tail;
-    while (true && my_pointer != 0){
-        my_code += my_pointer->HERA_data();
-        if (my_pointer->_tail == 0) break;
-        my_pointer = my_pointer->_tail;
+    if (_tail != 0){
+        my_code += _tail->HERA_data();
     }
 
     return my_code;

@@ -74,12 +74,17 @@ static bool textToBool(std::string the_text)
 
 static char textToControl(std::string the_text)
 {
-    std::string my_binary = std::bitset<8>(the_text[1]).to_string();
-    my_binary[1] = '0';
-    my_binary[2] = '0';
-    unsigned long i = std::bitset<8>(my_binary).to_ulong();
-    unsigned char c = static_cast<unsigned char>( i );
-    return c;
+
+    if (the_text[1] > 96) {
+        return the_text[1]-96;
+    } else if (the_text[1] > 64) {
+        return the_text[1]-64;
+    }  else if (the_text[1] > 32) {
+          return the_text[1]-32;
+    }  else {
+    //the_text[1] > 16
+              return the_text[1]-16;
+          }
 
 }
 
