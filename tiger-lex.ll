@@ -75,17 +75,25 @@ static bool textToBool(std::string the_text)
 static char textToControl(std::string the_text)
 {
 
-    if (the_text[1] > 96) {
-        return the_text[1]-96;
-    } else if (the_text[1] > 64) {
-        return the_text[1]-64;
-    }  else if (the_text[1] > 32) {
-          return the_text[1]-32;
+    if (the_text[2] > 96) {
+        return the_text[2]-96;
+    } else if (the_text[2] > 64) {
+        return the_text[2]-64;
+    }  else if (the_text[2] > 32) {
+          return the_text[2]-32;
     }  else {
-    //the_text[1] > 16
-              return the_text[1]-16;
+    //error
+    EM_error("Invalid control key", true);
+              return the_text[2];
           }
 
+}
+
+static char intToControl(std::string the_text)
+{
+    the_text.erase(0,1);
+    int my_num_string = std::stoi(the_text);
+    return char(my_num_string);
 }
 
 static Ty_ty textToType(std::string the_text)
@@ -257,7 +265,10 @@ var { return yy::tigerParser::make_VAR(loc); }
   \\n           { string_input += '\n'; loc.lines(yyleng); loc.step(); }
   \\t           { string_input += '\t'; loc.lines(yyleng); loc.step(); }
   \\\"           { string_input += '\"'; loc.lines(yyleng); loc.step(); }
-  (\\[a-zA-Z]|\\\^[a-zA-Z])    { string_input += textToControl(yytext); loc.lines(yyleng); loc.step(); }
+  \\\^[a-zA-Z]    { string_input += textToControl(yytext); loc.lines(yyleng); loc.step(); }
+  \\[0-9][0-9][0-9]    { string_input += intToControl(yytext); loc.lines(yyleng); loc.step(); }
+  "\\"            { string_input += '\\'; loc.lines(yyleng); loc.step(); }
+
    /* Above handle escape strings; Then get out. */
   \"            { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); return yy::tigerParser::make_STRING(string_input, loc); }
   . {loc.lines(yyleng); loc.step();}
