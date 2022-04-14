@@ -980,6 +980,17 @@ public:
         }
     }
 
+    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus) {
+        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))), this->vars_data_shell);
+    };
+
+    virtual local_variable_scope my_local_variables(){
+        if (!is_vars_init) {
+            vars_data_shell = this->init_local_variable();
+        }
+        return vars_data_shell;
+    }
+
     virtual string HERA_data();
     virtual string HERA_code();
 
@@ -990,6 +1001,10 @@ private:
 	A_exp _hi;
 	A_exp _body;
 
+    bool is_vars_init = false;
+    local_variable_scope init_local_variable();
+    local_variable_scope vars_data_shell = local_variable_scope();
+    tiger_standard_library funcs_data_shell = tiger_standard_library();
     int init_result_reg();
     int init_labels();
     int stored_result_reg = -1;

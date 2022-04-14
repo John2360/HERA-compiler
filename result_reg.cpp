@@ -318,6 +318,12 @@ int A_simpleVar_::get_offest() {
     return stored_offest;
 }
 
+local_variable_scope A_forExp_::init_local_variable(){
+    this->create_variable(_var, Ty_Int(), this->result_fp_plus());
+
+    return vars_data_shell;
+}
+
 local_variable_scope AST_node_::init_local_variable(){
     return vars_data_shell;
 }
