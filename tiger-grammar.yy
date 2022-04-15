@@ -44,7 +44,7 @@ class tigerParseDriver;
 
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
-%left IF WHILE DO BREAK FOR LET IN END_LET
+%left IF WHILE DO BREAK FOR LET IN END_LET ASSIGN
 %left THEN
 %left ELSE
 %left OR AND
@@ -249,6 +249,11 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                                     );
 
                         }
+    | VAR ID[name] ASSIGN exp[seq1] { $$.AST = A_AssignExp($seq1.AST->pos(),
+                                                        A_SimpleVar(Position::fromLex(@name), to_Symbol($name)),
+                                                         $seq1.AST
+                                                         );
+    }
 
 //
 // Note: In older compiler tools, instead of writing $exp1 and $exp2, we'd write $1 and $3,

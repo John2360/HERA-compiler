@@ -80,6 +80,10 @@ string A_stringExp_::HERA_data()
     return my_code;
 }
 
+string A_assignExp_::HERA_data() {
+    return _exp->HERA_data() + _var->HERA_data();
+}
+
 string A_letExp_::HERA_data() {
     return _decs->HERA_data() + _body->HERA_data();
 }

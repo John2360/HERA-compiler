@@ -144,6 +144,15 @@ void A_expList_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_par
     }
 }
 
+void A_assignExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _var->set_parent_pointers_for_me_and_my_descendants(this);
+    _exp->set_parent_pointers_for_me_and_my_descendants(this);
+}
+
 
 
 // The following should never be called, but this "general" version

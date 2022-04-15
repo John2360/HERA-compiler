@@ -230,6 +230,10 @@ Ty_ty A_varDec_::typecheck() {
     if (from_String(str(_typ)) != _init->typecheck()) {EM_error("Oops, the declared type does not match variable type", true); return Ty_Error();}
     return from_String(str(_typ));
 }
+
+Ty_ty A_assignExp_::typecheck() {
+    return Ty_Void();
+}
 // The bodies of other type checking functions,
 //  including any virtual functions you introduce into
 //  the AST classes, should go here.

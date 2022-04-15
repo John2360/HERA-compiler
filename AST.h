@@ -338,6 +338,10 @@ public:
         return -1;
     }
 
+    virtual int result_reg() {
+        return 1;
+    }
+
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
 	AST_node_ *stored_parent = 0;
@@ -383,6 +387,10 @@ public:
     virtual int result_fp_plus(){
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
         return this->stored_fp_plus;
+    }
+
+    virtual Ty_ty typecheck(){
+        return Ty_Nil();
     }
 
 
@@ -732,9 +740,26 @@ class A_assignExp_ : public A_exp_ {
 public:
 	A_assignExp_(A_pos pos, A_var var, A_exp exp);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    int result_reg() {
+        if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
+        return stored_result_reg;
+    }
+    string result_reg_s() { // return in string form, e.g. "R2"
+        return "R" + std::to_string(this->result_reg());
+    }
+
+    string HERA_code();
+    string HERA_data();
+
+    Ty_ty typecheck();
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 private:
 	A_var _var;
 	A_exp _exp;
+
+    int init_result_reg();
+    int stored_result_reg = -1;
 };
 
 class A_letExp_ : public A_exp_ {
@@ -1079,6 +1104,9 @@ public:
     int result_reg() {
         return 1;
     }
+    virtual string HERA_assign(){
+        return "";
+    };
 };
 
 class A_simpleVar_ : public A_var_ {
@@ -1103,6 +1131,7 @@ public:
 
     virtual string HERA_data();
     virtual string HERA_code();
+    virtual string HERA_assign();
 
     virtual Ty_ty typecheck();
 private:

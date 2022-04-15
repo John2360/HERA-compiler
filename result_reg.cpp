@@ -294,6 +294,10 @@ int A_ifExp_::init_result_reg()
     return std::max(_then->result_reg(), else_reg_num);
 }
 
+int A_assignExp_::init_result_reg() {
+    return _exp->result_reg();
+}
+
 int A_whileExp_::init_result_reg()
 {
     return _body->result_reg();
