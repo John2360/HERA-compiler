@@ -287,7 +287,7 @@ string A_assignExp_::HERA_code() {
 }
 
 string A_simpleVar_::HERA_assign() {
-    return "STORE(R"+str(parent()->result_reg())+", "+str(this->get_offest())+", FP)";
+    return "STORE(R"+str(parent()->result_reg())+", "+str(this->get_offest())+", FP)\n";
 }
 string A_letExp_::HERA_code() {
     string my_code;

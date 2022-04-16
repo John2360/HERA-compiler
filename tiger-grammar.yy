@@ -249,7 +249,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                                     );
 
                         }
-    | VAR ID[name] ASSIGN exp[seq1] { $$.AST = A_AssignExp($seq1.AST->pos(),
+    | ID[name] ASSIGN exp[seq1] { $$.AST = A_AssignExp($seq1.AST->pos(),
                                                         A_SimpleVar(Position::fromLex(@name), to_Symbol($name)),
                                                          $seq1.AST
                                                          );
