@@ -234,6 +234,10 @@ Ty_ty A_varDec_::typecheck() {
 Ty_ty A_assignExp_::typecheck() {
     return Ty_Void();
 }
+
+Ty_ty A_fundec_::typecheck() {
+    return Ty_Nil();
+}
 // The bodies of other type checking functions,
 //  including any virtual functions you introduce into
 //  the AST classes, should go here.

@@ -121,10 +121,6 @@ void A_varDec_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_pare
     _init->set_parent_pointers_for_me_and_my_descendants(this);
 }
 
-void A_var_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root){
-    stored_parent = my_parent_or_null_if_i_am_the_root;
-}
-
 void A_simpleVar_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
 {
     // record my parent
@@ -153,6 +149,54 @@ void A_assignExp_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_p
     _exp->set_parent_pointers_for_me_and_my_descendants(this);
 }
 
+void A_fundecList_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    if (_tail != 0){
+        _tail->set_parent_pointers_for_me_and_my_descendants(this);
+
+    }
+    _head->set_parent_pointers_for_me_and_my_descendants(this);
+}
+
+void A_fundec_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _body->set_parent_pointers_for_me_and_my_descendants(this);
+    _params->set_parent_pointers_for_me_and_my_descendants(this);
+}
+
+void A_fieldList_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+    _head->set_parent_pointers_for_me_and_my_descendants(this);
+    if (_tail != 0){
+        _tail->set_parent_pointers_for_me_and_my_descendants(this);
+
+    }
+}
+
+void A_field_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+}
+
+void A_functionDec_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)
+{
+    // record my parent
+    stored_parent = my_parent_or_null_if_i_am_the_root;
+    // now, tell my children to record me as theirs... they'll tell the grandkids
+
+    theFunctions->set_parent_pointers_for_me_and_my_descendants(this);
+}
 
 
 // The following should never be called, but this "general" version

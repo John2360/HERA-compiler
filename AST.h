@@ -276,6 +276,9 @@ public:
     virtual int my_let_fp_plus(){
         return -1;
     }
+    virtual int my_func_fp_plus(){
+        return -1;
+    }
 
     virtual function_type_info find_local_functions(Symbol name) {
         try {
@@ -317,6 +320,13 @@ public:
         return vars_data_shell;
     }
 
+    virtual tiger_standard_library my_local_functions(){
+        if (!is_funcs_init) {
+            funcs_data_shell = this->init_local_funcs();
+        }
+        return funcs_data_shell;
+    }
+
     virtual string my_local_variables_print(){
         if (!is_vars_init) {
             vars_data_shell = this->init_local_variable();
@@ -353,6 +363,9 @@ private:
     bool is_vars_init = false;
     local_variable_scope init_local_variable();
     local_variable_scope vars_data_shell = local_variable_scope();
+
+    bool is_funcs_init = false;
+    tiger_standard_library init_local_funcs();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
 
 
@@ -854,6 +867,7 @@ public:
 
     virtual Ty_ty typecheck();
 
+
     void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 
 private:
@@ -1099,7 +1113,6 @@ private:
 
 class A_var_ : public AST_node_ {
 public:
-    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 	A_var_(A_pos p);
     int result_reg() {
         return 1;
@@ -1335,6 +1348,12 @@ class A_functionDec_: public A_dec_ {
 public:
 	A_functionDec_(A_pos pos, A_fundecList functions_that_might_call_each_other);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
+    virtual string HERA_code();
+    virtual string HERA_data();
+
 private:
 	A_fundecList theFunctions;
 };
@@ -1351,16 +1370,77 @@ class A_fundec_ : public AST_node_ {  // possibly this would be happier as a sub
 public:
 	A_fundec_(A_pos pos, Symbol name, A_fieldList params, Symbol result_type,  A_exp body);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
+    virtual void create_function(Symbol name, Ty_ty return_type, HaverfordCS::list<Ty_ty> param_types) {
+        funcs_data_shell = merge(tiger_standard_library(std::pair(name, function_type_info(return_type, param_types))), this->funcs_data_shell);
+    };
+
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
+
+    virtual int my_func_fp_plus(){
+        return this->result_fp_plus();
+    }
+
+
+    virtual local_variable_scope my_local_variables(){
+        if (!is_vars_init) {
+            vars_data_shell = this->init_local_variable();
+        }
+        return vars_data_shell;
+    }
+
+    virtual tiger_standard_library my_local_functions(){
+        if (!is_funcs_init) {
+            funcs_data_shell = this->init_local_funcs();
+        }
+        return funcs_data_shell;
+    }
+
+    string branch_label_post() {
+        if (stored_skip_label == "") stored_skip_label = this->init_label_skip();
+        return stored_skip_label;
+    }
+
+    HaverfordCS::list<Ty_ty> type_field_list();
+
+    virtual string HERA_code();
+    virtual string HERA_data();
+
+    virtual Ty_ty typecheck();
 private:
 	Symbol _name;
 	A_fieldList _params;
 	Symbol _result;
 	A_exp _body;
+
+    string stored_skip_label = "";
+    string init_label_skip();
+    int stored_fp_plus = -1;
+    int init_result_fp_plus();
+
+    bool is_vars_init = false;
+    local_variable_scope init_local_variable();
+    local_variable_scope vars_data_shell = local_variable_scope();
+
+    bool is_funcs_init = false;
+    tiger_standard_library init_local_funcs();
+    tiger_standard_library funcs_data_shell = tiger_standard_library();
+
 };
 class A_fundecList_ : public AST_node_ {
 public:
 	A_fundecList_(A_fundec head, A_fundecList tail);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
+    virtual string HERA_code();
+    virtual string HERA_data();
 private:
 	A_fundec _head;
 	A_fundecList _tail;
@@ -1394,18 +1474,76 @@ class A_fieldList_ : public AST_node_ {
 public:
 	A_fieldList_(A_field head, A_fieldList tail);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
+    local_variable_scope virtual my_local_variables(){
+        if (!is_vars_init) {
+            vars_data_shell = this->init_local_variable();
+        }
+        return vars_data_shell;
+    }
+    HaverfordCS::list<Ty_ty> type_field_list();
+
+    virtual string HERA_code();
+    virtual string HERA_data();
 private:
 	A_field _head;
 	A_fieldList _tail;
+
+    int stored_fp_plus = -1;
+    int init_result_fp_plus();
+
+    bool is_vars_init = false;
+    local_variable_scope init_local_variable();
+    local_variable_scope vars_data_shell = local_variable_scope();
+    tiger_standard_library funcs_data_shell = tiger_standard_library();
 };
 
 class A_field_ : public AST_node_ {
 public:
 	A_field_(A_pos pos, Symbol name, Symbol type_or_0_pointer_for_no_type_in_declaration);
 	virtual string print_rep(int indent, bool with_attributes);
+
+    void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
+
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
+
+    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus) {
+        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))), this->vars_data_shell);
+    };
+
+    virtual local_variable_scope my_local_variables(){
+        if (!is_vars_init) {
+            vars_data_shell = this->init_local_variable();
+        }
+        return vars_data_shell;
+    }
+
+    HaverfordCS::list<Ty_ty> type_field_list(){
+        return HaverfordCS::ez_list(from_String(str(_typ)));
+    }
+
+    virtual string HERA_code();
+    virtual string HERA_data();
 private:
 	Symbol _name;
 	Symbol _typ;
+
+    int stored_fp_plus = -1;
+    int init_result_fp_plus();
+
+    bool is_vars_init = false;
+    local_variable_scope init_local_variable();
+    local_variable_scope vars_data_shell = local_variable_scope();
+    tiger_standard_library funcs_data_shell = tiger_standard_library();
 };
 
 

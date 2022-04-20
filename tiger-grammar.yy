@@ -29,7 +29,7 @@ class tigerParseDriver;
 %token <bool> BOOL
 %token <int>  INT
 %token <std::string> ID STRING
-%token <Ty_ty> MY_TYPE
+%token <Ty_ty> MY_TYPE//todo:: change to id
 // NOTE that bison complains if you have the same symbol listed as %token (above) and %type (below)
 //      so if you want to add attributes to a token, remove it from the list below
 
@@ -44,9 +44,9 @@ class tigerParseDriver;
 
 /* precedence (stickiness) ... put the stickiest stuff at the bottom of the list */
 
-%left IF WHILE DO BREAK FOR LET IN END_LET ASSIGN
-%left THEN
-%left ELSE
+%left IF WHILE DO BREAK FOR LET ASSIGN
+%left THEN IN
+%left ELSE END_LET
 %left OR AND
 %left EQ NEQ LT LE GT GE
 %left MINUS PLUS
@@ -62,12 +62,21 @@ class tigerParseDriver;
 %type <expAttrs>  seq
 %type <expListAttrs>  args
 %type <decListAttrs>  let_dec
+%type <funcListAttrs> funcs_decs
+%type <fieldListAttrs>  funcdec_args
 
 
 // The line below means our grammar must not have conflicts
 //  (no conflicts means it is "an LALR(1) grammar",
 //   meaning it must be unambiguous and have some other properties).
-%expect 0
+%expect 1
+
+// allowing one shift reduce in func_decs
+// func_decs wants to shift and reduce at the end of func_decs this means that by reducing we are chunking up the func_dec lists
+// by doing shift we are merging the chunks. Either are accepetable so we will allow the one execption.
+// 8 funcs_decs: FUNCTION ID LPAREN funcdec_args RPAREN COLON MY_TYPE EQ exp •
+// 9           | FUNCTION ID LPAREN funcdec_args RPAREN COLON MY_TYPE EQ exp • funcs_decs
+
 
 
 %%
@@ -96,12 +105,32 @@ args: exp[i]					{ $$.AST = A_ExpList($i.AST, 0);
 }
 ;
 
+funcdec_args: ID[name] COLON MY_TYPE[type]		{ $$.AST = A_FieldList(A_Field(Position::fromLex(@name), to_Symbol($name), to_Symbol(str($type))), 0);
+      								  EM_debug("Got param in funcdec", $$.AST->pos());
+      								}
+    | ID[name] COLON MY_TYPE[type] COMMA funcdec_args[seq1]    { $$.AST = A_FieldList(A_Field(Position::fromLex(@name), to_Symbol($name), to_Symbol(str($type))), $seq1.AST);
+                                        EM_debug("Got comma param in funcdec", $$.AST->pos());
+
+}
+;
+
+funcs_decs:  FUNCTION ID[name] LPAREN funcdec_args[params] RPAREN COLON MY_TYPE[type] EQ exp[seq1] { $$.AST = A_FundecList(A_Fundec(Position::fromLex(@name), to_Symbol($name), $params.AST, to_Symbol(str($type)), $seq1.AST),
+                                                                         0
+                                                                         );
+                                                       EM_debug("Got single func dec", $$.AST->pos());
+                }
+             |  FUNCTION ID[name] LPAREN funcdec_args[params] RPAREN COLON MY_TYPE[type] EQ exp[seq1] funcs_decs[funcs] { $$.AST = A_FundecList(A_Fundec(Position::fromLex(@name), to_Symbol($name), $params.AST, to_Symbol(str($type)), $seq1.AST),
+                                                                                        $funcs.AST
+                                                                                        );
+                                                                                        EM_debug("Got multi func dec", $$.AST->pos());
+                               }
+;
+
 let_dec: VAR ID[name] COLON MY_TYPE[type] ASSIGN exp[seq1]			{ $$.AST = A_DecList(
                                   A_VarDec($seq1.AST->pos(),
                                             to_Symbol($name),
                                             to_Symbol(str($type)),
                                             $seq1.AST), 0);
-                                  //$$.AST->create_variable(to_Symbol($name), $type, 0);
       								  EM_debug("Got single let dec", $$.AST->pos());
       								}
     | VAR ID[name] COLON MY_TYPE[type] ASSIGN exp[seq1] let_dec[decs]    {
@@ -110,9 +139,16 @@ let_dec: VAR ID[name] COLON MY_TYPE[type] ASSIGN exp[seq1]			{ $$.AST = A_DecLis
                                 to_Symbol($name),
                                 to_Symbol(str($type)),
                                 $seq1.AST), $decs.AST);
-                //$$.AST->create_variable(to_Symbol($name), $type, 0);
                           EM_debug("Got multiple let dec", $$.AST->pos());
-}
+                          }
+    | funcs_decs[funcs] let_dec[decs]  {
+                    $$.AST = A_DecList(A_FunctionDec(Position::undefined(), $funcs.AST), $decs.AST);
+                    EM_debug("Got func dec followed by let dec", $$.AST->pos());
+        }
+   | funcs_decs[funcs]  {
+                       $$.AST = A_DecList(A_FunctionDec(Position::undefined(), $funcs.AST), 0);
+                       EM_debug("Got closing func dec", $$.AST->pos());
+           }
 ;
 
 exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);

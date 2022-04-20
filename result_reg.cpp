@@ -11,6 +11,7 @@ static int next_unique_while_number = 0;
 static int next_unique_if_arith_number = 0;
 static int next_unique_if_cond_number = 0;
 static int next_unique_for_number = 0;
+static int next_unique_skip_func_number = 0;
 
 //int AST_node_::fp_plus_for_me(A_exp which_child) {
 //    return which_child->regular_fp_plus();
@@ -97,8 +98,17 @@ int A_varDec_::init_result_fp_plus() {
     return this->parent()->result_fp_plus();
 }
 
+int A_fundec_::init_result_fp_plus() {
+    return 3;
+}
+
 int A_decList_::init_result_fp_plus(){
     if (parent()->my_let_fp_plus() != -1) return parent()->my_let_fp_plus();
+    return this->parent()->result_fp_plus()+1;
+}
+
+int A_fieldList_::init_result_fp_plus(){
+    if (parent()->my_func_fp_plus() != -1) return parent()->my_func_fp_plus();
     return this->parent()->result_fp_plus()+1;
 }
 
@@ -106,6 +116,9 @@ int A_expList_::init_result_fp_plus() {
     return this->parent()->result_fp_plus();
 }
 int A_simpleVar_::init_result_fp_plus() {
+    return this->parent()->result_fp_plus();
+}
+int A_field_::init_result_fp_plus() {
     return this->parent()->result_fp_plus();
 }
 
@@ -242,6 +255,14 @@ string A_stringExp_::init_result_dlabel()  // generate unique numbers, starting 
     return my_string;
 }
 
+string A_fundec_::init_label_skip(){
+    int my_number = next_unique_skip_func_number;
+    next_unique_skip_func_number = next_unique_skip_func_number + 1;
+    std::string my_string = "my_skip_func_"+str(next_unique_skip_func_number);
+    // end of atomic transaction
+    return my_string;
+}
+
 int A_condExp_::init_labels()
 {
     int my_number = next_unique_if_cond_number;
@@ -332,11 +353,31 @@ local_variable_scope AST_node_::init_local_variable(){
     return vars_data_shell;
 }
 
+tiger_standard_library AST_node_::init_local_funcs(){
+
+    return funcs_data_shell;
+}
+
+tiger_standard_library A_fundec_::init_local_funcs(){
+    this->create_function(_name, from_String(str(_result)), this->type_field_list());
+
+    return funcs_data_shell;
+}
+
 local_variable_scope A_letExp_::init_local_variable(){
     return _decs->my_local_variables();
 }
 
+local_variable_scope A_fundec_::init_local_variable(){
+    return _params->my_local_variables();
+}
+
 local_variable_scope A_decList_::init_local_variable(){
+    if (_tail == 0) return _head->my_local_variables();
+    return merge(_head->my_local_variables(), _tail->my_local_variables());
+}
+
+local_variable_scope A_fieldList_::init_local_variable(){
     if (_tail == 0) return _head->my_local_variables();
     return merge(_head->my_local_variables(), _tail->my_local_variables());
 }
@@ -345,4 +386,19 @@ local_variable_scope A_varDec_::init_local_variable(){
     this->create_variable(_var, from_String(str(_typ)), this->result_fp_plus());
 
     return vars_data_shell;
+}
+
+local_variable_scope A_field_::init_local_variable(){
+    this->create_variable(_name, from_String(str(_typ)), this->result_fp_plus());
+
+    return vars_data_shell;
+}
+
+HaverfordCS::list<Ty_ty> A_fieldList_::type_field_list(){
+    if (_tail != 0) return _head->type_field_list();
+    return _head->type_field_list().operator=(_tail->type_field_list());
+}
+
+HaverfordCS::list<Ty_ty> A_fundec_::type_field_list(){
+    return _params->type_field_list();
 }

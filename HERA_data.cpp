@@ -99,6 +99,32 @@ string A_decList_::HERA_data() {
     return my_code;
 }
 
+string A_fundecList_::HERA_data() {
+    string my_code;
+    my_code += _head->HERA_data();
+
+    if (_tail != 0){
+        my_code += _tail->HERA_data();
+    }
+
+    return my_code;
+}
+
+string A_fieldList_::HERA_data() {
+    string my_code;
+    my_code += _head->HERA_data();
+
+    if (_tail != 0){
+        my_code += _tail->HERA_data();
+    }
+
+    return my_code;
+}
+
+string A_field_::HERA_data() {
+    return "";
+}
+
 string A_varDec_::HERA_data() {
     return _init->HERA_data();
 }
@@ -125,4 +151,20 @@ string A_breakExp_::HERA_data() {
 
 string A_varExp_::HERA_data() {
     return _var->HERA_data();
+}
+
+string A_fundec_::HERA_data() {
+    string my_code;
+
+    my_code += "BR("+this->branch_label_post()+")\n";
+    my_code += "LABEL("+str(_name)+")\n";
+    my_code += _body->HERA_code();
+    my_code += "STORE("+_body->result_reg_s()+", 3, FP)\nRETURN(FP_alt, PC_ret)\n";
+    my_code += "LABEL("+this->branch_label_post()+")\n\n";
+
+    return my_code;
+}
+
+string A_functionDec_::HERA_data() {
+    return theFunctions->HERA_data();
 }

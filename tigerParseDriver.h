@@ -15,6 +15,14 @@ struct expListAttrs {
 struct decListAttrs {
     A_decList AST;
 };
+
+struct funcListAttrs{
+    A_fundecList AST;
+};
+
+struct fieldListAttrs {
+    A_fieldList AST;
+};
 #include "tiger-grammar.tab.hpp"
 
 

@@ -246,6 +246,7 @@ in    { return yy::tigerParser::make_IN(loc); }
 let { return yy::tigerParser::make_LET(loc); }
 end { return yy::tigerParser::make_END_LET(loc); }
 var { return yy::tigerParser::make_VAR(loc); }
+function { return yy::tigerParser::make_FUNCTION(loc); }
 
 
 {bool}	{
