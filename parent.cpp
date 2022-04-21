@@ -167,7 +167,7 @@ void A_fundec_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_pare
     stored_parent = my_parent_or_null_if_i_am_the_root;
     // now, tell my children to record me as theirs... they'll tell the grandkids
     _body->set_parent_pointers_for_me_and_my_descendants(this);
-    _params->set_parent_pointers_for_me_and_my_descendants(this);
+    if (_params != 0) _params->set_parent_pointers_for_me_and_my_descendants(this);
 }
 
 void A_fieldList_::set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent_or_null_if_i_am_the_root)

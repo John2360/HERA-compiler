@@ -105,7 +105,9 @@ args: exp[i]					{ $$.AST = A_ExpList($i.AST, 0);
 }
 ;
 
-funcdec_args: ID[name] COLON MY_TYPE[type]		{ $$.AST = A_FieldList(A_Field(Position::fromLex(@name), to_Symbol($name), to_Symbol(str($type))), 0);
+funcdec_args: { $$.AST = $$.AST;}
+
+    | ID[name] COLON MY_TYPE[type]		{ $$.AST = A_FieldList(A_Field(Position::fromLex(@name), to_Symbol($name), to_Symbol(str($type))), 0);
       								  EM_debug("Got param in funcdec", $$.AST->pos());
       								}
     | ID[name] COLON MY_TYPE[type] COMMA funcdec_args[seq1]    { $$.AST = A_FieldList(A_Field(Position::fromLex(@name), to_Symbol($name), to_Symbol(str($type))), $seq1.AST);
