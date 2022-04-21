@@ -282,6 +282,9 @@ public:
     virtual int my_func_fp_plus(){
         return -1;
     }
+    virtual int get_bottom_fp(){
+        return -1;
+    }
 
     virtual function_type_info find_local_functions(Symbol name) {
         try {
@@ -1393,6 +1396,8 @@ public:
         return this->stored_fp_plus;
     }
 
+    int fp_plus_for_me(A_exp which_child);
+
     virtual int my_func_fp_plus(){
         return this->result_fp_plus();
     }
@@ -1499,6 +1504,11 @@ public:
         return vars_data_shell;
     }
     HaverfordCS::list<Ty_ty> type_field_list();
+
+    virtual int get_bottom_fp(){
+        if(_tail == 0) return this->result_fp_plus();
+        return _tail->result_fp_plus();
+    }
 
     virtual string HERA_code();
     virtual string HERA_data();
