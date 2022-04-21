@@ -114,7 +114,8 @@ funcdec_args: ID[name] COLON MY_TYPE[type]		{ $$.AST = A_FieldList(A_Field(Posit
 }
 ;
 
-funcs_decs:  FUNCTION ID[name] LPAREN funcdec_args[params] RPAREN COLON MY_TYPE[type] EQ exp[seq1] { $$.AST = A_FundecList(A_Fundec(Position::fromLex(@name), to_Symbol($name), $params.AST, to_Symbol(str($type)), $seq1.AST),
+funcs_decs:  FUNCTION ID[name] LPAREN funcdec_args[params] RPAREN COLON MY_TYPE[type] EQ exp[seq1] {
+$$.AST = A_FundecList(A_Fundec(Position::fromLex(@name), to_Symbol($name), $params.AST, to_Symbol(str($type)), $seq1.AST),
                                                                          0
                                                                          );
                                                        EM_debug("Got single func dec", $$.AST->pos());
@@ -142,7 +143,7 @@ let_dec: VAR ID[name] COLON MY_TYPE[type] ASSIGN exp[seq1]			{ $$.AST = A_DecLis
                           EM_debug("Got multiple let dec", $$.AST->pos());
                           }
     | funcs_decs[funcs] let_dec[decs]  {
-                    $$.AST = A_DecList(A_FunctionDec(Position::undefined(), $funcs.AST), $decs.AST);
+                    $$.AST = A_DecList(A_FunctionDec($funcs.AST->pos(), $funcs.AST), $decs.AST);
                     EM_debug("Got func dec followed by let dec", $$.AST->pos());
         }
    | funcs_decs[funcs]  {
@@ -283,6 +284,7 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
                                                     $decs.AST,
                                                     $seq1.AST
                                                     );
+                                                    EM_debug("Got let",$seq1.AST->pos());
 
                         }
     | ID[name] ASSIGN exp[seq1] { $$.AST = A_AssignExp($seq1.AST->pos(),

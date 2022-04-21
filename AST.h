@@ -276,6 +276,9 @@ public:
     virtual int my_let_fp_plus(){
         return -1;
     }
+    virtual bool carrys_func(){
+        return false;
+    }
     virtual int my_func_fp_plus(){
         return -1;
     }
@@ -1260,6 +1263,10 @@ public:
         return this->stored_end_fp_plus;
     }
 
+    virtual bool carrys_func(){
+        return _head->carrys_func();
+    }
+
     local_variable_scope virtual my_local_variables(){
         if (!is_vars_init) {
             vars_data_shell = this->init_local_variable();
@@ -1353,6 +1360,10 @@ public:
 
     virtual string HERA_code();
     virtual string HERA_data();
+
+    virtual bool carrys_func(){
+        return true;
+    }
 
 private:
 	A_fundecList theFunctions;

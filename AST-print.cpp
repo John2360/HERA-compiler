@@ -282,7 +282,7 @@ String A_varDec_::print_rep(int indent, bool with_attributes)
 String A_functionDec_::print_rep(int indent, bool with_attributes)
 {
 	return ("A_FunctionDec("+ print_pos_rep(pos(), ", ") +
-		print_rep_or_zero(theFunctions, indent, with_attributes));
+		print_rep_or_zero(theFunctions, indent, with_attributes) + ")");
 }
 
 String A_fundecList_::print_rep(int indent, bool with_attributes)
