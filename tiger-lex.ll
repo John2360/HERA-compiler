@@ -267,8 +267,8 @@ function { return yy::tigerParser::make_FUNCTION(loc); }
 
    /* Above handle escape strings; Then get out. */
   \"            { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); return yy::tigerParser::make_STRING(string_input, loc); }
+  /* Flex knows it cannot get here and that is good! */
   . {loc.lines(yyleng); loc.step();}
-     /* See below */
 }
 
 {integer}	{

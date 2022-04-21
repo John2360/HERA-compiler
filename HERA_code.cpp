@@ -317,11 +317,15 @@ string A_simpleVar_::HERA_assign() {
 }
 string A_letExp_::HERA_code() {
     string my_code;
+    int dec_amount = this->result_end_fp_plus()-(this->result_fp_plus()-1);
 
     my_code += _decs->HERA_code();
     my_code += _body->HERA_code();
+    if (dec_amount > 0) {
+        my_code += "DEC(SP, " + str(this->result_end_fp_plus() - (this->result_fp_plus() - 1)) + ")\n";
+    }
 
-    return my_code + "DEC(SP, "+str(this->result_end_fp_plus()-(this->result_fp_plus()-1))+")\n";
+    return my_code;
 }
 
 string A_varDec_::HERA_code(){
