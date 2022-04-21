@@ -288,7 +288,7 @@ public:
 
     virtual function_type_info find_local_functions(Symbol name) {
         try {
-            function_type_info my_func = lookup(name, funcs_data_shell);
+            function_type_info my_func = lookup(name, this->my_local_functions());
             return my_func;
         } catch(const tiger_standard_library::undefined_symbol &missing) {
                 return parent()->find_local_functions(name);
@@ -828,6 +828,13 @@ public:
         return vars_data_shell;
     }
 
+    tiger_standard_library virtual my_local_functions(){
+        if (!is_funcs_init) {
+            funcs_data_shell = this->init_local_functions();
+        }
+        return funcs_data_shell;
+    }
+
     virtual string HERA_code();
     virtual string HERA_data();
 
@@ -843,7 +850,9 @@ private:
     int stored_end_fp_plus = -1;
 
     bool is_vars_init = false;
+    bool is_funcs_init = false;
     local_variable_scope init_local_variable();
+    tiger_standard_library init_local_functions();
     local_variable_scope vars_data_shell = local_variable_scope();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
 
@@ -1115,6 +1124,7 @@ public:
 private:
 	A_expList _seq;
     int stored_result_reg = -1;
+
 };
 
 class A_var_ : public AST_node_ {
@@ -1277,6 +1287,13 @@ public:
         return vars_data_shell;
     }
 
+    tiger_standard_library virtual my_local_functions(){
+        if (!is_funcs_init) {
+            funcs_data_shell = this->init_local_functions();
+        }
+        return funcs_data_shell;
+    }
+
     virtual string HERA_code();
     virtual string HERA_data();
     virtual Ty_ty typecheck();
@@ -1294,7 +1311,9 @@ private:
     int init_result_end_fp_plus();
 
     bool is_vars_init = false;
+    bool is_funcs_init = false;
     local_variable_scope init_local_variable();
+    tiger_standard_library init_local_functions();
     local_variable_scope vars_data_shell = local_variable_scope();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
 
@@ -1368,7 +1387,18 @@ public:
         return true;
     }
 
+    tiger_standard_library virtual my_local_functions(){
+        if (!is_funcs_init) {
+            funcs_data_shell = this->init_local_functions();
+        }
+        return funcs_data_shell;
+    }
+
 private:
+    bool is_funcs_init = false;
+    tiger_standard_library init_local_functions();
+    tiger_standard_library funcs_data_shell = tiger_standard_library();
+
 	A_fundecList theFunctions;
 };
 
@@ -1455,11 +1485,22 @@ public:
 
     void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 
+    tiger_standard_library virtual my_local_functions(){
+        if (!is_funcs_init) {
+            funcs_data_shell = this->init_local_functions();
+        }
+        return funcs_data_shell;
+    }
+
     virtual string HERA_code();
     virtual string HERA_data();
 private:
 	A_fundec _head;
 	A_fundecList _tail;
+
+    bool is_funcs_init = false;
+    tiger_standard_library init_local_functions();
+    tiger_standard_library funcs_data_shell = tiger_standard_library();
 };
 
 

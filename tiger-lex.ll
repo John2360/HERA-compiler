@@ -160,7 +160,7 @@ real	[0-9]+\.[0-9]*(e-?[0-9]+)?
 */
 
 /* type */
-type (int|string|bool|void)
+/* type (int|string|bool|void)*/
 
 /* bool */
 bool (true|false)
@@ -251,11 +251,6 @@ function { return yy::tigerParser::make_FUNCTION(loc); }
 
 {bool}	{
    return yy::tigerParser::make_BOOL(textToBool(yytext), loc);
-   }
-
-{type}	{
-   //textToType(yytext)
-   return yy::tigerParser::make_MY_TYPE(textToType(yytext), loc);
    }
 
 {identifier}   { return yy::tigerParser::make_ID(yytext, loc); }

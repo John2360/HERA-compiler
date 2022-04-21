@@ -139,7 +139,7 @@ Ty_ty A_whileExp_::typecheck() {
 Ty_ty A_callExp_::typecheck()
 {
     try {
-        function_type_info my_func = lookup(_func, data_shell);
+        function_type_info my_func = this->find_local_functions(_func);
 
         // check num of args
         int total_func_args = 0;
@@ -164,6 +164,7 @@ Ty_ty A_callExp_::typecheck()
 
         if (head(my_pointer_func_list) != Ty_Void()) {
             while (true){
+                Ty_ty test = my_pointer_func->_head->typecheck();
                 if (head(my_pointer_func_list) != my_pointer_func->_head->typecheck()) {
                     EM_error("Oops, the function inputs do not match the expected types", true);
                     return Ty_Error();

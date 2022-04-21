@@ -336,7 +336,17 @@ string A_varDec_::HERA_code(){
 }
 
 string A_fundec_::HERA_code() {
-    return "";
+    string my_code;
+
+    my_code += "BR("+this->branch_label_post()+")\n";
+    my_code += "LABEL("+str(_name)+")\n";
+    my_code += "STORE(PC_ret, 0,FP)\nSTORE(FP_alt,1,FP)\n";
+    my_code += _body->HERA_code();
+    my_code += "LOAD(PC_ret, 0,FP)\nLOAD(FP_alt,1,FP)\n";
+    my_code += "STORE("+_body->result_reg_s()+", 3, FP)\nRETURN(FP_alt, PC_ret)\n";
+    my_code += "LABEL("+this->branch_label_post()+")\n\n";
+
+    return my_code;
 }
 
 string A_functionDec_::HERA_code() {

@@ -379,6 +379,20 @@ local_variable_scope A_decList_::init_local_variable(){
     return merge(_head->my_local_variables(), _tail->my_local_variables());
 }
 
+tiger_standard_library A_decList_::init_local_functions(){
+    if (_tail == 0) return _head->my_local_functions();
+    return merge(_head->my_local_functions(), _tail->my_local_functions());
+}
+
+tiger_standard_library A_functionDec_::init_local_functions(){
+    return theFunctions->my_local_functions();
+}
+
+tiger_standard_library A_fundecList_::init_local_functions(){
+    if (_tail == 0) return _head->my_local_functions();
+    return merge(_head->my_local_functions(), _tail->my_local_functions());
+}
+
 local_variable_scope A_fieldList_::init_local_variable(){
     if (_tail == 0) return _head->my_local_variables();
     return merge(_head->my_local_variables(), _tail->my_local_variables());
@@ -396,8 +410,12 @@ local_variable_scope A_field_::init_local_variable(){
     return vars_data_shell;
 }
 
+tiger_standard_library A_letExp_::init_local_functions(){
+    return _decs->my_local_functions();
+}
+
 HaverfordCS::list<Ty_ty> A_fieldList_::type_field_list(){
-    if (_tail != 0) return _head->type_field_list();
+    if (_tail == 0) return _head->type_field_list();
     return _head->type_field_list().operator=(_tail->type_field_list());
 }
 

@@ -5,6 +5,11 @@
    // my_bit_set[0] = '0';
     //my_bit_set[1] = '0';
 
+    /*{type}	{
+       //textToType(yytext)
+       return yy::tigerParser::make_MY_TYPE(textToType(yytext), loc);
+       }*/
+
 
 DO NOT MODIFY BELOW CODE IS BEAUTIFUL
 STRING REGEX:

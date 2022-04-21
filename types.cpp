@@ -296,14 +296,17 @@ string Ty_tyList_::__str__() { return to_String(this); }
 
 Ty_ty from_String(string t){
     Ty_ty my_type;
-    if (t == "Ty_Int()"){
+    if (t == "int"){
         my_type = Ty_Int();
-    } else if (t == "Ty_String()") {
+    } else if (t == "string") {
         my_type = Ty_String();
-    }  else if (t == "Ty_Bool()") {
+    }  else if (t == "bool") {
         my_type = Ty_Bool();
-    } else {
+    } else if (t == "void") {
         my_type = Ty_Void();
+    } else {
+        EM_error("Oops, could not translate to valid type", false);
+        my_type = Ty_Error();
     }
 
     return my_type;
