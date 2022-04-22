@@ -12,6 +12,12 @@ struct expListAttrs {
     A_expList AST;
 };
 
+struct argListAttrs {
+    A_expList AST;
+    A_decList DEC;
+    int num;
+};
+
 struct decListAttrs {
     A_decList AST;
 };

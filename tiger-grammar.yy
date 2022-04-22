@@ -59,7 +59,7 @@ class tigerParseDriver;
 /* Attributes types for nonterminals are next, e.g. struct's from tigerParseDriver.h */
 %type <expAttrs>  exp
 %type <expAttrs>  seq
-%type <expListAttrs>  args
+%type <argListAttrs>  args
 %type <decListAttrs>  let_dec
 %type <funcListAttrs> funcs_decs
 %type <fieldListAttrs>  funcdec_args
@@ -96,11 +96,22 @@ seq: exp[i]					{ $$.AST = $i.AST;
 }
 ;
 
-args: exp[i]					{ $$.AST = A_ExpList($i.AST, 0);
+args: exp[i]					{ $$.DEC = A_DecList( A_VarDec($i.AST->pos(),
+                                                             to_Symbol("preprogram1"),
+                                                             to_Symbol("unknown"),
+                                                             $i.AST), 0);
+                             $$.AST = A_ExpList(A_VarExp($i.AST->pos(), A_SimpleVar($i.AST->pos(), to_Symbol("preprogram1"))), 0);
       								  EM_debug("Got exp in args", $$.AST->pos());
+      					    $$.num = 1;
+
       								}
-    | exp[exp1] COMMA args[seq1]    { $$.AST = A_ExpList($exp1.AST, $seq1.AST);
+    | exp[exp1] COMMA args[seq1]    { $$.DEC = A_DecList( A_VarDec($exp1.AST->pos(),
+                                                                       to_Symbol("preprogram"+str($seq1.num+1)),
+                                                                       to_Symbol("unknown"),
+                                                                       $exp1.AST), $seq1.DEC);
+                                       $$.AST = A_ExpList(A_VarExp($exp1.AST->pos(), A_SimpleVar($exp1.AST->pos(), to_Symbol("preprogram"+str($seq1.num+1)))), $seq1.AST);
                                         EM_debug("Got comma arg expression.", $$.AST->pos());
+                                        $$.num = $$.num+1;
 }
 ;
 
@@ -219,10 +230,10 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
     | LPAREN seq[seq1] RPAREN { $$.AST = $seq1.AST;
                                 EM_debug("Got seq expression.", $$.AST->pos());
                                 }
-    | ID[name] LPAREN args[arg1] RPAREN { $$.AST = A_CallExp( Position::range(Position::fromLex(@name), $arg1.AST->pos()),
+    | ID[name] LPAREN args[arg1] RPAREN { $$.AST = A_LetExp($arg1.AST->pos() ,$arg1.DEC, A_CallExp( Position::fromLex(@name),
                                                                 to_Symbol($name),
                                                                 $arg1.AST
-                                                                 );
+                                                                 ));
 
                                   EM_debug("Got function call to "+$name, $$.AST->pos());
                                 }

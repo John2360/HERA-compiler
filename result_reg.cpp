@@ -399,6 +399,7 @@ local_variable_scope A_fieldList_::init_local_variable(){
 }
 
 local_variable_scope A_varDec_::init_local_variable(){
+    if (str(_typ) == "unknown") _typ = to_Symbol(from_Type(_init->typecheck()));
     this->create_variable(_var, from_String(str(_typ)), this->result_fp_plus());
 
     return vars_data_shell;

@@ -312,6 +312,24 @@ Ty_ty from_String(string t){
     return my_type;
 }
 
+string from_Type(Ty_ty t){
+    string my_type;
+    if (t == Ty_Int()){
+        my_type = "int";
+    } else if (t == Ty_String()) {
+        my_type = "string";
+    }  else if (t == Ty_Bool()) {
+        my_type = "bool";
+    } else if (t == Ty_Void()) {
+        my_type = "void";
+    } else {
+        EM_error("Oops, could not translate to valid type", false);
+        my_type = "Error";
+    }
+
+    return my_type;
+}
+
 
 void Ty_print(Ty_ty t)
 {
