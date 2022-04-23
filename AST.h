@@ -272,7 +272,7 @@ public:
     virtual Ty_ty typecheck();
     virtual string break_label() { if (branch_label_post() != "") return branch_label_post(); else { if (parent() != 0 ) {return parent()->break_label(); } else { EM_error("Oops, break point could not be associated with a while loop", true); return "Label_Error";};} }
     virtual string branch_label_post() { return ""; };
-    virtual bool skip_my_symbol_table() {return true;}
+    virtual bool skip_my_symbol_table() {return false;}
     virtual Ty_ty find_my_implicit(Symbol name){return Ty_Error();}
 
     virtual int my_let_fp_plus(){

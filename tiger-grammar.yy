@@ -105,13 +105,14 @@ args: exp[i]					{ $$.DEC = A_DecList( A_VarDec($i.AST->pos(),
       					    $$.num = 1;
 
       								}
-    | exp[exp1] COMMA args[seq1]    { $$.DEC = A_DecList( A_VarDec($exp1.AST->pos(),
+    | exp[exp1] COMMA args[seq1]    { $$.num = $seq1.num+1;
+    $$.DEC = A_DecList( A_VarDec($exp1.AST->pos(),
                                                                        to_Symbol("!preprogram"+str($seq1.num+1)),
                                                                        to_Symbol("unknown"),
                                                                        $exp1.AST), $seq1.DEC);
-                                       $$.AST = A_ExpList(A_VarExp($exp1.AST->pos(), A_SimpleVar($exp1.AST->pos(), to_Symbol("!preprogram"+str($seq1.num+1)))), $seq1.AST);
+                                       $$.AST = A_ExpList(A_VarExp($exp1.AST->pos(), A_SimpleVar($exp1.AST->pos(), to_Symbol("!preprogram"+str($$.num)))), $seq1.AST);
                                         EM_debug("Got comma arg expression.", $$.AST->pos());
-                                        $$.num = $$.num+1;
+
 }
 ;
 
