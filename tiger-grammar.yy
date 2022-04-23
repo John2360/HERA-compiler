@@ -198,9 +198,16 @@ exp:  INT[i]					{ $$.AST = A_IntExp(Position::fromLex(@i), $i);
 												   A_timesOp, $exp1.AST,$exp2.AST);
 								  EM_debug("Got times expression.", $$.AST->pos());
 								 }
-	| exp[exp1] DIVIDE exp[exp2]	{  $$.AST = A_CallExp( Position::range($exp1.AST->pos(), $exp2.AST->pos()),
-                                                                                                       to_Symbol("div"),
-                                                                                                       A_ExpList($exp1.AST, A_ExpList($exp2.AST, 0)));
+	| exp[exp1] DIVIDE exp[exp2]	{  //$$.AST = A_CallExp( Position::range($exp1.AST->pos(), $exp2.AST->pos()),
+                                         //                                                              to_Symbol("div"),
+                                           //                                                            A_ExpList($exp1.AST, A_ExpList($exp2.AST, 0)));
+                                       Symbol lname = to_Symbol("!divleft"+str($exp1.AST->my_unique_num()));
+                                       Symbol rname = to_Symbol("!divright"+str($exp1.AST->my_unique_num()));
+                                        $$.AST = A_LetExp(Position::range($exp1.AST->pos(), $exp2.AST->pos()), A_DecList(A_VarDec(Position::undefined(), lname,
+                                                                                                                                   to_Symbol("int"), $exp1.AST),
+                                                                                                                        A_DecList(A_VarDec(Position::undefined(), rname, to_Symbol("int"), $exp2.AST), 0)),
+                                                                                       A_CallExp(Position::undefined(), to_Symbol("div"), A_ExpList(A_VarExp(Position::undefined(), A_SimpleVar(Position::undefined(), lname)),
+                                                                                                                                                         A_ExpList(A_VarExp(Position::undefined(), A_SimpleVar(Position::undefined(), rname)), 0))));
                                       EM_debug("Got divide expression.", $$.AST->pos());
 
     								 }
