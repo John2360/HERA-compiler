@@ -463,3 +463,20 @@ int AST_node_::my_unique_num(){
     next_unique_let_num = my_number + 1;
     return next_unique_let_num;
 }
+
+int A_letExp_::let_fp_plus_total() {
+    return _decs->let_fp_plus_total();
+}
+
+int A_decList_::let_fp_plus_total() {
+    if (_tail == 0) return _head->let_fp_plus_total();
+    return _head->let_fp_plus_total()+_tail->let_fp_plus_total();
+}
+
+int A_varDec_::let_fp_plus_total() {
+    return 1;
+}
+
+int A_functionDec_::let_fp_plus_total() {
+    return 0;
+}

@@ -380,6 +380,10 @@ public:
         return 1;
     }
 
+    virtual int let_fp_plus_total(){
+        return -1;
+    };
+
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
 	AST_node_ *stored_parent = 0;
@@ -869,6 +873,7 @@ public:
     virtual Ty_ty typecheck();
 
     virtual bool skip_my_symbol_table() {return false;}
+    virtual int let_fp_plus_total();
 private:
     int init_result_reg();
     int stored_result_reg = -1;
@@ -1330,6 +1335,8 @@ public:
     virtual string HERA_data();
     virtual Ty_ty typecheck();
 
+    virtual int let_fp_plus_total();
+
 private:
     A_dec _head;
     A_decList _tail;
@@ -1386,6 +1393,7 @@ public:
     virtual string HERA_data();
 
     virtual Ty_ty typecheck();
+    virtual int let_fp_plus_total();
 private:
 	Symbol _var;
 	Symbol _typ;
@@ -1427,6 +1435,7 @@ public:
         }
         return funcs_data_shell;
     }
+    virtual int let_fp_plus_total();
 
 private:
     bool is_funcs_init = false;

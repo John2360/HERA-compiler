@@ -255,7 +255,7 @@ string A_ifExp_::HERA_code()
     }
     else_clause += "\nBR(" + this->branch_label_post() + ")\n";
 
-    return test_cond + then_clause + else_clause + "LABEL(" + this->branch_label_post() + ")";
+    return test_cond + then_clause + else_clause + "LABEL(" + this->branch_label_post() + ")\n";
 }
 
 string A_whileExp_::HERA_code() {
@@ -327,7 +327,7 @@ string A_simpleVar_::HERA_assign() {
 }
 string A_letExp_::HERA_code() {
     string my_code;
-    int dec_amount = this->result_end_fp_plus()-(this->result_fp_plus()-1);
+    int dec_amount = this->let_fp_plus_total();
 
     my_code += _decs->HERA_code();
     my_code += _body->HERA_code();
