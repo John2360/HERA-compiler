@@ -399,7 +399,7 @@ local_variable_scope A_fieldList_::init_local_variable(){
 }
 
 local_variable_scope A_varDec_::init_local_variable(){
-    if (str(_typ) == "unknown") _typ = to_Symbol(from_Type(_init->typecheck()));
+//    if (str(_typ) == "unknown") {_typ = to_Symbol(from_Type(_init->typecheck()));};
     this->create_variable(_var, from_String(str(_typ)), this->result_fp_plus());
 
     return vars_data_shell;
@@ -431,4 +431,27 @@ int A_fundec_::fp_plus_for_me(A_exp which_child) {
     } else {
         return this->result_fp_plus();
     }
+}
+
+Ty_ty A_letExp_::implicit_type_init(Symbol name) {
+    if (this->skip_my_symbol_table()) return parent()->implicit_type_init(name);
+    try {
+    variable_type_info my_var = lookup(name, this->my_local_variables());
+    return this->_decs->find_my_implicit(name);
+    } catch(const local_variable_scope::undefined_symbol &missing) {
+    return parent()->implicit_type_init(name);
+    }
+}
+
+Ty_ty A_decList_::find_my_implicit(Symbol name){
+    if (_head->find_my_implicit(name) != Ty_Nil()) return _head->find_my_implicit(name);
+    if (_tail != 0) return _tail->find_my_implicit(name);
+    return Ty_Nil();
+
+}
+
+Ty_ty A_varDec_::find_my_implicit(Symbol name){
+    Ty_ty my_type = _init->typecheck();
+    if (str(_var) == str(name)) return _init->typecheck();
+    return Ty_Nil();
 }

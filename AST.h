@@ -271,7 +271,9 @@ public:
 	virtual int compute_depth();   // just for an example, not needed to compile
     virtual Ty_ty typecheck();
     virtual string break_label() { if (branch_label_post() != "") return branch_label_post(); else { if (parent() != 0 ) {return parent()->break_label(); } else { EM_error("Oops, break point could not be associated with a while loop", true); return "Label_Error";};} }
-    virtual string branch_label_post() { return ""; }
+    virtual string branch_label_post() { return ""; };
+    virtual bool skip_my_symbol_table() {return true;}
+    virtual Ty_ty find_my_implicit(Symbol name){return Ty_Error();}
 
     virtual int my_let_fp_plus(){
         return -1;
@@ -310,12 +312,23 @@ public:
     }
 
     virtual variable_type_info find_local_variables(Symbol name) {
+        if (this->skip_my_symbol_table()) return parent()->find_local_variables(name);
         try {
             variable_type_info my_var = lookup(name, this->my_local_variables());
 
             return my_var;
         } catch(const local_variable_scope::undefined_symbol &missing) {
             return parent()->find_local_variables(name);
+        }
+    }
+
+    virtual Ty_ty implicit_type_init(Symbol name) {
+        if (this->skip_my_symbol_table()) return parent()->implicit_type_init(name);
+        try {
+            variable_type_info my_var = lookup(name, this->my_local_variables());
+            return Ty_Error();
+        } catch(const local_variable_scope::undefined_symbol &missing) {
+            return parent()->implicit_type_init(name);
         }
     }
 
@@ -338,6 +351,13 @@ public:
             vars_data_shell = this->init_local_variable();
         }
         return str(vars_data_shell);
+    }
+
+    virtual Ty_ty my_result_type(){
+        if (!is_type_init) {
+            my_type = this->init_my_type();
+        }
+        return my_type;
     }
 
     virtual void create_variable(Symbol name, Ty_ty type, int fp_plus) {
@@ -365,6 +385,10 @@ protected:  // so that derived class's set_parent should be able to get at store
 private:
 	virtual AST_node_ *get_parent_without_checking();	// NOT FOR GENERAL USE: get the parent node, either before or after the 'set all parent nodes' pass, but note it will be incorrect if done before (this is usually just done for assertions)
 	A_pos stored_pos;
+
+    bool is_type_init = false;
+    Ty_ty init_my_type();
+    Ty_ty my_type = Ty_Error();
 
     bool is_vars_init = false;
     local_variable_scope init_local_variable();
@@ -455,7 +479,7 @@ public:
             return my_var;
         } catch(const local_variable_scope::undefined_symbol &missing) {
             EM_error("Oops, the variable "+ str(name) +" was not found", true);
-            return variable_type_info(nullptr, 0);
+            return variable_type_info(nullptr, -1);
         }
     }
 
@@ -835,10 +859,14 @@ public:
         return funcs_data_shell;
     }
 
+    virtual Ty_ty implicit_type_init(Symbol name);
+
     virtual string HERA_code();
     virtual string HERA_data();
 
     virtual Ty_ty typecheck();
+
+    virtual bool skip_my_symbol_table() {return false;}
 private:
     int init_result_reg();
     int stored_result_reg = -1;
@@ -1294,6 +1322,8 @@ public:
         return funcs_data_shell;
     }
 
+    virtual Ty_ty find_my_implicit(Symbol name);
+
     virtual string HERA_code();
     virtual string HERA_data();
     virtual Ty_ty typecheck();
@@ -1347,6 +1377,8 @@ public:
         }
         return vars_data_shell;
     }
+
+    virtual Ty_ty find_my_implicit(Symbol name);
 
     virtual string HERA_code();
     virtual string HERA_data();

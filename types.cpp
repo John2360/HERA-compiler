@@ -304,6 +304,8 @@ Ty_ty from_String(string t){
         my_type = Ty_Bool();
     } else if (t == "void") {
         my_type = Ty_Void();
+    } else if (t == "unknown") {
+        my_type = Ty_Nil();
     } else {
         EM_error("Oops, could not translate to valid type", false);
         my_type = Ty_Error();

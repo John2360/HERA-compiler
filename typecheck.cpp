@@ -31,7 +31,12 @@ void typecheck(AST_node_ *root)
 Ty_ty AST_node_::typecheck()
 {
     EM_warning("Using generic node method", false);
-    return Ty_Nil();
+    return Ty_Error();
+}
+
+Ty_ty AST_node_::init_my_type(){
+    EM_warning("Error, my_type not implemented here", false);
+    return Ty_Error();
 }
 
 Ty_ty A_root_::typecheck()
@@ -91,7 +96,7 @@ Ty_ty A_seqExp_::typecheck()
 Ty_ty A_arithExp_::typecheck()
 {
     if (_left->typecheck() != Ty_Int() || _right->typecheck() != Ty_Int()) {
-        EM_error("Oops, math operation expects two INTs as parameter types", true);
+        EM_error("Oops silly goose, math operation expects two INTs as parameter types", true);
         return Ty_Error();
     } else {
         return Ty_Int();
@@ -102,7 +107,7 @@ Ty_ty A_condExp_::typecheck()
 {
     // Fix inputs
     if (_right->typecheck() != _left->typecheck()) {
-        EM_error("Oops, left and right of conditional operator must be of the same type", true);
+        EM_error("Oops silly goose, left and right of conditional operator must be of the same type", true);
         return Ty_Error();
     } else {
         return Ty_Bool();
@@ -112,13 +117,13 @@ Ty_ty A_condExp_::typecheck()
 Ty_ty A_ifExp_::typecheck()
 {
     if (_test->typecheck() != Ty_Bool()) {
-        EM_error("Oops, if expression requires boolean", true);
+        EM_error("Oops silly goose, if expression requires boolean", true);
         return Ty_Error();
     } else {
         // return children type and make sure have same type
         if (_else_or_null != 0) {
             if (_then->typecheck() != _else_or_null->typecheck()) {
-                EM_error("Oops, if requires then and else to be of the same type", true);
+                EM_error("Oops silly goose, if requires then and else to be of the same type", true);
                 return Ty_Error();
             }
         }
@@ -129,7 +134,7 @@ Ty_ty A_ifExp_::typecheck()
 
 Ty_ty A_whileExp_::typecheck() {
     if (_cond->typecheck() != Ty_Bool()){
-        EM_error("Oops, while cond requires boolean", true);
+        EM_error("Oops silly goose, while cond requires boolean", true);
         return Ty_Error();
     }
 
@@ -154,7 +159,7 @@ Ty_ty A_callExp_::typecheck()
         }
 
         if (length(my_func.param_types) != total_func_args) {
-            EM_error("Oops, the number of parameters do not match", true);
+            EM_error("Oops silly goose, the number of parameters do not match", true);
             return Ty_Error();
         }
 
@@ -166,7 +171,7 @@ Ty_ty A_callExp_::typecheck()
             while (true){
                 Ty_ty test = my_pointer_func->_head->typecheck();
                 if (head(my_pointer_func_list) != my_pointer_func->_head->typecheck()) {
-                    EM_error("Oops, the function inputs do not match the expected types", true);
+                    EM_error("Oops silly goose, the function inputs do not match the expected types", true);
                     return Ty_Error();
                 }
 
@@ -175,7 +180,7 @@ Ty_ty A_callExp_::typecheck()
                 my_pointer_func = my_pointer_func->_tail;
             }
         } else if (head(my_pointer_func_list) == Ty_Void() && _args->length() > 1 && _args->_head != A_NilExp(Position::undefined())) {
-            EM_error("Oops, the function should have no inputs", true);
+            EM_error("Oops silly goose, the function should have no inputs", true);
             return Ty_Error();
         }
 
@@ -183,7 +188,7 @@ Ty_ty A_callExp_::typecheck()
 
     }
     catch(const tiger_standard_library::undefined_symbol &missing) {
-        EM_debug("Oops, the function " + str(missing.name) + " is not defined");
+        EM_debug("Oops silly goose, the function " + str(missing.name) + " is not defined");
         return Ty_Error();
     }
 }
@@ -191,7 +196,7 @@ Ty_ty A_callExp_::typecheck()
 Ty_ty A_forExp_::typecheck() {
 
     if (_hi->typecheck() != Ty_Int() || _lo->typecheck() != Ty_Int()){
-        EM_error("Oops, for requires bounds to be type int", true);
+        EM_error("Oops silly goose, for requires bounds to be type int", true);
         return Ty_Error();
     }
 
@@ -204,7 +209,10 @@ Ty_ty A_varExp_::typecheck() {
 }
 
 Ty_ty A_simpleVar_::typecheck() {
-    return this->find_local_variables(_sym).type;
+    Ty_ty my_type = this->find_local_variables(_sym).type;
+
+    if (my_type == Ty_Nil()) return this->implicit_type_init(_sym);
+    return my_type;
 }
 
 Ty_ty A_decList_::typecheck() {
@@ -228,7 +236,7 @@ Ty_ty A_letExp_::typecheck(){
 }
 
 Ty_ty A_varDec_::typecheck() {
-    if (from_String(str(_typ)) != _init->typecheck()) {EM_error("Oops, the declared type does not match variable type", true); return Ty_Error();}
+    if (from_String(str(_typ)) != _init->typecheck()) {EM_error("Oops silly goose, the declared type does not match variable type", true); return Ty_Error();}
     return from_String(str(_typ));
 }
 
