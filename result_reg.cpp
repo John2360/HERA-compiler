@@ -12,6 +12,7 @@ static int next_unique_if_arith_number = 0;
 static int next_unique_if_cond_number = 0;
 static int next_unique_for_number = 0;
 static int next_unique_skip_func_number = 0;
+static int next_unique_let_num = 0;
 
 //int AST_node_::fp_plus_for_me(A_exp which_child) {
 //    return which_child->regular_fp_plus();
@@ -454,4 +455,11 @@ Ty_ty A_varDec_::find_my_implicit(Symbol name){
     Ty_ty my_type = _init->typecheck();
     if (str(_var) == str(name)) return _init->typecheck();
     return Ty_Nil();
+}
+
+
+int AST_node_::my_unique_num(){
+    int my_number = next_unique_let_num;
+    next_unique_let_num = my_number + 1;
+    return next_unique_let_num;
 }

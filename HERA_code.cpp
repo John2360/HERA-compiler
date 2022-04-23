@@ -100,9 +100,19 @@ string A_condExp_::HERA_code()
         my_code += HERA_math_op(pos(), _oper) + "(" + this->branch_label_true() + ")\n";
 
     } else if (left_type == Ty_String()){
-        A_callExp_ my_call = A_callExp_(Position::undefined(), to_Symbol("tstrcmp"), A_ExpList(_left, A_ExpList(_right, 0)));
+        //A_ExpList(_left, A_ExpList(_right, 0))
+        Symbol lname = to_Symbol("!callleft"+str(this->my_unique_num()));
+        Symbol rname = to_Symbol("!callright"+str(this->my_unique_num()));
+        A_letExp_ my_call = A_letExp_(Position::undefined(), A_DecList(A_VarDec(Position::undefined(), lname,
+                                                                                  to_Symbol("string"), _left),
+                                                                       A_DecList(A_VarDec(Position::undefined(), rname, to_Symbol("string"), _right), 0)),
+                                      A_CallExp(Position::undefined(), to_Symbol("tstrcmp"), A_ExpList(A_VarExp(Position::undefined(), A_SimpleVar(Position::undefined(), lname)),
+                                                                                                        A_ExpList(A_VarExp(Position::undefined(), A_SimpleVar(Position::undefined(), rname)), 0))));
 
+        my_call.set_parent_pointers_for_me_and_my_descendants(this);
+//        A_callExp_ my_call = A_callExp_(Position::undefined(), to_Symbol("tstrcmp"), A_ExpList(_left, A_ExpList(_right, 0)));
         my_code += my_call.HERA_code();
+//        my_code += "LOAD("+this->result_reg_s()+", "+str(this->result_fp_plus())+", FP)";
         my_code += "CMP("+my_call.result_reg_s()+", R0)\n";
         //returns neg # if a < b, 0 if =, pos # if a > b
         my_code += HERA_math_op(pos(), _oper) + "(" + this->branch_label_true() + ")\n";
@@ -322,7 +332,7 @@ string A_letExp_::HERA_code() {
     my_code += _decs->HERA_code();
     my_code += _body->HERA_code();
     if (dec_amount > 0) {
-        my_code += "DEC(SP, " + str(this->result_end_fp_plus() - (this->result_fp_plus() - 1)) + ")\n";
+        my_code += "DEC(SP, " + str(dec_amount) + ")\n";
     }
 
     return my_code;

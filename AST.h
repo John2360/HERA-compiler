@@ -374,6 +374,8 @@ public:
         return -1;
     }
 
+    virtual int my_unique_num();
+
     virtual int result_reg() {
         return 1;
     }
