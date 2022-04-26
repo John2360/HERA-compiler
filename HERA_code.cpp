@@ -161,6 +161,8 @@ string A_callExp_::HERA_code()
 {
 
     string my_code;
+    function_type_info my_func = find_local_functions(_func);
+
     int starting_frame_size = 3;
     int stack_pointer = starting_frame_size;
     my_code += "MOVE(FP_alt, SP)\nINC(SP, "+str(_args->length()+starting_frame_size)+")\n";
@@ -177,7 +179,7 @@ string A_callExp_::HERA_code()
 
     }
 
-    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+")\nLOAD("+this->result_reg_s()+", 3, FP_alt)\nDEC(SP, "+str(_args->length()+starting_frame_size)+") \n\n";
+    my_code += "CALL(FP_alt, "+Symbol_to_string(_func)+my_func.unique_id+")\nLOAD("+this->result_reg_s()+", 3, FP_alt)\nDEC(SP, "+str(_args->length()+starting_frame_size)+") \n\n";
 
     return my_code;
 }
@@ -353,7 +355,7 @@ string A_fundec_::HERA_code() {
     string my_code;
 
     my_code += "BR("+this->branch_label_post()+")\n";
-    my_code += "LABEL("+str(_name)+")\n";
+    my_code += "LABEL("+str(_name)+this->set_unique_id()+")\n";
     my_code += "STORE(PC_ret, 0,FP)\nSTORE(FP_alt,1,FP)\n";
     my_code += _body->HERA_code();
     my_code += "LOAD(PC_ret, 0,FP)\nLOAD(FP_alt,1,FP)\n";

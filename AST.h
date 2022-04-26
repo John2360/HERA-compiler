@@ -170,10 +170,12 @@ typedef Position A_pos;
 struct function_type_info {
 public:
     function_type_info(
+            string unique_id,
             Ty_ty return_type,
             HaverfordCS::list<Ty_ty> param_types
     );
     // leave data public, which is the default for 'struct'
+    string unique_id;
     Ty_ty return_type;
     HaverfordCS::list<Ty_ty> param_types;
 
@@ -384,6 +386,10 @@ public:
         return -1;
     };
 
+    virtual int my_let_num(){
+        return parent()->my_let_num();
+    }
+
 
 protected:  // so that derived class's set_parent should be able to get at stored_parent for "this" object ... Smalltalk allows this by default
 	AST_node_ *stored_parent = 0;
@@ -512,7 +518,7 @@ public:
             return my_func;
         } catch(const tiger_standard_library::undefined_symbol &missing) {
                EM_error("Oops, the function "+ str(name) +" was not found in scope", true);
-               return function_type_info(nullptr, HaverfordCS::ez_list(Ty_Nil()));
+               return function_type_info("", nullptr, HaverfordCS::ez_list(Ty_Nil()));
         }
     }
 
@@ -874,6 +880,10 @@ public:
 
     virtual bool skip_my_symbol_table() {return false;}
     virtual int let_fp_plus_total();
+    virtual int my_let_num(){
+        if (my_let_number ==-1 ) my_let_number = this->my_unique_num();
+        return my_let_number;
+    }
 private:
     int init_result_reg();
     int stored_result_reg = -1;
@@ -890,6 +900,8 @@ private:
     tiger_standard_library init_local_functions();
     local_variable_scope vars_data_shell = local_variable_scope();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
+
+    int my_let_number = -1;
 
 	A_decList _decs;
 	A_exp _body;
@@ -1460,8 +1472,8 @@ public:
 
     void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 
-    virtual void create_function(Symbol name, Ty_ty return_type, HaverfordCS::list<Ty_ty> param_types) {
-        funcs_data_shell = merge(tiger_standard_library(std::pair(name, function_type_info(return_type, param_types))), this->funcs_data_shell);
+    virtual void create_function(Symbol name, string unique_id, Ty_ty return_type, HaverfordCS::list<Ty_ty> param_types) {
+        funcs_data_shell = merge(tiger_standard_library(std::pair(name, function_type_info(unique_id, return_type, param_types))), this->funcs_data_shell);
     };
 
     int result_fp_plus(){
@@ -1495,6 +1507,11 @@ public:
         return stored_skip_label;
     }
 
+    string set_unique_id(){
+        if (_unique_id == "") _unique_id = "_lkudge"+ str(this->my_unique_num());
+        return _unique_id;
+    }
+
     HaverfordCS::list<Ty_ty> type_field_list();
 
     virtual string HERA_code();
@@ -1506,6 +1523,7 @@ private:
 	A_fieldList _params;
 	Symbol _result;
 	A_exp _body;
+    string _unique_id;
 
     string stored_skip_label = "";
     string init_label_skip();
@@ -1634,6 +1652,10 @@ public:
 
     HaverfordCS::list<Ty_ty> type_field_list(){
         return HaverfordCS::ez_list(from_String(str(_typ)));
+    }
+
+    Ty_ty type_field_list_singular(){
+        return from_String(str(_typ));
     }
 
     virtual string HERA_code();

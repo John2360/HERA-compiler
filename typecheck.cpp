@@ -157,6 +157,7 @@ Ty_ty A_callExp_::typecheck()
             my_pointer = my_pointer->_tail;
 
         }
+        int found_func_length_of_param = length(my_func.param_types);
 
         if (length(my_func.param_types) != total_func_args) {
             EM_error("Oops silly goose, the number of parameters do not match", true);

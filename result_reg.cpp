@@ -78,11 +78,17 @@ int A_varExp_::init_result_fp_plus() {
 }
 int A_letExp_::init_result_fp_plus() {
     int for_me = this->parent()->fp_plus_for_me(this);
+    int my_dec_amount = this->let_fp_plus_total();
+    int increment_stack = 0;
+
+    if (my_dec_amount > 0){
+        increment_stack += 1;
+    }
 
     if (for_me == -1){
-        return this->parent()->regular_fp_plus()+1;
+        return this->parent()->regular_fp_plus()+increment_stack;
     } else {
-        return for_me+1;
+        return for_me+increment_stack;
     }
 }
 
@@ -362,7 +368,7 @@ tiger_standard_library AST_node_::init_local_funcs(){
 }
 
 tiger_standard_library A_fundec_::init_local_funcs(){
-    this->create_function(_name, from_String(str(_result)), this->type_field_list());
+    this->create_function(_name, this->set_unique_id(), from_String(str(_result)), this->type_field_list());
 
     return funcs_data_shell;
 }
@@ -417,8 +423,8 @@ tiger_standard_library A_letExp_::init_local_functions(){
 }
 
 HaverfordCS::list<Ty_ty> A_fieldList_::type_field_list(){
-    if (_tail == 0) return _head->type_field_list();
-    return _head->type_field_list().operator=(_tail->type_field_list());
+    if (_tail == 0) return HaverfordCS::ez_list(_head->type_field_list_singular());
+    return HaverfordCS::list<Ty_ty>(_head->type_field_list_singular(),_tail->type_field_list());
 }
 
 HaverfordCS::list<Ty_ty> A_fundec_::type_field_list(){

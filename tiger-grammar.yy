@@ -96,21 +96,24 @@ seq: exp[i]					{ $$.AST = $i.AST;
 }
 ;
 
-args: exp[i]					{ $$.DEC = A_DecList( A_VarDec($i.AST->pos(),
-                                                             to_Symbol("!preprogram1"),
+args: exp[i]					{
+                                string my_unique_id = str(A_NilExp(Position::undefined())->my_unique_num());
+                                $$.DEC = A_DecList( A_VarDec($i.AST->pos(),
+                                                             to_Symbol("!preprogram"+my_unique_id),
                                                              to_Symbol("unknown"),
                                                              $i.AST), 0);
-                             $$.AST = A_ExpList(A_VarExp($i.AST->pos(), A_SimpleVar($i.AST->pos(), to_Symbol("!preprogram1"))), 0);
+                             $$.AST = A_ExpList(A_VarExp($i.AST->pos(), A_SimpleVar($i.AST->pos(), to_Symbol("!preprogram"+my_unique_id))), 0);
       								  EM_debug("Got exp in args", $$.AST->pos());
       					    $$.num = 1;
 
       								}
     | exp[exp1] COMMA args[seq1]    { $$.num = $seq1.num+1;
+    string my_unique_id = str(A_NilExp(Position::undefined())->my_unique_num());
     $$.DEC = A_DecList( A_VarDec($exp1.AST->pos(),
-                                                                       to_Symbol("!preprogram"+str($seq1.num+1)),
+                                                                       to_Symbol("!preprogram"+my_unique_id),
                                                                        to_Symbol("unknown"),
                                                                        $exp1.AST), $seq1.DEC);
-                                       $$.AST = A_ExpList(A_VarExp($exp1.AST->pos(), A_SimpleVar($exp1.AST->pos(), to_Symbol("!preprogram"+str($$.num)))), $seq1.AST);
+                                       $$.AST = A_ExpList(A_VarExp($exp1.AST->pos(), A_SimpleVar($exp1.AST->pos(), to_Symbol("!preprogram"+my_unique_id))), $seq1.AST);
                                         EM_debug("Got comma arg expression.", $$.AST->pos());
 
 }
