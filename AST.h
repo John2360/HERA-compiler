@@ -1075,7 +1075,7 @@ public:
     }
     int fp_plus_for_me(A_exp which_child) {
         if (which_child == _hi || which_child == _lo){
-            return this->parent()->regular_fp_plus();
+            return this->parent()->result_fp_plus();
         } else {
             return this->result_fp_plus();
         }
