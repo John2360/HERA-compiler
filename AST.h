@@ -303,7 +303,7 @@ public:
         try {
             variable_type_info my_var = lookup(name, this->my_local_variables());
 
-            if (this->result_fp_plus() <= ceiling){
+            if (my_var.fp_plus <= ceiling){
                 return my_var.fp_plus;
             } else {
                 return parent()->find_local_variables_fp(name, ceiling);

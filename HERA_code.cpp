@@ -312,6 +312,7 @@ string A_varExp_::HERA_code() {
 }
 
 string A_simpleVar_::HERA_code() {
+    int test = this->get_offest();
     return "//load "+str(_sym)+" from mem\nLOAD("+ this->result_reg_s()+", "+str(this->get_offest())+", FP)\n";
 };
 
