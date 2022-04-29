@@ -163,7 +163,7 @@ int A_varDec_::init_result_reg()  // generate unique numbers, starting from 1, e
 {
     // for those who've taken CS355/356, this should be an atomic transaction, in a concurrent environment
     // TODO: Put this back to one once we have different function parameters on the stack
-    return 1;
+    return _init->result_reg();
 }
 
 int A_nilExp_::init_result_reg()  // generate unique numbers, starting from 1, each time this is called
@@ -207,10 +207,24 @@ int A_expList_::init_result_reg()
     return max_reg;
 }
 
-// possible issue
 int A_decList_::init_result_reg()
 {
-    return 1;
+    A_decList my_pointer = _tail;
+    int max_reg = 0;
+    max_reg = _head->result_reg();
+    while (true && my_pointer != 0) {
+
+        string my_register;
+        if (max_reg < my_pointer->_head->result_reg()){
+            max_reg = my_pointer->_head->result_reg();
+        }
+
+        if (my_pointer->_tail == 0) break;
+        my_pointer = my_pointer->_tail;
+
+    }
+
+    return max_reg;
 }
 
 int A_seqExp_::init_result_reg()
@@ -287,7 +301,7 @@ int A_forExp_::init_result_reg() {
 }
 
 int A_letExp_::init_result_reg(){
-    return _body->result_reg();
+    return std::max(_body->result_reg(), _decs->result_reg());
 }
 
 int A_varExp_::init_result_reg() {
