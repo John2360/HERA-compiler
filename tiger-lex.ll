@@ -264,9 +264,12 @@ function { return yy::tigerParser::make_FUNCTION(loc); }
   \\\^[a-zA-Z]    { string_input += textToControl(yytext); loc.lines(yyleng); loc.step(); }
   \\[0-9][0-9][0-9]    { string_input += intToControl(yytext); loc.lines(yyleng); loc.step(); }
   "\\"            { string_input += '\\'; loc.lines(yyleng); loc.step(); }
+  \\[0-9][0-9] {EM_error("Oops, invalid use of escape string", true);}
+  \\[0-9] {EM_error("Oops, invalid use of escape string", true);}
 
    /* Above handle escape strings; Then get out. */
   \"            { loc.lines(yyleng); loc.step(); BEGIN(INITIAL); return yy::tigerParser::make_STRING(string_input, loc); }
+
   /* Flex knows it cannot get here and that is good! */
   . {loc.lines(yyleng); loc.step();}
 }
