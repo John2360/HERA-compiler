@@ -46,7 +46,8 @@ class tigerParseDriver;
 %left IF WHILE DO BREAK FOR LET ASSIGN
 %left THEN IN
 %left ELSE END_LET
-%left OR AND
+%left OR
+%left AND
 %left EQ NEQ LT LE GT GE
 %left MINUS PLUS
 %left TIMES DIVIDE
