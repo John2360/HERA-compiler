@@ -249,15 +249,15 @@ string A_field_::HERA_code() {
 string A_ifExp_::HERA_code()
 {
     string test_cond = _test->HERA_code() + "\nCMP(" + _test->result_reg_s() + ", R0)" + "\nBZ(" + this->branch_label_else() + ")\n";
-    string then_clause = "\nLABEL(" + this->branch_label_then() + ")\n" +  _then->HERA_code() + "\nMOVE(" + this->result_reg_s() + ", " + _then->result_reg_s() + ")\n" + "BR(" + this->branch_label_post() + ")\n";
+    string then_clause = "\nLABEL(" + this->branch_label_then() + ")\n" +  _then->HERA_code() + "\nMOVE(" + this->result_reg_s() + ", " + _then->result_reg_s() + ")\n" + "BR(" + this->branch_label_post_if() + ")\n";
 
     string else_clause = "\nLABEL(" + this->branch_label_else() + ")\n";
     if (_else_or_null != 0){
         else_clause += _else_or_null->HERA_code() + "\nMOVE(" + this->result_reg_s() + ", " + _else_or_null->result_reg_s() + ")\n";
     }
-    else_clause += "\nBR(" + this->branch_label_post() + ")\n";
+    else_clause += "\nBR(" + this->branch_label_post_if() + ")\n";
 
-    return test_cond + then_clause + else_clause + "LABEL(" + this->branch_label_post() + ")\n";
+    return test_cond + then_clause + else_clause + "LABEL(" + this->branch_label_post_if() + ")\n";
 }
 
 string A_whileExp_::HERA_code() {

@@ -975,7 +975,7 @@ public:
         do_init();
         return stored_else_label;
     }
-    string branch_label_post() {
+    string branch_label_post_if() {
         do_init();
         return stored_post_label;
     }
