@@ -116,6 +116,7 @@ Ty_ty A_condExp_::typecheck()
 
 Ty_ty A_ifExp_::typecheck()
 {
+    Ty_ty my_type = Ty_Void();
     if (_test->typecheck() != Ty_Bool()) {
         EM_error("Oops silly goose, if expression requires boolean", true);
         return Ty_Error();
@@ -126,9 +127,12 @@ Ty_ty A_ifExp_::typecheck()
                 EM_error("Oops silly goose, if requires then and else to be of the same type", true);
                 return Ty_Error();
             }
+
+            // only set type if has then because could be else null
+            my_type = _then->typecheck();
         }
 
-        return _then->typecheck();
+        return my_type;
     }
 }
 

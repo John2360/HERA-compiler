@@ -333,9 +333,10 @@ int A_forExp_::init_labels()
 int A_ifExp_::init_result_reg()
 {
     int else_reg_num = -1;
+    int test_reg = _test->result_reg();
     if (_else_or_null != 0) {else_reg_num = _else_or_null->result_reg();};
-    if (_then->result_reg() == else_reg_num) return _then->result_reg()+1;
-    return std::max(_then->result_reg(), else_reg_num);
+    if (_then->result_reg() == else_reg_num && test_reg == else_reg_num) return _then->result_reg()+1;
+    return std::max(_test->result_reg(), std::max(_then->result_reg(), else_reg_num));
 }
 
 int A_assignExp_::init_result_reg() {
