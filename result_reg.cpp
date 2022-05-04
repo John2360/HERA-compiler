@@ -345,7 +345,7 @@ int A_assignExp_::init_result_reg() {
 
 int A_whileExp_::init_result_reg()
 {
-    return _body->result_reg();
+    return std::max(_cond->result_reg(), _body->result_reg());
 }
 
 int A_breakExp_::init_result_reg(){
