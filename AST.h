@@ -276,6 +276,7 @@ public:
     virtual string branch_label_post() { return ""; };
     virtual bool skip_my_symbol_table() {return false;}
     virtual Ty_ty find_my_implicit(Symbol name){return Ty_Error();}
+    virtual bool null_input() {return false;}
 
     virtual int my_let_fp_plus(){
         return -1;
@@ -549,6 +550,7 @@ public:
 	A_nilExp_(A_pos p);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    virtual bool null_input() {return true;}
     int    result_reg() {
         if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
         return stored_result_reg;

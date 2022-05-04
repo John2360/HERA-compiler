@@ -184,7 +184,7 @@ Ty_ty A_callExp_::typecheck()
                 my_pointer_func_list = rest(my_pointer_func_list);
                 my_pointer_func = my_pointer_func->_tail;
             }
-        } else if (head(my_pointer_func_list) == Ty_Void() && _args->length() >= 1) {
+        } else if (head(my_pointer_func_list) == Ty_Void() && _args->length() >= 1 && !_args->_head->null_input()) {
             EM_error("Oops silly goose, the function should have no inputs", true);
             return Ty_Error();
         }
