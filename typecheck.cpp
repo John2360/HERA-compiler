@@ -221,28 +221,30 @@ Ty_ty A_simpleVar_::typecheck() {
 }
 
 Ty_ty A_decList_::typecheck() {
-    A_decList my_pointer = _tail;
-    A_dec my_node = _head;
 
-    while (true) {
+    _head->typecheck();
 
-        if (my_pointer->_tail == 0) break;
-        my_node = my_pointer->_head;
-        my_node->typecheck();
-        my_pointer = my_pointer->_tail;
-
-    }
-
+    if (_tail != 0) _tail->typecheck();
     return Ty_Void();
 }
 
 Ty_ty A_letExp_::typecheck(){
+    _decs->typecheck();
     return _body->typecheck();
 }
 
+//Ty_ty A_decList_::typecheck() {
+//    Ty_ty head_type = _head->typecheck();
+//
+//    if (_tail != 0) return _tail->typecheck();
+//    return head_type;
+//}
+
 Ty_ty A_varDec_::typecheck() {
-    if (from_String(str(_typ)) != _init->typecheck()) {EM_error("Oops silly goose, the declared type does not match variable type", true); return Ty_Error();}
-    return from_String(str(_typ));
+    Ty_ty my_type = _init->typecheck();
+    if (from_String(str(_typ)) != my_type && from_String(str(_typ)) != Ty_Nil()) {EM_error("Oops silly goose, the declared type does not match variable type", true); return Ty_Error();}
+    if (from_String(str(_typ)) != my_type) _typ = to_Symbol(from_Type(my_type));
+    return my_type;
 }
 
 Ty_ty A_assignExp_::typecheck() {
