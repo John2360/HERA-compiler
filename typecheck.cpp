@@ -123,6 +123,8 @@ Ty_ty A_ifExp_::typecheck()
     } else {
         // return children type and make sure have same type
         if (_else_or_null != 0) {
+            Ty_ty else_type = _else_or_null->typecheck();
+
             if (_then->typecheck() != _else_or_null->typecheck()) {
                 EM_error("Oops silly goose, if requires then and else to be of the same type", true);
                 return Ty_Error();
@@ -241,6 +243,11 @@ Ty_ty A_varDec_::typecheck() {
 }
 
 Ty_ty A_assignExp_::typecheck() {
+
+//    if (this->my_for_loop() == this->my_var_from_var()) {
+//        //idk what todo if this is true but it should check if decrementing by -1
+//    }
+
     return Ty_Void();
 }
 

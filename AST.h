@@ -290,6 +290,9 @@ public:
     virtual int get_bottom_fp(){
         return -1;
     }
+    virtual Symbol my_var_from_var() {return nullptr;}
+
+    virtual Symbol my_for_loop(){ return parent()->my_for_loop();};
 
     virtual function_type_info find_local_functions(Symbol name) {
         try {
@@ -482,6 +485,7 @@ public:
         return -1;
     }
 
+    virtual Symbol my_for_loop(){ return to_Symbol("!noforloop");};
 
     virtual Ty_ty typecheck();
 
@@ -561,6 +565,11 @@ public:
 
     virtual string HERA_code(){return "";}
     virtual string HERA_data(){return "";}
+
+    /* this could really screw up function type checking */
+    virtual Ty_ty typecheck(){
+        return Ty_Void();
+    }
 private:
     virtual int init_result_reg();
     int stored_result_reg = -1;
@@ -805,6 +814,7 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
+    virtual Symbol my_var_from_var();
 
     string HERA_code();
     string HERA_data();
@@ -1064,6 +1074,8 @@ public:
         return stored_post_label;
     }
 
+    virtual Symbol my_for_loop(){ return _var;};
+
     int    result_reg() {
         if (this->stored_result_reg < 0) this->stored_result_reg = this->init_result_reg();
         return stored_result_reg;
@@ -1206,6 +1218,7 @@ public:
     }
 
     int get_offest();
+    virtual Symbol my_var_from_var() {return _sym;}
 
     virtual string HERA_data();
     virtual string HERA_code();

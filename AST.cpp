@@ -491,5 +491,8 @@ A_arrayty_::A_arrayty_(A_pos pos, Symbol array) :  A_ty_(pos), _array(array)
 	precondition(array != 0);
 }
 
+Symbol A_assignExp_::my_var_from_var() {return _var->my_var_from_var();}
+
+
 bool have_AST_attrs = false;
 
