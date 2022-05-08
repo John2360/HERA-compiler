@@ -233,13 +233,6 @@ Ty_ty A_letExp_::typecheck(){
     return _body->typecheck();
 }
 
-//Ty_ty A_decList_::typecheck() {
-//    Ty_ty head_type = _head->typecheck();
-//
-//    if (_tail != 0) return _tail->typecheck();
-//    return head_type;
-//}
-
 Ty_ty A_varDec_::typecheck() {
     Ty_ty my_type = _init->typecheck();
     if (from_String(str(_typ)) != my_type && from_String(str(_typ)) != Ty_Nil()) {EM_error("Oops silly goose, the declared type does not match variable type", true); return Ty_Error();}

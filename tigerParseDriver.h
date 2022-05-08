@@ -29,6 +29,7 @@ struct funcListAttrs{
 struct fieldListAttrs {
     A_fieldList AST;
 };
+
 #include "tiger-grammar.tab.hpp"
 
 

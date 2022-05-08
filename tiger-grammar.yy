@@ -97,6 +97,8 @@ seq: exp[i]					{ $$.AST = $i.AST;
 }
 ;
 
+
+
 args: exp[i]					{
                                 string my_unique_id = str(A_NilExp(Position::undefined())->my_unique_num());
                                 $$.DEC = A_DecList( A_VarDec($i.AST->pos(),
@@ -151,6 +153,13 @@ let_dec: VAR ID[name] COLON ID[type] ASSIGN exp[seq1]			{ $$.AST = A_DecList(
                                             $seq1.AST), 0);
       								  EM_debug("Got single let dec", $$.AST->pos());
       								}
+    | VAR ID[name] ASSIGN exp[seq1]			{ $$.AST = A_DecList(
+                                        A_VarDec($seq1.AST->pos(),
+                                                  to_Symbol($name),
+                                                  to_Symbol("void"),
+                                                  $seq1.AST), 0);
+            								  EM_debug("Got single let dec", $$.AST->pos());
+            								}
     | VAR ID[name] COLON ID[type] ASSIGN exp[seq1] let_dec[decs]    {
                 $$.AST = A_DecList(
                       A_VarDec($seq1.AST->pos(),
@@ -159,6 +168,14 @@ let_dec: VAR ID[name] COLON ID[type] ASSIGN exp[seq1]			{ $$.AST = A_DecList(
                                 $seq1.AST), $decs.AST);
                           EM_debug("Got multiple let dec", $$.AST->pos());
                           }
+    | VAR ID[name] ASSIGN exp[seq1] let_dec[decs]    {
+                    $$.AST = A_DecList(
+                          A_VarDec($seq1.AST->pos(),
+                                    to_Symbol($name),
+                                    to_Symbol("void"),
+                                    $seq1.AST), $decs.AST);
+                              EM_debug("Got multiple let dec", $$.AST->pos());
+                              }
     | funcs_decs[funcs] let_dec[decs]  {
                     $$.AST = A_DecList(A_FunctionDec($funcs.AST->pos(), $funcs.AST), $decs.AST);
                     EM_debug("Got func dec followed by let dec", $$.AST->pos());
