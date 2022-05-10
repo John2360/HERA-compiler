@@ -207,6 +207,8 @@ Ty_ty A_forExp_::typecheck() {
         return Ty_Error();
     }
 
+    _body->typecheck();
+
     return Ty_Void();
 
 }
@@ -255,9 +257,9 @@ Ty_ty A_varDec_::typecheck() {
 
 Ty_ty A_assignExp_::typecheck() {
 
-//    if (this->my_for_loop() == this->my_var_from_var()) {
-//        //idk what todo if this is true but it should check if decrementing by -1
-//    }
+    if (str(this->my_for_loop()) == str(this->my_var_from_var())) {
+        EM_error("Oops, you are not allowed to reassign the iterator variable", true);
+    }
 
     return Ty_Void();
 }

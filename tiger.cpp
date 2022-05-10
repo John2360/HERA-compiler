@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -177,6 +179,14 @@ int main(int argc, char **argv)
 				String code = driver.AST->HERA_code() + "\n\nHALT()\n#include \"Tiger-stdlib-stack.hera\"\n";
 				if (! EM_recorded_any_errors()) {
 					cout << code;
+                    std::ofstream outfile;
+                    outfile.open("/Users/john/Documents/haverford/classes/Archive/Comp/Algorithms-HERA/HERA_main.cc");
+
+                    // Write to the file
+                    outfile << "#include <HERA.h>\n #include <HERA-print.h>\n\n void HERA_main()\n {\n" << code << "\n}";
+
+                    // Close the file
+                    outfile.close();
 					return 0; // no errors
 				}
 			}
