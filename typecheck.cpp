@@ -222,6 +222,17 @@ Ty_ty A_simpleVar_::typecheck() {
     return my_type;
 }
 
+Ty_ty A_functionDec_::typecheck() {
+    return theFunctions->typecheck();
+}
+
+Ty_ty A_fundecList_::typecheck() {
+    _head->typecheck();
+
+    if (_tail != 0) return _tail->typecheck();
+    return Ty_Void();
+}
+
 Ty_ty A_decList_::typecheck() {
 
     _head->typecheck();

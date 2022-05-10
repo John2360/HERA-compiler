@@ -1463,6 +1463,7 @@ public:
         return funcs_data_shell;
     }
     virtual int let_fp_plus_total();
+    virtual Ty_ty typecheck();
 
 private:
     bool is_funcs_init = false;
@@ -1570,6 +1571,8 @@ public:
 
     virtual string HERA_code();
     virtual string HERA_data();
+
+    virtual Ty_ty typecheck();
 private:
 	A_fundec _head;
 	A_fundecList _tail;
