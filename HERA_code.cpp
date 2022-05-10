@@ -334,6 +334,12 @@ string A_letExp_::HERA_code() {
 
     my_code += _decs->HERA_code();
     my_code += _body->HERA_code();
+
+    // rescure kludge
+    if (_decs->result_reg() > _body->result_reg()) {
+        my_code += "MOVE(R"+str(_decs->result_reg())+", R"+str(_body->result_reg())+")\n";
+    }
+
     if (dec_amount > 0) {
         my_code += "DEC(SP, " + str(dec_amount) + ")\n";
     }
@@ -357,10 +363,10 @@ string A_fundec_::HERA_code() {
 
     my_code += "BR("+this->branch_label_post()+")\n";
     my_code += "LABEL("+str(_name)+this->set_unique_id()+")\n";
-    my_code += "STORE(PC_ret, 0,FP)\nSTORE(FP_alt,1,FP)\n";
+    my_code += "STORE(PC_ret, 0, FP)\nSTORE(FP_alt, 1, FP)\n";
     my_code += _body->HERA_code();
-    my_code += "LOAD(PC_ret, 0,FP)\nLOAD(FP_alt,1,FP)\n";
-    my_code += "STORE("+_body->result_reg_s()+", 3, FP)\nRETURN(FP_alt, PC_ret)\n";
+    my_code += "STORE("+_body->result_reg_s()+", 3, FP)\nLOAD(PC_ret, 0, FP)\nLOAD(FP_alt, 1, FP)\n";
+    my_code += "RETURN(FP_alt, PC_ret)\n";
     my_code += "LABEL("+this->branch_label_post()+")\n\n";
 
     return my_code;
