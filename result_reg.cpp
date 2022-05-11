@@ -368,7 +368,7 @@ int A_simpleVar_::get_offest() {
 }
 
 local_variable_scope A_forExp_::init_local_variable(){
-    this->create_variable(_var, Ty_Int(), this->result_fp_plus());
+    this->create_variable(_var, Ty_Int(), this->result_fp_plus(), this->result_frames());
 
     return vars_data_shell;
 }
@@ -393,6 +393,7 @@ local_variable_scope A_letExp_::init_local_variable(){
 }
 
 local_variable_scope A_fundec_::init_local_variable(){
+    if (_params == 0) return local_variable_scope();
     return _params->my_local_variables();
 }
 
@@ -422,13 +423,13 @@ local_variable_scope A_fieldList_::init_local_variable(){
 
 local_variable_scope A_varDec_::init_local_variable(){
 //    if (str(_typ) == "unknown") {_typ = to_Symbol(from_Type(_init->typecheck()));};
-    this->create_variable(_var, from_String(str(_typ)), this->result_fp_plus());
+    this->create_variable(_var, from_String(str(_typ)), this->result_fp_plus(), this->result_frames());
 
     return vars_data_shell;
 }
 
 local_variable_scope A_field_::init_local_variable(){
-    this->create_variable(_name, from_String(str(_typ)), this->result_fp_plus());
+    this->create_variable(_name, from_String(str(_typ)), this->result_fp_plus(), this->result_frames());
 
     return vars_data_shell;
 }
@@ -500,4 +501,16 @@ int A_varDec_::let_fp_plus_total() {
 
 int A_functionDec_::let_fp_plus_total() {
     return 0;
+}
+
+int AST_node_::init_result_frames() {
+    return this->parent()->result_frames();
+}
+
+int A_exp_::init_result_frames() {
+    return this->parent()->result_frames();
+}
+
+int A_fundec_::init_result_frames() {
+    return this->parent()->result_frames()+1;
 }

@@ -312,7 +312,18 @@ string A_varExp_::HERA_code() {
 }
 
 string A_simpleVar_::HERA_code() {
-    int test = this->get_offest();
+    int var_frame = this->find_local_variables_frames(_sym, this->result_fp_plus());
+    if (this->result_frames() != var_frame) {
+        string my_code = "//load "+str(_sym)+" from mem (frame: "+str(var_frame)+")\n";
+
+        my_code += "LOAD(Rt, 2, FP)\n";
+        for (int i = 0; i < this->result_frames()-var_frame-1; i++) {
+            my_code += "LOAD(Rt, 2, Rt)\n";
+        }
+
+        my_code += "LOAD("+ this->result_reg_s()+", "+str(this->get_offest())+", Rt)\n";
+        return my_code;
+    }
     return "//load "+str(_sym)+" from mem\nLOAD("+ this->result_reg_s()+", "+str(this->get_offest())+", FP)\n";
 };
 
@@ -370,7 +381,6 @@ string A_fundec_::HERA_code() {
     my_code += "STORE(PC_ret, 0, FP)\nSTORE(FP_alt, 1, FP)\n";
 
     my_code += "//save registers \nINC(SP, "+str(save_these_regs)+")\n";
-    EM_debug(str(save_these_regs), false);
     for (int i = 1; i <= save_these_regs; i++) {
         my_code += "STORE(R"+str(i)+", "+str(2+number_of_params+i)+", FP)\n";
     }

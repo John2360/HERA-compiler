@@ -192,13 +192,15 @@ struct variable_type_info {
 public:
     variable_type_info(
             Ty_ty type,
-            int fp_plus
+            int fp_plus,
+            int frames
     );
     // leave data public, which is the default for 'struct'
     Ty_ty type;
     int fp_plus;
+    int frames;
 
-    string __repr__() {return "type: " + str(type) + "  fp_plus:" + str(fp_plus);};
+    string __repr__() {return "type: " + str(type) + "  fp_plus:" + str(fp_plus) + "  frames:" + str(frames);};
     string __str__()  { return this->__repr__(); }
 
 };
@@ -317,6 +319,20 @@ public:
         }
     }
 
+    virtual int find_local_variables_frames(Symbol name, int ceiling = 1000000000) {
+        try {
+            variable_type_info my_var = lookup(name, this->my_local_variables());
+
+            if (my_var.fp_plus <= ceiling){
+                return my_var.frames;
+            } else {
+                return parent()->find_local_variables_frames(name, ceiling);
+            }
+        } catch(const local_variable_scope::undefined_symbol &missing) {
+            return parent()->find_local_variables_frames(name, ceiling);
+        }
+    }
+
     virtual variable_type_info find_local_variables(Symbol name) {
         if (this->skip_my_symbol_table()) return parent()->find_local_variables(name);
         try {
@@ -366,8 +382,8 @@ public:
         return my_type;
     }
 
-    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus) {
-        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))), this->vars_data_shell);
+    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus, int frames) {
+        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus, frames))), this->vars_data_shell);
     };
 
     virtual int fp_plus_for_me(A_exp which_child){
@@ -378,6 +394,10 @@ public:
     }
     virtual int result_fp_plus(){
         return -1;
+    }
+    virtual int result_frames(){
+        if (this->stored_frames < 0) this->stored_frames = this->init_result_frames();
+        return this->stored_frames;
     }
 
     virtual int my_unique_num();
@@ -414,6 +434,9 @@ private:
     tiger_standard_library init_local_funcs();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
 
+    int init_result_frames();
+    int stored_frames = -1;
+
 
 };
 
@@ -447,6 +470,10 @@ public:
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
         return this->stored_fp_plus;
     }
+    virtual int result_frames(){
+        if (this->stored_frames < 0) this->stored_frames = this->init_result_frames();
+        return this->stored_frames;
+    }
 
     virtual Ty_ty typecheck(){
         return Ty_Nil();
@@ -469,6 +496,9 @@ private:
     int stored_regular_fp_plus = -1;
     int stored_result_fp_plus = -1;
 
+    virtual int init_result_frames();
+    int stored_frames = -1;
+
     local_variable_scope vars_data_shell = local_variable_scope();
 };
 
@@ -485,6 +515,10 @@ public:
         return -1;
     }
 
+    int result_frames() {
+        return 0;
+    }
+
     virtual Symbol my_for_loop(){ return to_Symbol("!noforloop");};
 
     virtual Ty_ty typecheck();
@@ -496,7 +530,7 @@ public:
             return my_var;
         } catch(const local_variable_scope::undefined_symbol &missing) {
             EM_error("Oops, the variable "+ str(name) +" was not found", true);
-            return variable_type_info(nullptr, -1);
+            return variable_type_info(nullptr, -1, -1);
         }
     }
 
@@ -516,6 +550,21 @@ public:
         }
     }
 
+    virtual int find_local_variables_frames(Symbol name, int ceiling = 10000000) {
+        try {
+            variable_type_info my_var = lookup(name, this->vars_data_shell);
+
+            if (this->result_fp_plus() <= ceiling){
+                return my_var.frames;
+            } else {
+                EM_error("Oops, the variable "+ str(name) +" was not found", true);
+                return 0;
+            }
+        } catch(const local_variable_scope::undefined_symbol &missing) {
+            EM_error("Oops, the variable "+ str(name) +" was not found", true);
+            return 0;
+        }
+    }
 
     virtual function_type_info find_local_functions(Symbol name) {
         try {
@@ -1095,8 +1144,8 @@ public:
         }
     }
 
-    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus) {
-        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))), this->vars_data_shell);
+    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus, int frames) {
+        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus, frames))), this->vars_data_shell);
     };
 
     virtual local_variable_scope my_local_variables(){
@@ -1403,8 +1452,8 @@ public:
         return this->stored_fp_plus;
     }
 
-    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus) {
-        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))), this->vars_data_shell);
+    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus, int frames) {
+        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus, frames))), this->vars_data_shell);
     };
 
     virtual local_variable_scope my_local_variables(){
@@ -1503,6 +1552,11 @@ public:
         return this->result_fp_plus();
     }
 
+    virtual int result_frames(){
+        if (this->stored_frames < 0) this->stored_frames = this->init_result_frames();
+        return this->stored_frames;
+    }
+
 
     virtual local_variable_scope my_local_variables(){
         if (!is_vars_init) {
@@ -1545,6 +1599,9 @@ private:
     string init_label_skip();
     int stored_fp_plus = -1;
     int init_result_fp_plus();
+
+    int init_result_frames();
+    int stored_frames = -1;
 
     bool is_vars_init = false;
     local_variable_scope init_local_variable();
@@ -1657,8 +1714,8 @@ public:
         return this->stored_fp_plus;
     }
 
-    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus) {
-        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus))), this->vars_data_shell);
+    virtual void create_variable(Symbol name, Ty_ty type, int fp_plus, int frames) {
+        vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus, frames))), this->vars_data_shell);
     };
 
     virtual local_variable_scope my_local_variables(){

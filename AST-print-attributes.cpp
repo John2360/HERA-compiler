@@ -14,6 +14,7 @@ String AST_node_::attributes_for_printing()
 		+ ("pos = "            + str(stored_pos)      + "; ")
         + ("vars= " +str(vars_data_shell) + "; ")
         + "my_fp() = " + str(this->result_fp_plus()) + "; "
+        + "my_frame() = " + str(this->result_frames()) + "; "
 		// concatenate any other attributes here for printing
 		);
 }
