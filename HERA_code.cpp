@@ -361,11 +361,29 @@ string A_varDec_::HERA_code(){
 string A_fundec_::HERA_code() {
     string my_code;
 
+    // save registers
+    int save_these_regs = _body->result_reg();
+    int number_of_params = length(this->type_field_list());
+
     my_code += "BR("+this->branch_label_post()+")\n";
     my_code += "LABEL("+str(_name)+this->set_unique_id()+")\n";
     my_code += "STORE(PC_ret, 0, FP)\nSTORE(FP_alt, 1, FP)\n";
+
+    my_code += "//save registers \nINC(SP, "+str(save_these_regs)+")\n";
+    EM_debug(str(save_these_regs), false);
+    for (int i = 1; i <= save_these_regs; i++) {
+        my_code += "STORE(R"+str(i)+", "+str(2+number_of_params+i)+", FP)\n";
+    }
+
     my_code += _body->HERA_code();
-    my_code += "STORE("+_body->result_reg_s()+", 3, FP)\nLOAD(PC_ret, 0, FP)\nLOAD(FP_alt, 1, FP)\n";
+    my_code += "STORE("+_body->result_reg_s()+", 3, FP)\n";
+
+    for (int i = 1; i <= save_these_regs; i++) {
+        my_code += "LOAD(R"+str(i)+", "+str(2+number_of_params+i)+", FP)\n";
+    }
+    my_code += "DEC(SP, "+str(save_these_regs)+")\n";
+
+    my_code += "LOAD(PC_ret, 0, FP)\nLOAD(FP_alt, 1, FP)\n";
     my_code += "RETURN(FP_alt, PC_ret)\n";
     my_code += "LABEL("+this->branch_label_post()+")\n\n";
 

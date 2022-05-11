@@ -449,9 +449,9 @@ HaverfordCS::list<Ty_ty> A_fundec_::type_field_list(){
 
 int A_fundec_::fp_plus_for_me(A_exp which_child) {
     if (which_child == _body && _params != 0){
-        return _params->get_bottom_fp();
+        return _params->get_bottom_fp()+length(this->type_field_list());
     } else {
-        return this->result_fp_plus();
+        return this->result_fp_plus()+length(this->type_field_list());
     }
 }
 
