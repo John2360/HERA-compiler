@@ -250,7 +250,7 @@ Ty_ty A_letExp_::typecheck(){
 
 Ty_ty A_varDec_::typecheck() {
     Ty_ty my_type = _init->typecheck();
-    if (from_String(str(_typ)) != my_type && from_String(str(_typ)) != Ty_Nil()) {EM_error("Oops silly goose, the declared type does not match variable type", true); return Ty_Error();}
+    if (from_String(str(_typ)) != my_type && from_String(str(_typ)) != Ty_Nil()) {EM_error("Oops silly goose, the declared type does not match variable type for "+str(_var), true); return Ty_Error();}
     if (from_String(str(_typ)) != my_type) _typ = to_Symbol(from_Type(my_type));
     return my_type;
 }

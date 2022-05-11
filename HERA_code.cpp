@@ -337,7 +337,19 @@ string A_assignExp_::HERA_code() {
 }
 
 string A_simpleVar_::HERA_assign() {
-    return "STORE(R"+str(parent()->result_reg())+", "+str(this->get_offest())+", FP)\n";
+    int var_frame = this->find_local_variables_frames(_sym, this->result_fp_plus());
+    if (this->result_frames() != var_frame) {
+        string my_code = "//assign "+str(_sym)+" from mem (frame: "+str(var_frame)+")\n";
+
+        my_code += "LOAD(Rt, 2, FP)\n";
+        for (int i = 0; i < this->result_frames()-var_frame-1; i++) {
+            my_code += "LOAD(Rt, 2, Rt)\n";
+        }
+        my_code += "STORE(R"+ str(parent()->result_reg())+", "+str(this->get_offest())+", Rt)\n";
+        return my_code;
+    }
+
+    return "//assign "+str(_sym)+"\n STORE(R"+str(parent()->result_reg())+", "+str(this->get_offest())+", FP)\n";
 }
 string A_letExp_::HERA_code() {
     string my_code;
