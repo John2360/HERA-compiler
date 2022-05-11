@@ -69,7 +69,8 @@ class tigerParseDriver;
 // The line below means our grammar must not have conflicts
 //  (no conflicts means it is "an LALR(1) grammar",
 //   meaning it must be unambiguous and have some other properties).
-%expect 1
+// The other conflict is from void funcs
+%expect 2
 
 // allowing one shift reduce in func_decs
 // func_decs wants to shift and reduce at the end of func_decs this means that by reducing we are chunking up the func_dec lists
@@ -139,11 +140,23 @@ $$.AST = A_FundecList(A_Fundec(Position::fromLex(@name), to_Symbol($name), $para
                                                                          );
                                                        EM_debug("Got single func dec", $$.AST->pos());
                 }
+             | FUNCTION ID[name] LPAREN funcdec_args[params] RPAREN EQ exp[seq1] {
+               $$.AST = A_FundecList(A_Fundec(Position::fromLex(@name), to_Symbol($name), $params.AST, to_Symbol("void"), $seq1.AST),
+                                                                                        0
+                                                                                        );
+                                                                      EM_debug("Got single func void dec", $$.AST->pos());
+                               }
+            | FUNCTION ID[name] LPAREN funcdec_args[params] RPAREN EQ exp[seq1] funcs_decs[funcs] { $$.AST = A_FundecList(A_Fundec(Position::fromLex(@name), to_Symbol($name), $params.AST, to_Symbol("void"), $seq1.AST),
+                                                                                                                  $funcs.AST
+                                                                                                                  );
+                                                                                                                  EM_debug("Got multi func dec", $$.AST->pos());
+                                                         }
              |  FUNCTION ID[name] LPAREN funcdec_args[params] RPAREN COLON ID[type] EQ exp[seq1] funcs_decs[funcs] { $$.AST = A_FundecList(A_Fundec(Position::fromLex(@name), to_Symbol($name), $params.AST, to_Symbol($type), $seq1.AST),
                                                                                         $funcs.AST
                                                                                         );
                                                                                         EM_debug("Got multi func dec", $$.AST->pos());
                                }
+
 ;
 
 let_dec: VAR ID[name] COLON ID[type] ASSIGN exp[seq1]			{ $$.AST = A_DecList(
