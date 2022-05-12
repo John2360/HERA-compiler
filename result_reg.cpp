@@ -131,7 +131,7 @@ int A_fundec_::init_result_fp_plus() {
 
 int A_decList_::init_result_fp_plus(){
     if (parent()->my_let_fp_plus() != -1) return this->parent()->my_let_fp_plus();
-//    if (parent()->carrys_func()) return this->parent()->result_fp_plus();
+    if (parent()->carrys_func()) return this->parent()->result_fp_plus();
 
     // added and is possible garbage
     if (this->carrys_func()) return this->parent()->result_fp_plus();
