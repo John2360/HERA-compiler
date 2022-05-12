@@ -1232,6 +1232,10 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
     virtual int init_result_reg();
 
     virtual string HERA_data();
@@ -1243,6 +1247,9 @@ public:
 private:
 	A_expList _seq;
     int stored_result_reg = -1;
+
+    int init_result_fp_plus();
+    int stored_fp_plus = -1;
 
 };
 
@@ -1507,6 +1514,11 @@ public:
 
     void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
+
     virtual string HERA_code();
     virtual string HERA_data();
 
@@ -1527,6 +1539,9 @@ private:
     bool is_funcs_init = false;
     tiger_standard_library init_local_functions();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
+
+    int init_result_fp_plus();
+    int stored_fp_plus = -1;
 
 	A_fundecList theFunctions;
 };

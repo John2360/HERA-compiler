@@ -97,6 +97,20 @@ int A_letExp_::init_result_fp_plus() {
     }
 }
 
+int A_seqExp_::init_result_fp_plus() {
+    int for_me = this->parent()->fp_plus_for_me(this);
+
+    if (for_me == -1){
+        return this->parent()->result_fp_plus();
+    } else {
+        return for_me;
+    }
+}
+
+int A_functionDec_::init_result_fp_plus() {
+    return this->parent()->result_fp_plus();
+}
+
 int A_letExp_::init_result_end_fp_plus() {
     return _decs->result_end_fp_plus();
 }
@@ -117,10 +131,10 @@ int A_fundec_::init_result_fp_plus() {
 
 int A_decList_::init_result_fp_plus(){
     if (parent()->my_let_fp_plus() != -1) return this->parent()->my_let_fp_plus();
-    if (parent()->carrys_func()) return this->parent()->result_fp_plus();
+//    if (parent()->carrys_func()) return this->parent()->result_fp_plus();
 
     // added and is possible garbage
-//    if (this->carrys_func()) return this->parent()->result_fp_plus();
+    if (this->carrys_func()) return this->parent()->result_fp_plus();
 
     return this->parent()->result_fp_plus()+1;
 }
