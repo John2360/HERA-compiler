@@ -393,7 +393,8 @@ public:
         return parent()->result_fp_plus();
     }
     virtual int result_fp_plus(){
-        return -1;
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
     }
     virtual int result_frames(){
         if (this->stored_frames < 0) this->stored_frames = this->init_result_frames();
@@ -436,6 +437,9 @@ private:
 
     int init_result_frames();
     int stored_frames = -1;
+
+    int init_result_fp_plus();
+    int stored_fp_plus = -1;
 
 
 };
@@ -512,6 +516,10 @@ public:
 	string print_rep(int indent, bool with_attributes);
 
     int regular_fp_plus() {
+        return -1;
+    }
+
+    int result_fp_plus() {
         return -1;
     }
 
