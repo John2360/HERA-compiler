@@ -115,7 +115,14 @@ int A_letExp_::init_result_end_fp_plus() {
     return _decs->result_end_fp_plus();
 }
 int A_decList_::init_result_end_fp_plus() {
-    if (_tail == 0) return _head->result_fp_plus();
+    // Do not allow last fp_plus to be a func
+    if (_tail == 0) {
+        if( _head->carrys_func()){
+            return parent()->result_fp_plus();
+        } else {
+            return _head->result_fp_plus();
+        }
+    };
     return _tail->result_end_fp_plus();
 }
 
@@ -131,10 +138,10 @@ int A_fundec_::init_result_fp_plus() {
 
 int A_decList_::init_result_fp_plus(){
     if (parent()->my_let_fp_plus() != -1) return this->parent()->my_let_fp_plus();
-//    if (parent()->carrys_func()) return this->parent()->result_fp_plus();
+    if (parent()->carrys_func()) return this->parent()->result_fp_plus();
 
     // added and is possible garbage
-    if (this->carrys_func()) return this->parent()->result_fp_plus();
+//    if (this->carrys_func()) return this->parent()->result_fp_plus();
 
     return this->parent()->result_fp_plus()+1;
 }

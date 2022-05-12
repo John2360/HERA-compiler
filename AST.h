@@ -908,6 +908,7 @@ public:
 
     int fp_plus_for_me(A_exp which_child) {
         if (which_child == _body){
+            EM_debug("my result end fp_plus "+str(this->result_end_fp_plus()), false);
             return this->result_end_fp_plus();
         } else {
             return this->result_fp_plus();
