@@ -117,7 +117,7 @@ int A_fundec_::init_result_fp_plus() {
 
 int A_decList_::init_result_fp_plus(){
     if (parent()->my_let_fp_plus() != -1) return this->parent()->my_let_fp_plus();
-    if (parent()->carrys_func()) return this->parent()->result_fp_plus();
+//    if (parent()->carrys_func()) return this->parent()->result_fp_plus();
 
     // added and is possible garbage
     if (this->carrys_func()) return this->parent()->result_fp_plus();
@@ -392,7 +392,7 @@ tiger_standard_library AST_node_::init_local_funcs(){
 }
 
 tiger_standard_library A_fundec_::init_local_funcs(){
-    this->create_function(_name, this->set_unique_id(), from_String(str(_result)), this->type_field_list());
+    this->create_function(_name, this->set_unique_id(), from_String(str(_result)), this->type_field_list(), this->result_frames());
 
     return funcs_data_shell;
 }

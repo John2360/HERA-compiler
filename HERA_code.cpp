@@ -165,7 +165,7 @@ string A_callExp_::HERA_code()
 
     int starting_frame_size = 3;
     int stack_pointer = starting_frame_size;
-    my_code += "MOVE(FP_alt, SP)\nINC(SP, "+str(_args->length()+starting_frame_size)+")\nSTORE(FP, 2, FP_alt)\n";
+    my_code += "MOVE(FP_alt, SP)\nINC(SP, "+str(_args->length()+starting_frame_size)+")\nSTORE(FP, "+str(my_func.frame)+", FP_alt)\n";
 
     A_expList my_pointer = _args;
     while (true) {

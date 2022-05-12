@@ -172,12 +172,14 @@ public:
     function_type_info(
             string unique_id,
             Ty_ty return_type,
-            HaverfordCS::list<Ty_ty> param_types
+            HaverfordCS::list<Ty_ty> param_types,
+            int frame
     );
     // leave data public, which is the default for 'struct'
     string unique_id;
     Ty_ty return_type;
     HaverfordCS::list<Ty_ty> param_types;
+    int frame;
 
 //    string __repr__();
 //    string __str__();
@@ -580,7 +582,7 @@ public:
             return my_func;
         } catch(const tiger_standard_library::undefined_symbol &missing) {
                EM_error("Oops, the function "+ str(name) +" was not found in scope", true);
-               return function_type_info("", nullptr, HaverfordCS::ez_list(Ty_Nil()));
+               return function_type_info("", nullptr, HaverfordCS::ez_list(Ty_Nil()), 0);
         }
     }
 
@@ -1545,8 +1547,8 @@ public:
 
     void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 
-    virtual void create_function(Symbol name, string unique_id, Ty_ty return_type, HaverfordCS::list<Ty_ty> param_types) {
-        funcs_data_shell = merge(tiger_standard_library(std::pair(name, function_type_info(unique_id, return_type, param_types))), this->funcs_data_shell);
+    virtual void create_function(Symbol name, string unique_id, Ty_ty return_type, HaverfordCS::list<Ty_ty> param_types, int frame) {
+        funcs_data_shell = merge(tiger_standard_library(std::pair(name, function_type_info(unique_id, return_type, param_types, frame))), this->funcs_data_shell);
     };
 
     int result_fp_plus(){
