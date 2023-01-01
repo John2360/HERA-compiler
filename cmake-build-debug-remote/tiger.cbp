@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="tiger"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="tiger">
+				<Option output="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/tiger" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote"/>
+					<Add directory="/tmp/tmp.18DAIcLDn9"/>
+					<Add directory="/home/courses/include"/>
+					<Add directory="/tmp/tmp.18DAIcLDn9/../HaverfordCS/include"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 tiger"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="tiger/fast">
+				<Option output="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/tiger" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote"/>
+					<Add directory="/tmp/tmp.18DAIcLDn9"/>
+					<Add directory="/home/courses/include"/>
+					<Add directory="/tmp/tmp.18DAIcLDn9/../HaverfordCS/include"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 tiger/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/AST-print-attributes.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/AST-print.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/AST.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/AST.h">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/HERA_code.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/HERA_data.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/ST-2024.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/ST-2024.h">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/tiger-grammar.tab.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/tiger-grammar.tab.cpp.rule">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/tiger-grammar.tab.hpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/tiger-lex.yy.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/cmake-build-debug-remote/tiger-lex.yy.cpp.rule">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/depth.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/errormsg.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/errormsg.h">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/height.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/layout_frames.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/parent.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/result_reg.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/static_checks.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/static_checks.h">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/tiger.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/tigerParseDriver.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/tigerParseDriver.h">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/typecheck.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/typecheck.h">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/types.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/types.h">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/util.cpp">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/util.h">
+			<Option target="tiger"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.18DAIcLDn9/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

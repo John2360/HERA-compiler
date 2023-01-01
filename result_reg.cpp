@@ -83,17 +83,11 @@ int A_varExp_::init_result_fp_plus() {
 }
 int A_letExp_::init_result_fp_plus() {
     int for_me = this->parent()->fp_plus_for_me(this);
-    int my_dec_amount = this->let_fp_plus_total();
-    int increment_stack = 0;
-
-    if (my_dec_amount > 0){
-        increment_stack += 1;
-    }
 
     if (for_me == -1){
-        return this->parent()->result_fp_plus()+increment_stack;
+        return this->parent()->result_fp_plus();
     } else {
-        return for_me+increment_stack;
+        return for_me;
     }
 }
 
@@ -108,7 +102,14 @@ int A_seqExp_::init_result_fp_plus() {
 }
 
 int A_functionDec_::init_result_fp_plus() {
-    return this->parent()->result_fp_plus();
+    return parent()->result_fp_plus();
+}
+
+int A_fundecList_::init_result_fp_plus() {
+//    int for_me = parent()->fp_plus_for_me(this);
+
+//    if (for_me != -1) return for_me;
+    return parent()->result_fp_plus();
 }
 
 int A_letExp_::init_result_end_fp_plus() {
@@ -132,18 +133,13 @@ int A_varDec_::init_result_fp_plus() {
 }
 
 int A_fundec_::init_result_fp_plus() {
-    //todo: after variables are created
-    return 3;
+    if (head(this->type_field_list()) == Ty_Void()) return 3;
+    return 3+length(this->type_field_list());
 }
 
 int A_decList_::init_result_fp_plus(){
-    if (parent()->my_let_fp_plus() != -1) return this->parent()->my_let_fp_plus();
-    if (parent()->carrys_func()) return this->parent()->result_fp_plus();
-
-    // added and is possible garbage
-//    if (this->carrys_func()) return this->parent()->result_fp_plus();
-
-    return this->parent()->result_fp_plus()+1;
+    if (_head->carrys_func()) return parent()->result_fp_plus();
+    return parent()->result_fp_plus()+1;
 }
 
 int A_fieldList_::init_result_fp_plus(){
@@ -413,8 +409,17 @@ tiger_standard_library AST_node_::init_local_funcs(){
 }
 
 tiger_standard_library A_fundec_::init_local_funcs(){
-    this->create_function(_name, this->set_unique_id(), from_String(str(_result)), this->type_field_list(), this->result_frames());
+    if (!is_funcs_init) {
+        int static_link = this->result_where_stack()-this->result_fp_plus();
+        if (static_link == -1) static_link += 1;
+        this->create_function(_name, this->set_unique_id(), from_String(str(_result)), this->type_field_list(),
+                              static_link, this->result_frames());
 
+        EM_debug(str(_name) + " " + str(static_link), false);
+        EM_debug(str(_name) + " - where stack: " + str(this->result_where_stack()), false);
+        EM_debug(str(_name) + " " + str(this->result_frames()*3-3), false);
+        is_funcs_init = true;
+    }
     return funcs_data_shell;
 }
 
@@ -480,8 +485,10 @@ HaverfordCS::list<Ty_ty> A_fundec_::type_field_list(){
 
 int A_fundec_::fp_plus_for_me(A_exp which_child) {
     if (which_child == _body && _params != 0){
+        if (head(this->type_field_list()) == Ty_Void()) return _params->get_bottom_fp();
         return _params->get_bottom_fp()+length(this->type_field_list());
     } else {
+        if (head(this->type_field_list()) == Ty_Void()) return this->result_fp_plus();
         return this->result_fp_plus()+length(this->type_field_list());
     }
 }
@@ -543,4 +550,24 @@ int A_exp_::init_result_frames() {
 
 int A_fundec_::init_result_frames() {
     return this->parent()->result_frames()+1;
+}
+
+int AST_node_::init_result_where_stack(){
+    return this->parent()->result_where_stack();
+}
+
+int A_varDec_::init_result_where_stack(){
+    return this->parent()->result_where_stack()+1;
+}
+
+int A_letExp_::init_result_where_stack(){
+    return this->parent()->result_where_stack();
+}
+
+int A_fundec_::init_result_where_stack(){
+    return this->parent()->result_where_stack()+this->result_fp_plus()+this->_body->result_reg();
+}
+
+bool A_fieldList_::null_input() {
+    return _head->null_input();
 }

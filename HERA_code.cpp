@@ -165,10 +165,13 @@ string A_callExp_::HERA_code()
 
     int starting_frame_size = 3;
     int stack_pointer = starting_frame_size;
-    my_code += "MOVE(FP_alt, SP)\nINC(SP, "+str(_args->length()+starting_frame_size)+")\nSTORE(FP, "+str(my_func.frame)+", FP_alt)\n";
+
+    int increment_size = starting_frame_size;
+    if (!_args->_head->null_input()) increment_size = increment_size+_args->length();
+    my_code += "MOVE(FP_alt, SP)\nINC(SP, "+str(increment_size)+")\n//set static link for "+str(_func)+" \nSET("+this->result_reg_s()+", "+str(my_func.fp)+")\nSTORE("+this->result_reg_s()+", 2, FP_alt)\n";
 
     A_expList my_pointer = _args;
-    while (true) {
+    while (true && !_args->_head->null_input()) {
 
         my_code += my_pointer->_head->HERA_code();
         my_code += "STORE("+my_pointer->_head->result_reg_s()+", "+str(stack_pointer)+", FP_alt) \n";
@@ -386,7 +389,8 @@ string A_fundec_::HERA_code() {
 
     // save registers
     int save_these_regs = _body->result_reg();
-    int number_of_params = length(this->type_field_list());
+    int number_of_params = 0;
+    if (head(this->type_field_list()) != Ty_Void()) number_of_params = length(this->type_field_list());
 
     my_code += "BR("+this->branch_label_post()+")\n";
     my_code += "LABEL("+str(_name)+this->set_unique_id()+")\n";

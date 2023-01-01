@@ -15,35 +15,35 @@
 // To run the examples, use the command
 //	g++ -std=c++0x -I/home/courses/include -D AST_EXAMPLES_IS_MAIN=1 -D ERRORMSG_SKIP_LEX=1 AST.cc AST-print.cc AST-print-attributes.cc HERA_code.cc result_reg.cc util.cc errormsg.cc -L/home/courses/lib -lcourses -o AST_examples && ./AST_examples
 
-function_type_info::function_type_info(string the_unique_id, Ty_ty the_return_type,  HaverfordCS::list<Ty_ty> the_param_types, int the_frame) : unique_id(the_unique_id), return_type(the_return_type), param_types(the_param_types), frame(the_frame) {};
+function_type_info::function_type_info(string the_unique_id, Ty_ty the_return_type,  HaverfordCS::list<Ty_ty> the_param_types, int the_fp, int the_frame) : unique_id(the_unique_id), return_type(the_return_type), param_types(the_param_types), fp(the_fp), frame(the_frame) {};
 variable_type_info::variable_type_info(Ty_ty the_type, int the_fp_plus, int the_frames) : type(the_type), fp_plus(the_fp_plus), frames(the_frames) {};
 
 tiger_standard_library data_shell =
         tiger_standard_library({
-               std::pair(to_Symbol("ord"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_String()), 0)),
-               std::pair(to_Symbol("chr"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_Int()), 0)),
-               std::pair(to_Symbol("size"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_String()), 0)),
-               std::pair(to_Symbol("substring"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_String(), Ty_Int(), Ty_Int()), 0)),
-               std::pair(to_Symbol("concat"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_String(), Ty_String()), 0)),
-               std::pair(to_Symbol("tstrcmp"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_String(), Ty_String()), 0)),
-               std::pair(to_Symbol("div"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Int(), Ty_Int()), 0)),
-               std::pair(to_Symbol("mod"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Int(), Ty_Int()), 0)),
-               std::pair(to_Symbol("not"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Int()), 0)),
-               std::pair(to_Symbol("getchar_ord"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Void()), 0)),
-               std::pair(to_Symbol("putchar_ord"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Int()), 0)),
-               std::pair(to_Symbol("flush"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Void()), 0)),
-               std::pair(to_Symbol("print"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_String()), 0)),
-               std::pair(to_Symbol("println"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_String()), 0)),
-               std::pair(to_Symbol("printint"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Int()), 0)),
-               std::pair(to_Symbol("printbool"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Bool()), 0)),
-               std::pair(to_Symbol("getchar"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_Void()), 0)),
-               std::pair(to_Symbol("ungetchar"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Void()), 0)),
-               std::pair(to_Symbol("getline"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_Void()), 0)),
-               std::pair(to_Symbol("getint"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Void()), 0)),
-               std::pair(to_Symbol("exit"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Int()), 0)),
-               std::pair(to_Symbol("malloc"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Int()), 0)),
-               std::pair(to_Symbol("free"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Int()), 0)),
-                               });
+               std::pair(to_Symbol("ord"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_String()), 0, 0)),
+               std::pair(to_Symbol("chr"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_Int()), 0, 0)),
+               std::pair(to_Symbol("size"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_String()), 0, 0)),
+               std::pair(to_Symbol("substring"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_String(), Ty_Int(), Ty_Int()), 0, 0)),
+               std::pair(to_Symbol("concat"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_String(), Ty_String()), 0, 0)),
+               std::pair(to_Symbol("tstrcmp"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_String(), Ty_String()), 0, 0)),
+               std::pair(to_Symbol("div"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Int(), Ty_Int()), 0, 0)),
+               std::pair(to_Symbol("mod"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Int(), Ty_Int()), 0, 0)),
+               std::pair(to_Symbol("not"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Int()), 0, 0)),
+               std::pair(to_Symbol("getchar_ord"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Void()), 0, 0)),
+               std::pair(to_Symbol("putchar_ord"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Int()), 0, 0)),
+               std::pair(to_Symbol("flush"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Void()), 0, 0)),
+               std::pair(to_Symbol("print"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_String()), 0, 0)),
+               std::pair(to_Symbol("println"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_String()), 0, 0)),
+               std::pair(to_Symbol("printint"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Int()), 0, 0)),
+               std::pair(to_Symbol("printbool"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Bool()), 0, 0)),
+               std::pair(to_Symbol("getchar"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_Void()), 0, 0)),
+               std::pair(to_Symbol("ungetchar"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Void()), 0, 0)),
+               std::pair(to_Symbol("getline"), function_type_info("", Ty_String(), HaverfordCS::ez_list(Ty_Void()), 0, 0)),
+               std::pair(to_Symbol("getint"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Void()), 0, 0)),
+               std::pair(to_Symbol("exit"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Int()), 0, 0)),
+               std::pair(to_Symbol("malloc"), function_type_info("", Ty_Int(), HaverfordCS::ez_list(Ty_Int()), 0, 0)),
+               std::pair(to_Symbol("free"), function_type_info("", Ty_Void(), HaverfordCS::ez_list(Ty_Int()), 0, 0)),
+       });
 
 void AST_examples()
 {

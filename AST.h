@@ -173,12 +173,14 @@ public:
             string unique_id,
             Ty_ty return_type,
             HaverfordCS::list<Ty_ty> param_types,
+            int fp,
             int frame
     );
     // leave data public, which is the default for 'struct'
     string unique_id;
     Ty_ty return_type;
     HaverfordCS::list<Ty_ty> param_types;
+    int fp;
     int frame;
 
 //    string __repr__();
@@ -282,9 +284,6 @@ public:
     virtual Ty_ty find_my_implicit(Symbol name){return Ty_Error();}
     virtual bool null_input() {return false;}
 
-    virtual int my_let_fp_plus(){
-        return -1;
-    }
     virtual bool carrys_func(){
         return false;
     }
@@ -294,6 +293,11 @@ public:
     virtual int get_bottom_fp(){
         return -1;
     }
+    virtual int result_where_stack(){
+        if (this->stored_where_stack < 0) this->stored_where_stack = this->init_result_where_stack();
+        return this->stored_where_stack;
+    }
+
     virtual Symbol my_var_from_var() {return nullptr;}
 
     virtual Symbol my_for_loop(){ return parent()->my_for_loop();};
@@ -391,6 +395,12 @@ public:
     virtual int fp_plus_for_me(A_exp which_child){
         return -1;
     };
+    virtual int fp_plus_for_me(A_fundec which_child){
+        return -1;
+    };
+    virtual int fp_plus_for_me(A_fundecList which_child){
+        return -1;
+    };
     virtual int regular_fp_plus(){
         return parent()->result_fp_plus();
     }
@@ -414,6 +424,10 @@ public:
 
     virtual int my_let_num(){
         return parent()->my_let_num();
+    }
+
+    virtual int my_let_fp_plus(){
+        return this->parent()->my_let_fp_plus();
     }
 
 
@@ -441,6 +455,9 @@ private:
 
     int init_result_fp_plus();
     int stored_fp_plus = -1;
+
+    int init_result_where_stack();
+    int stored_where_stack = -1;
 
 
 };
@@ -528,6 +545,18 @@ public:
         return 0;
     }
 
+    virtual int decs_before_me(){
+        return 0;
+    }
+
+    virtual int get_let_link_fp_plus(){
+        return 0;
+    }
+
+    virtual int result_where_stack(){
+        return 0;
+    }
+
     virtual Symbol my_for_loop(){ return to_Symbol("!noforloop");};
 
     virtual Ty_ty typecheck();
@@ -581,7 +610,7 @@ public:
             return my_func;
         } catch(const tiger_standard_library::undefined_symbol &missing) {
                EM_error("Oops, the function "+ str(name) +" was not found in scope", true);
-               return function_type_info("", nullptr, HaverfordCS::ez_list(Ty_Nil()), 0);
+               return function_type_info("", nullptr, HaverfordCS::ez_list(Ty_Nil()), 0, 0);
         }
     }
 
@@ -900,6 +929,14 @@ public:
     string result_reg_s() { // return in string form, e.g. "R2"
         return "R" + std::to_string(this->result_reg());
     }
+    virtual int result_where_stack(){
+        if (this->stored_where_stack < 0) this->stored_where_stack = this->init_result_where_stack();
+        return this->stored_where_stack;
+    }
+
+    virtual int my_let_fp_plus() {
+        return this->result_fp_plus();
+    }
 
     // this might be trouble
     virtual int regular_fp_plus(){
@@ -908,7 +945,6 @@ public:
 
     int fp_plus_for_me(A_exp which_child) {
         if (which_child == _body){
-            EM_debug("my result end fp_plus "+str(this->result_end_fp_plus()), false);
             return this->result_end_fp_plus();
         } else {
             return this->result_fp_plus();
@@ -917,10 +953,6 @@ public:
     virtual int result_fp_plus(){
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
         return this->stored_fp_plus;
-    }
-
-    virtual int my_let_fp_plus(){
-        return this->result_fp_plus();
     }
 
     virtual int result_end_fp_plus(){
@@ -964,6 +996,9 @@ private:
 
     int init_result_end_fp_plus();
     int stored_end_fp_plus = -1;
+
+    int stored_where_stack = -1;
+    int init_result_where_stack();
 
     bool is_vars_init = false;
     bool is_funcs_init = false;
@@ -1408,6 +1443,19 @@ public:
         return _head->carrys_func();
     }
 
+    virtual int number_of_var_decs(){
+        if (!this->carrys_func() && _tail != 0) {
+            return _tail->number_of_var_decs()+1;
+        } else if (this->carrys_func() && _tail != 0) {
+            return _tail->number_of_var_decs();
+        } else if (!this->carrys_func() && _tail == 0) {
+            return 1;
+        } else if (this->carrys_func() && _tail == 0) {
+            return 0;
+        }
+        return 0;
+    }
+
     local_variable_scope virtual my_local_variables(){
         if (!is_vars_init) {
             vars_data_shell = this->init_local_variable();
@@ -1469,6 +1517,12 @@ public:
         return this->stored_fp_plus;
     }
 
+    virtual int result_where_stack(){
+        if (this->stored_where_stack < 0) this->stored_where_stack = this->init_result_where_stack();
+        return this->stored_where_stack;
+    }
+
+
     virtual void create_variable(Symbol name, Ty_ty type, int fp_plus, int frames) {
         vars_data_shell = merge(local_variable_scope(std::pair(name, variable_type_info(type, fp_plus, frames))), this->vars_data_shell);
     };
@@ -1496,6 +1550,8 @@ private:
     int init_result_reg();
     int stored_fp_plus = -1;
     int init_result_fp_plus();
+    int stored_where_stack = -1;
+    int init_result_where_stack();
 
     bool is_vars_init = false;
     local_variable_scope init_local_variable();
@@ -1562,13 +1618,18 @@ public:
 
     void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 
-    virtual void create_function(Symbol name, string unique_id, Ty_ty return_type, HaverfordCS::list<Ty_ty> param_types, int frame) {
-        funcs_data_shell = merge(tiger_standard_library(std::pair(name, function_type_info(unique_id, return_type, param_types, frame))), this->funcs_data_shell);
+    virtual void create_function(Symbol name, string unique_id, Ty_ty return_type, HaverfordCS::list<Ty_ty> param_types, int fp, int frame) {
+        funcs_data_shell = merge(tiger_standard_library(std::pair(name, function_type_info(unique_id, return_type, param_types, fp, frame))), this->funcs_data_shell);
     };
 
     int result_fp_plus(){
         if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
         return this->stored_fp_plus;
+    }
+
+    virtual int result_where_stack(){
+        if (this->stored_where_stack < 0) this->stored_where_stack = this->init_result_where_stack();
+        return this->stored_where_stack;
     }
 
     int fp_plus_for_me(A_exp which_child);
@@ -1581,7 +1642,6 @@ public:
         if (this->stored_frames < 0) this->stored_frames = this->init_result_frames();
         return this->stored_frames;
     }
-
 
     virtual local_variable_scope my_local_variables(){
         if (!is_vars_init) {
@@ -1620,6 +1680,8 @@ private:
 	A_exp _body;
     string _unique_id;
 
+    int stored_where_stack = -1;
+    int init_result_where_stack();
     string stored_skip_label = "";
     string init_label_skip();
     int stored_fp_plus = -1;
@@ -1642,6 +1704,19 @@ public:
 	A_fundecList_(A_fundec head, A_fundecList tail);
 	virtual string print_rep(int indent, bool with_attributes);
 
+    int fp_plus_for_me(A_fundecList which_child){
+        if (which_child == _tail) return this->result_fp_plus()+_head->result_fp_plus();
+    }
+
+    int fp_plus_for_me(A_fundec which_child){
+        if (which_child == _head) return this->result_fp_plus();;
+    }
+
+    int result_fp_plus(){
+        if (this->stored_fp_plus < 0) this->stored_fp_plus = this->init_result_fp_plus();
+        return this->stored_fp_plus;
+    }
+
     void set_parent_pointers_for_me_and_my_descendants(AST_node_ *my_parent);
 
     tiger_standard_library virtual my_local_functions(){
@@ -1662,6 +1737,9 @@ private:
     bool is_funcs_init = false;
     tiger_standard_library init_local_functions();
     tiger_standard_library funcs_data_shell = tiger_standard_library();
+
+    int stored_fp_plus = -1;
+    int init_result_fp_plus();
 };
 
 
@@ -1711,6 +1789,8 @@ public:
         if(_tail == 0) return this->result_fp_plus();
         return _tail->result_fp_plus();
     }
+
+    bool null_input();
 
     virtual string HERA_code();
     virtual string HERA_data();
